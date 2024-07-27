@@ -118,6 +118,16 @@ const config: HardhatUserConfig = {
       url: "https://sepolia.publicgoods.network",
       accounts: [deployerPrivateKey],
     },
+    shibarium: {
+      url: "https://rpc.shibrpc.com", 
+      accounts: [deployerPrivateKey],
+      chainId: 157,
+    },
+    crossfi: {
+      url: "https://rpc.testnet.ms",
+      accounts: [deployerPrivateKey],
+      chainId: 4157,
+    },
   },
   // configuration for harhdat-verify plugin
   etherscan: {
