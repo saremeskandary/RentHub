@@ -44,7 +44,11 @@ contract RentalAgreement is ReentrancyGuard {
         require(rental.isActive, "Rental not active");
 
         rental.isActive = false;
-        payable(rental.owner).transfer(rental.price);
+        address owner = rental.owner;
+        uint256 price = rental.price;
+
+        (bool success, ) = owner.call{value: price}("");
+        require(success, "Failed to transfer funds");
 
         emit RentalEnded(_rentalId);
     }
