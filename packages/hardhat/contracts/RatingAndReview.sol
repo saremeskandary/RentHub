@@ -35,14 +35,13 @@ contract RatingAndReview {
     }
 
     function getAverageRating(address _user) external view returns (uint8) {
-        Review[] memory reviews = userReviews[_user];
-        if (reviews.length == 0) return 0;
-
         uint256 totalRating = 0;
-        for (uint i = 0; i < reviews.length; i++) {
-            totalRating += reviews[i].rating;
+        uint256 reviewCount = userReviews[_user].length;
+
+        for (uint i = 0; i < reviewCount; i++) {
+            totalRating += userReviews[_user][i].rating;
         }
 
-        return uint8(totalRating / reviews.length);
+        return reviewCount == 0 ? 0 : uint8(totalRating / reviewCount);
     }
 }
