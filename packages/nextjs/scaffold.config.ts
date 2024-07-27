@@ -1,4 +1,16 @@
 import * as chains from "viem/chains";
+import { defineChain } from "viem";
+
+// TODO test it works
+export const crossfi = defineChain({
+  id: 4157,
+  name: "CrossFi Testnet Chain",
+  nativeCurrency: { name: "XFI", symbol: "XFI", decimals: 18 },
+  rpcUrls: { default: { http: ["https://rpc.testnet.ms"] } },
+  blockExplorers: {
+    default: { name: "CrossFi Explorer", url: "https://scan.testnet.ms" },
+  },
+});
 
 export type ScaffoldConfig = {
   targetNetworks: readonly chains.Chain[];
@@ -8,9 +20,15 @@ export type ScaffoldConfig = {
   onlyLocalBurnerWallet: boolean;
 };
 
+
 const scaffoldConfig = {
   // The networks on which your DApp is live
-  targetNetworks: [chains.hardhat],
+   targetNetworks: [
+    chains.hardhat,
+    chains.mainnet,
+    chains.shibarium,
+    crossfi
+  ],
 
   // The interval at which your front-end polls the RPC servers for new data
   // it has no effect if you only target the local network (default is 4000)
