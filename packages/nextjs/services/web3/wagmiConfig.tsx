@@ -5,7 +5,10 @@ import { createConfig } from "wagmi";
 import scaffoldConfig from "~~/scaffold.config";
 import { getAlchemyHttpUrl } from "~~/utils/scaffold-eth";
 
+
 const { targetNetworks } = scaffoldConfig;
+
+// TODO Ensure that your wagmi.config.ts file includes the new networks:
 
 // We always want to have mainnet enabled (ENS resolution, ETH price, etc). But only once.
 export const enabledChains = targetNetworks.find((network: Chain) => network.id === 1)
