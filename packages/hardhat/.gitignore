@@ -25,3 +25,30 @@ deployments/localhost
 
 # other
 temp
+
+node_modules
+.env
+coverage
+coverage.json
+typechain
+typechain-types
+temp
+
+#Hardhat files
+cache
+artifacts
+
+deployments
+
+#Foundry files
+# Compiler files
+out/
+forge-cache
+
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
