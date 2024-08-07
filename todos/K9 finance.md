@@ -77,7 +77,11 @@ This todo list covers the main requirements of the bounty while building upon yo
 
 ---
 
-test deployment
+# Datas
+
+## test deployment storage sample contract
+
+https://docs.shib.io/docs/shibarium/build/build-on-shibarium
 
 Deploying contracts with the account: 0x6a3131C7A9228C7953e79d903c4fB8161AB4521E
 SimpleStorage deployed to: 0xc510984C0084bC914aEE674afee6Cf43144CA08d
