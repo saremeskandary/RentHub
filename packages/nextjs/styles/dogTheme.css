@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* :root {
   --color-brand-100: #FFF8E1;
   --color-brand-200: #FFE082;
   --color-brand-300: #FFC107;
@@ -22,4 +22,4 @@ p, span, div {
   @apply font-body;
 }
 
-/* Add any custom components or overrides here */
+Add any custom components or overrides here */
