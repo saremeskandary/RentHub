@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @title RevenueSharing
  * @dev This contract manages the distribution of revenue, allowing the owner to set a platform fee and a K9 Finance DAO fee.
  */
-contract RevenueSharing is Ownable {
+contract a is Ownable {
 	uint256 public platformFee = 50; // 5% platform fee
 	uint256 public k9FinanceDAOFee = 25; // 2.5% K9 Finance DAO fee
 	uint256 public constant DENOMINATOR = 1000;
