@@ -64,4 +64,4 @@ Based on the CrossFi bounty requirements, here's a todo list to adapt your RentH
     - Design the system to handle potential growth on CrossFi Chain
     - Implement sharding or other scalability solutions if necessary
 
-Remember to prioritize the features that align most closely with the bounty requirements, especially those that boost XFI utility and leverage CrossFi's unique architecture. Focus on creating a functional MVP that demonstrates the potential of RentHub on CrossFi Chain.
+on hold 
