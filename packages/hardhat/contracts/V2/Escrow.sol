@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Escrow {
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract Escrow is ReentrancyGuard {
     mapping(uint256 => uint256) public lockedFunds;
     mapping(uint256 => address) public fundOwners;
 
@@ -19,7 +21,7 @@ contract Escrow {
         emit FundsLocked(_agreementId, _amount, msg.sender);
     }
 
-    function releaseFunds(uint256 _agreementId) external {
+    function releaseFunds(uint256 _agreementId, address _recipient) external nonReentrant  {
         require(lockedFunds[_agreementId] > 0, "No funds to release");
         require(msg.sender == fundOwners[_agreementId], "Not authorized");
 
@@ -27,12 +29,12 @@ contract Escrow {
         lockedFunds[_agreementId] = 0;
 
         // Logic to transfer funds to the owner would be implemented here
-        payable(msg.sender).transfer(amount);
+        payable(_recipient).transfer(amount);
 
-        emit FundsReleased(_agreementId, amount, msg.sender);
+        emit FundsReleased(_agreementId, amount, _recipient);
     }
 
-    function refundDeposit(uint256 _agreementId) external {
+    function refundDeposit(uint256 _agreementId, address _recipient) external nonReentrant  {
         require(lockedFunds[_agreementId] > 0, "No funds to refund");
         require(msg.sender == fundOwners[_agreementId], "Not authorized");
 
@@ -40,9 +42,9 @@ contract Escrow {
         lockedFunds[_agreementId] = 0;
 
         // Logic to refund deposit to renter would be implemented here
-        payable(msg.sender).transfer(amount);
+        payable(_recipient).transfer(amount);
 
-        emit DepositRefunded(_agreementId, amount, msg.sender);
+        emit DepositRefunded(_agreementId, amount, _recipient);
     }
 
     // Allow the contract to receive payments

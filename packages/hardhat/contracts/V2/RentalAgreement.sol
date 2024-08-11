@@ -29,6 +29,18 @@ interface IDisputeResolution {
 	function initiateDispute(uint256 _agreementId) external;
 }
 
+interface ISocialFi {
+	function rewardUser(address _user, uint256 _amount) external;
+}
+
+interface IMonetization {
+	function distributeRevenue(uint256 _agreementId, uint256 _amount) external;
+}
+
+interface IUserIdentity {
+	function isVerifiedUser(address _user) external view returns (bool);
+}
+
 contract RentalAgreement is ReentrancyGuard, Ownable {
 	struct Agreement {
 		address owner;
@@ -48,6 +60,9 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 	address public inspectionContract;
 	address public reputationContract;
 	address public disputeResolutionContract;
+	address public socialFiContract;
+	address public monetizationContract;
+	address public userIdentityContract;
 
 	event AgreementCreated(uint256 agreementId, address owner, address renter);
 	event AgreementCompleted(uint256 agreementId);
@@ -59,12 +74,26 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		address _escrowContract,
 		address _inspectionContract,
 		address _reputationContract,
-		address _disputeResolutionContract
+		address _disputeResolutionContract,
+		address _socialFiContract,
+		address _monetizationContract,
+		address _userIdentityContract
 	) {
 		escrowContract = _escrowContract;
 		inspectionContract = _inspectionContract;
 		reputationContract = _reputationContract;
 		disputeResolutionContract = _disputeResolutionContract;
+		socialFiContract = _socialFiContract;
+		monetizationContract = _monetizationContract;
+		userIdentityContract = _userIdentityContract;
+	}
+
+	modifier onlyVerifiedUser(address _user) {
+		require(
+			IUserIdentity(userIdentityContract).isVerifiedUser(_user),
+			"User not verified"
+		);
+		_;
 	}
 
 	function createAgreement(
@@ -72,7 +101,13 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		uint256 _rentalPeriod,
 		uint256 _cost,
 		uint256 _deposit
-	) external nonReentrant returns (uint256) {
+	)
+		external
+		nonReentrant
+		onlyVerifiedUser(msg.sender)
+		onlyVerifiedUser(_renter)
+		returns (uint256)
+	{
 		agreementCounter++;
 		agreements[agreementCounter] = Agreement({
 			owner: msg.sender,
@@ -117,6 +152,18 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 
 		agreement.isActive = false;
 		agreement.isCompleted = true;
+
+		// require(agreement.isActive == false, "agreement is active"); FIXME do we need this when we have nonReentrant?
+		// require(agreement.isCompleted == true, "agreement is not completed"); FIXME do we need this when we have nonReentrant?
+		// Reward users via SocialFi contract
+		ISocialFi(socialFiContract).rewardUser(agreement.owner, 100); // Example reward
+		ISocialFi(socialFiContract).rewardUser(agreement.renter, 100);
+
+		// Distribute revenue via Monetization contract
+		IMonetization(monetizationContract).distributeRevenue(
+			_agreementId,
+			agreement.cost
+		);
 
 		emit AgreementCompleted(_agreementId);
 
@@ -198,5 +245,23 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		address _disputeResolutionContract
 	) external onlyOwner {
 		disputeResolutionContract = _disputeResolutionContract;
+	}
+
+	function updateSocialFiContract(
+		address _socialFiContract
+	) external onlyOwner {
+		socialFiContract = _socialFiContract;
+	}
+
+	function updateMonetizationContract(
+		address _monetizationContract
+	) external onlyOwner {
+		monetizationContract = _monetizationContract;
+	}
+
+	function updateUserIdentityContract(
+		address _userIdentityContract
+	) external onlyOwner {
+		userIdentityContract = _userIdentityContract;
 	}
 }
