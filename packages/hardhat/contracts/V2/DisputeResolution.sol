@@ -25,7 +25,13 @@ contract DisputeResolution {
 
 		emit DisputeResolved(_agreementId, _resolvedInFavorOfOwner);
 
-		// Logic to resolve the dispute would be implemented here
-		// For example, releasing funds or updating reputations
+		// updating reputations
+		// TODO if User negative vote is more than average number of the dao users then user validation would be revoked.
+		// TODO if user negative vobe is more thatn one third of dao users then remove the user reputations score. 
+
+		// releasing funds
+		// TODO if renter is the loser the it's reposit fond, 10% of reposit found, 10% developer fee.
+		
+		// TODO renees penlaty is that no rental fee has been transfer to him
 	}
 }

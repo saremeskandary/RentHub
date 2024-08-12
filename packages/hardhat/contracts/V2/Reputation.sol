@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 contract Reputation {
 	mapping(address => uint256) public reputationScores;
+	// FIXME chane that to this: mapping(address => User) public reputationScores;
 
 	event ReputationUpdated(address user, uint256 newScore);
 

@@ -6,15 +6,24 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import { IUserIdentity, IEscrow, IInspection, ISocialFi, IMonetization, IEscrow, IReputation, IDisputeResolution } from "./interfaces";
 
 contract RentalAgreement is ReentrancyGuard, Ownable {
-	struct Agreement {
-		address owner;
-		address renter;
+	struct Asset { // FIXME add types and move it to interface
+		assetAddress; // 0xsomthing
+		tokenId; // bmw would be 0, 2, 3
+		name; // bmw, beach, iphonX
+		assetType; // car, home, cellphone
+		isActive;
+	}
+
+	struct Agreement { // FIXME move it to interface
+		address owner; // FIXME this should be type User
+		address renter; // FIXME this should be type User
+		Asset asset; // TODO create asset struct
 		uint256 rentalPeriod;
 		uint256 cost;
 		uint256 deposit;
-		uint256 startTime;
-		bool isActive;
-		bool isCompleted;
+		uint256 startTime; // FIXME change this to rentTime and create another time for registration.
+		bool isActive; // FIXME change this to status including started , completed , rented , canceled  
+		bool isDisputed = false; // then true when dipute resolotion occured is active would be false.
 	}
 
 	mapping(uint256 => Agreement) public agreements;
