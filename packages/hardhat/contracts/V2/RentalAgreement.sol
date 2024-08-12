@@ -3,43 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-
-interface IEscrow {
-	function lockFunds(uint256 _agreementId, uint256 _amount) external;
-
-	function releaseFunds(uint256 _agreementId) external;
-
-	function refundDeposit(uint256 _agreementId) external;
-}
-
-interface IReputation {
-	function updateReputations(
-		uint256 _agreementId,
-		address _owner,
-		address _renter,
-		bool _successful
-	) external;
-}
-
-interface IInspection {
-	function inspectItem(uint256 _agreementId) external returns (bool);
-}
-
-interface IDisputeResolution {
-	function initiateDispute(uint256 _agreementId) external;
-}
-
-interface ISocialFi {
-	function rewardUser(address _user, uint256 _amount) external;
-}
-
-interface IMonetization {
-	function distributeRevenue(uint256 _agreementId, uint256 _amount) external;
-}
-
-interface IUserIdentity {
-	function isVerifiedUser(address _user) external view returns (bool);
-}
+import { IUserIdentity, IEscrow, IInspection, ISocialFi, IMonetization, IEscrow, IReputation, IDisputeResolution } from "./interfaces";
 
 contract RentalAgreement is ReentrancyGuard, Ownable {
 	struct Agreement {
