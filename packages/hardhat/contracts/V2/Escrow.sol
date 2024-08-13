@@ -4,59 +4,69 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract Escrow is ReentrancyGuard {
-	mapping(uint256 => uint256) public lockedFunds;
-	mapping(uint256 => address) public fundOwners;
+    struct EscrowDetails {
+        uint256 lockedFunds;
+        uint256 deposit;
+        address owner;
+        address renter;
+    }
 
-	event FundsLocked(uint256 agreementId, uint256 amount, address owner);
-	event FundsReleased(uint256 agreementId, uint256 amount, address recipient);
-	event DepositRefunded(
-		uint256 agreementId,
-		uint256 amount,
-		address recipient
-	);
+    mapping(uint256 => EscrowDetails) public escrows;
 
-	function lockFunds(uint256 _agreementId, uint256 _amount) external {
-		require(lockedFunds[_agreementId] == 0, "Funds already locked");
-		require(_amount > 0, "Amount must be greater than 0");
+    event FundsLocked(uint256 agreementId, uint256 amount, address owner, address renter);
+    event FundsReleased(uint256 agreementId, uint256 amount, address recipient);
+    event DepositRefunded(uint256 agreementId, uint256 amount, address recipient);
 
-		lockedFunds[_agreementId] = _amount;
-		fundOwners[_agreementId] = msg.sender;
+    function lockFunds(uint256 _agreementId, uint256 _rentalFee, uint256 _deposit) external payable {
+        require(escrows[_agreementId].lockedFunds == 0, "Funds already locked");
+        require(msg.value == _rentalFee + _deposit, "Incorrect amount sent");
 
-		emit FundsLocked(_agreementId, _amount, msg.sender);
-	}
+        escrows[_agreementId] = EscrowDetails({
+            lockedFunds: _rentalFee,
+            deposit: _deposit,
+            owner: msg.sender,
+            renter: address(0) // Will be set when the renter confirms
+        });
 
-	function releaseFunds(
-		uint256 _agreementId,
-		address _recipient
-	) external nonReentrant {
-		require(lockedFunds[_agreementId] > 0, "No funds to release");
-		require(msg.sender == fundOwners[_agreementId], "Not authorized");
+        emit FundsLocked(_agreementId, msg.value, msg.sender, address(0));
+    }
 
-		uint256 amount = lockedFunds[_agreementId];
-		lockedFunds[_agreementId] = 0;
+    function confirmRental(uint256 _agreementId) external {
+        EscrowDetails storage escrow = escrows[_agreementId];
+        require(escrow.lockedFunds > 0, "No funds locked for this agreement");
+        require(escrow.renter == address(0), "Renter already confirmed");
 
-		// Logic to transfer funds to the owner would be implemented here
-		payable(_recipient).transfer(amount);
+        escrow.renter = msg.sender;
 
-		emit FundsReleased(_agreementId, amount, _recipient);
-	}
+        emit FundsLocked(_agreementId, escrow.lockedFunds + escrow.deposit, escrow.owner, msg.sender);
+    }
 
-	function refundDeposit(
-		uint256 _agreementId,
-		address _recipient
-	) external nonReentrant {
-		require(lockedFunds[_agreementId] > 0, "No funds to refund");
-		require(msg.sender == fundOwners[_agreementId], "Not authorized");
+    function releaseFunds(uint256 _agreementId) external nonReentrant {
+        EscrowDetails storage escrow = escrows[_agreementId];
+        require(escrow.lockedFunds > 0, "No funds to release");
+        require(msg.sender == escrow.owner, "Not authorized");
 
-		uint256 amount = lockedFunds[_agreementId];
-		lockedFunds[_agreementId] = 0;
+        uint256 amountToRelease = escrow.lockedFunds;
+        escrow.lockedFunds = 0;
 
-		// Logic to refund deposit to renter would be implemented here
-		payable(_recipient).transfer(amount);
+        payable(escrow.owner).transfer(amountToRelease);
 
-		emit DepositRefunded(_agreementId, amount, _recipient);
-	}
+        emit FundsReleased(_agreementId, amountToRelease, escrow.owner);
+    }
 
-	// Allow the contract to receive payments
-	receive() external payable {}
+    function refundDeposit(uint256 _agreementId) external nonReentrant {
+        EscrowDetails storage escrow = escrows[_agreementId];
+        require(escrow.deposit > 0, "No deposit to refund");
+        require(msg.sender == escrow.owner, "Not authorized");
+
+        uint256 depositToRefund = escrow.deposit;
+        escrow.deposit = 0;
+
+        payable(escrow.renter).transfer(depositToRefund);
+
+        emit DepositRefunded(_agreementId, depositToRefund, escrow.renter);
+    }
+
+    // Allow the contract to receive payments
+    receive() external payable {}
 }
