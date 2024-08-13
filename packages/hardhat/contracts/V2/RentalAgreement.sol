@@ -99,42 +99,47 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 	}
 
     function createAgreement(
-        address _renter,
-        uint256 _assetId,
-        uint256 _rentalPeriod,
-        uint256 _cost,
-        uint256 _deposit
-    )
-        external
-        nonReentrant
-        onlyVerifiedUser(msg.sender)
-        onlyVerifiedUser(_renter)
-        returns (uint256)
-    {
-        agreementCounter++;
-        Asset storage asset = assets[_assetId];
-        require(asset.isActive, "Asset is not active");
+		address _renter,
+		uint256 _assetId,
+		uint256 _rentalPeriod,
+		uint256 _cost,
+		uint256 _deposit
+	)
+		external
+		payable
+		nonReentrant
+		onlyVerifiedUser(msg.sender)
+		onlyVerifiedUser(_renter)
+		returns (uint256)
+	{
+		require(msg.value == _cost + _deposit, "Incorrect amount sent");
 
-        agreements[agreementCounter] = Agreement({
-            owner: users[msg.sender],
-            renter: users[_renter],
-            asset: asset,
-            rentalPeriod: _rentalPeriod,
-            cost: _cost,
-            deposit: _deposit,
-            startTime: 0, // Will be set when the rental actually starts
-            registrationTime: block.timestamp,
-            status: AgreementStatus.Created,
-            isDisputed: false
-        });
+		agreementCounter++;
+		Asset storage asset = assets[_assetId];
+		require(asset.isActive, "Asset is not active");
 
-        asset.timesRented++;
+		agreements[agreementCounter] = Agreement({
+			owner: users[msg.sender],
+			renter: users[_renter],
+			asset: asset,
+			rentalPeriod: _rentalPeriod,
+			cost: _cost,
+			deposit: _deposit,
+			startTime: 0,
+			registrationTime: block.timestamp,
+			status: AgreementStatus.Created,
+			isDisputed: false
+		});
 
-        emit AgreementCreated(agreementCounter, msg.sender, _renter);
+		asset.timesRented++;
 
-        return agreementCounter;
-    }
+		// Lock funds in the Escrow contract
+		IEscrow(escrowContract).lockFunds{value: msg.value}(agreementCounter, _cost, _deposit);
 
+		emit AgreementCreated(agreementCounter, msg.sender, _renter);
+
+		return agreementCounter;
+	}
 	function completeAgreement(uint256 _agreementId) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
 		require(
