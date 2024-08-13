@@ -19,74 +19,74 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	mapping(uint256 => Asset) public assets;
 	uint256 public agreementCounter;
 
-	address public escrowContract;
-	address public inspectionContract;
-	address public reputationContract;
-	address public disputeResolutionContract;
-	address public socialFiContract;
-	address public monetizationContract;
-	address public userIdentityContract;
-	address public daoContract;
+	IEscrow public escrow;
+	IInspection public inspection;
+	IReputation public reputation;
+	IDisputeResolution public disputeResolution;
+	ISocialFi public socialFi;
+	IMonetization public monetization;
+	IUserIdentity public userIdentity;
+	IRentalDAO public rentalDAO;
 
 	modifier onlyVerifiedUser(address _user) {
 		require(
 			_user != address(0) &&
-				IUserIdentity(userIdentityContract).isVerifiedUser(_user),
+				IUserIdentity(userIdentity).isVerifiedUser(_user),
 			"User not verified"
 		);
 		_;
 	}
 
 	constructor(
-		address _escrowContract,
-		address _inspectionContract,
-		address _reputationContract,
-		address _disputeResolutionContract,
-		address _socialFiContract,
-		address _monetizationContract,
-		address _userIdentityContract,
-		address _daoContract
+		address _escrow,
+		address _inspection,
+		address _reputation,
+		address _disputeResolution,
+		address _socialFi,
+		address _monetization,
+		address _userIdentity,
+		address _rentalDAO
 	) {
 		require(
-			_escrowContract != address(0),
-			"Invalid escrow contract address"
+			_escrow != address(0),
+			"Invalid escrow  address"
 		);
 		require(
-			_inspectionContract != address(0),
-			"Invalid inspection contract address"
+			_inspection != address(0),
+			"Invalid inspection  address"
 		);
 		require(
-			_reputationContract != address(0),
-			"Invalid reputation contract address"
+			_reputation != address(0),
+			"Invalid reputation  address"
 		);
 		require(
-			_disputeResolutionContract != address(0),
-			"Invalid dispute resolution contract address"
+			_disputeResolution != address(0),
+			"Invalid dispute resolution  address"
 		);
 		require(
-			_socialFiContract != address(0),
-			"Invalid social fi contract address"
+			_socialFi != address(0),
+			"Invalid social fi  address"
 		);
 		require(
-			_monetizationContract != address(0),
-			"Invalid monetization contract address"
+			_monetization != address(0),
+			"Invalid monetization  address"
 		);
 		require(
-			_userIdentityContract != address(0),
-			"Invalid user identity contract address"
+			_userIdentity != address(0),
+			"Invalid user identity  address"
 		);
-		require(_daoContract != address(0), "Invalid DAO contract address");
+		require(_rentalDAO != address(0), "Invalid DAO  address");
 
-		escrowContract = IEscrow(_escrowContract);
-		inspectionContract = IInspection(_inspectionContract);
-		reputationContract = IReputation(_reputationContract);
-		disputeResolutionContract = IDisputeResolution(
-			_disputeResolutionContract
+		escrow = IEscrow(_escrow);
+		inspection = IInspection(_inspection);
+		reputation = IReputation(_reputation);
+		disputeResolution = IDisputeResolution(
+			_disputeResolution
 		);
-		socialFiContract = ISocialFi(_socialFiContract);
-		monetizationContract = IMonetization(_monetizationContract);
-		userIdentityContract = IU(_userIdentityContract);
-		daoContract = IRentalDAO(_daoContract);
+		socialFi = ISocialFi(_socialFi);
+		monetization = IMonetization(_monetization);
+		userIdentity = IUserIdentity(_userIdentity);
+		rentalDAO = IRentalDAO(_rentalDAO);
 	}
 
 	function createAgreement(
@@ -107,7 +107,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		require(_deposit > 0, "Deposit must be greater than zero");
 		require(_rentalPeriod > 0, "Rental Period must be greater than zero");
 
-		uint256 systemFee = daoContract.getSystemFee();
+		uint256 systemFee = rentalDAO.getSystemFee();
 		uint256 feeAmount = (_cost * systemFee) / 10000;
 		uint256 totalAmount = _cost + _deposit + feeAmount;
 
@@ -132,15 +132,15 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 
 		asset.timesRented++;
 
-		// Lock funds in the Escrow contract
-		IEscrow(escrowContract).lockFunds{ value: _cost + _deposit }(
+		// Lock funds in the Escrow 
+		IEscrow(escrow).lockFunds{ value: _cost + _deposit }(
 			agreementCounter,
 			_cost,
 			_deposit
 		);
 
-		// Transfer system fee to the DAO contract
-		payable(daoContract).transfer(feeAmount);
+		// Transfer system fee to the DAO 
+		payable(rentalDAO).transfer(feeAmount);
 
 		emit AgreementCreated(agreementCounter, msg.sender, _renter);
 
@@ -160,7 +160,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		);
 
 		// Optionally, perform inspection before completion
-		bool isItemInGoodCondition = IInspection(inspectionContract)
+		bool isItemInGoodCondition = IInspection(inspection)
 			.inspectItem(_agreementId);
 		// Consider using a better inspection mechanism or allow mutual agreement by both parties.
 		require(
@@ -175,20 +175,20 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 
 		// require(agreement.isActive == false, "agreement is active"); FIXME do we need this when we have nonReentrant?
 		// require(agreement.isCompleted == true, "agreement is not completed"); FIXME do we need this when we have nonReentrant?
-		// Reward users via SocialFi contract
-		ISocialFi(socialFiContract).rewardUser(agreement.rentee, 100); // Example reward
-		ISocialFi(socialFiContract).rewardUser(agreement.renter, 100);
+		// Reward users via SocialFi 
+		ISocialFi(socialFi).rewardUser(agreement.rentee, 100); // Example reward
+		ISocialFi(socialFi).rewardUser(agreement.renter, 100);
 
-		// Distribute revenue via Monetization contract
-		IMonetization(monetizationContract).distributeRevenue(
+		// Distribute revenue via Monetization 
+		IMonetization(monetization).distributeRevenue(
 			_agreementId,
 			agreement.cost
 		);
 
 		emit AgreementCompleted(_agreementId);
 
-		IEscrow(escrowContract).releaseFunds(_agreementId);
-		IReputation(reputationContract).updateReputations(
+		IEscrow(escrow).releaseFunds(_agreementId);
+		IReputation(reputation).updateReputations(
 			_agreementId,
 			agreement.rentee,
 			agreement.renter,
@@ -206,7 +206,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 
 		emit DisputeRaised(_agreementId);
 
-		IDisputeResolution(disputeResolutionContract).initiateDispute(
+		IDisputeResolution(disputeResolution).initiateDispute(
 			_agreementId
 		);
 	}
@@ -224,7 +224,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		emit AgreementCancelled(_agreementId);
 
 		// Refund the deposit back to the renter
-		IEscrow(escrowContract).refundDeposit(_agreementId);
+		IEscrow(escrow).refundDeposit(_agreementId);
 	}
 
 	function extendRentalPeriod(
@@ -245,48 +245,48 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		// Optionally lock additional funds in escrow if required
 	}
 
-	function updateEscrowContract(address _escrowContract) external onlyOwner {
-		escrowContract = _escrowContract;
+	function updateEscrow(address _escrow) external onlyOwner {
+		escrow = _escrow;
 	}
 
-	function updateInspectionContract(
-		address _inspectionContract
+	function updateInspection(
+		address _inspection
 	) external onlyOwner {
-		inspectionContract = _inspectionContract;
+		inspection = _inspection;
 	}
 
-	function updateReputationContract(
-		address _reputationContract
+	function updateReputation(
+		address _reputation
 	) external onlyOwner {
-		reputationContract = _reputationContract;
+		reputation = _reputation;
 	}
 
-	function updateDisputeResolutionContract(
-		address _disputeResolutionContract
+	function updateDisputeResolution(
+		address _disputeResolution
 	) external onlyOwner {
-		disputeResolutionContract = _disputeResolutionContract;
+		disputeResolution = _disputeResolution;
 	}
 
-	function updateSocialFiContract(
-		address _socialFiContract
+	function updateSocialFi(
+		address _socialFi
 	) external onlyOwner {
-		socialFiContract = _socialFiContract;
+		socialFi = _socialFi;
 	}
 
-	function updateMonetizationContract(
-		address _monetizationContract
+	function updateMonetization(
+		address _monetization
 	) external onlyOwner {
-		monetizationContract = _monetizationContract;
+		monetization = _monetization;
 	}
 
-	function updateUserIdentityContract(
-		address _userIdentityContract
+	function updateUserIdentity(
+		address _userIdentity
 	) external onlyOwner {
-		userIdentityContract = _userIdentityContract;
+		userIdentity = _userIdentity;
 	}
 
-	function updateDAOContract(address _daoContract) external onlyOwner {
-		require(_daoContract != address(0), "Invalid DAO contract address");
-		daoContract = _daoContract;
+	function updateDAO(address _rentalDAO) external onlyOwner {
+		require(_rentalDAO != address(0), "Invalid DAO  address");
+		rentalDAO = _rentalDAO;
 	}
 }
