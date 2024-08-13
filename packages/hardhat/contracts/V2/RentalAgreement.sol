@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity 0.8.26;
 
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
@@ -47,42 +47,22 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		address _userIdentity,
 		address _rentalDAO
 	) {
-		require(
-			_escrow != address(0),
-			"Invalid escrow  address"
-		);
-		require(
-			_inspection != address(0),
-			"Invalid inspection  address"
-		);
-		require(
-			_reputation != address(0),
-			"Invalid reputation  address"
-		);
+		require(_escrow != address(0), "Invalid escrow  address");
+		require(_inspection != address(0), "Invalid inspection  address");
+		require(_reputation != address(0), "Invalid reputation  address");
 		require(
 			_disputeResolution != address(0),
 			"Invalid dispute resolution  address"
 		);
-		require(
-			_socialFi != address(0),
-			"Invalid social fi  address"
-		);
-		require(
-			_monetization != address(0),
-			"Invalid monetization  address"
-		);
-		require(
-			_userIdentity != address(0),
-			"Invalid user identity  address"
-		);
+		require(_socialFi != address(0), "Invalid social fi  address");
+		require(_monetization != address(0), "Invalid monetization  address");
+		require(_userIdentity != address(0), "Invalid user identity  address");
 		require(_rentalDAO != address(0), "Invalid DAO  address");
 
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
 		reputation = IReputation(_reputation);
-		disputeResolution = IDisputeResolution(
-			_disputeResolution
-		);
+		disputeResolution = IDisputeResolution(_disputeResolution);
 		socialFi = ISocialFi(_socialFi);
 		monetization = IMonetization(_monetization);
 		userIdentity = IUserIdentity(_userIdentity);
@@ -132,14 +112,14 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 
 		asset.timesRented++;
 
-		// Lock funds in the Escrow 
+		// Lock funds in the Escrow
 		IEscrow(escrow).lockFunds{ value: _cost + _deposit }(
 			agreementCounter,
 			_cost,
 			_deposit
 		);
 
-		// Transfer system fee to the DAO 
+		// Transfer system fee to the DAO
 		payable(rentalDAO).transfer(feeAmount);
 
 		emit AgreementCreated(agreementCounter, msg.sender, _renter);
@@ -160,8 +140,9 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		);
 
 		// Optionally, perform inspection before completion
-		bool isItemInGoodCondition = IInspection(inspection)
-			.inspectItem(_agreementId);
+		bool isItemInGoodCondition = IInspection(inspection).inspectItem(
+			_agreementId
+		);
 		// Consider using a better inspection mechanism or allow mutual agreement by both parties.
 		require(
 			isItemInGoodCondition ||
@@ -175,11 +156,11 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 
 		// require(agreement.isActive == false, "agreement is active"); FIXME do we need this when we have nonReentrant?
 		// require(agreement.isCompleted == true, "agreement is not completed"); FIXME do we need this when we have nonReentrant?
-		// Reward users via SocialFi 
+		// Reward users via SocialFi
 		ISocialFi(socialFi).rewardUser(agreement.rentee, 100); // Example reward
 		ISocialFi(socialFi).rewardUser(agreement.renter, 100);
 
-		// Distribute revenue via Monetization 
+		// Distribute revenue via Monetization
 		IMonetization(monetization).distributeRevenue(
 			_agreementId,
 			agreement.cost
@@ -206,9 +187,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 
 		emit DisputeRaised(_agreementId);
 
-		IDisputeResolution(disputeResolution).initiateDispute(
-			_agreementId
-		);
+		IDisputeResolution(disputeResolution).initiateDispute(_agreementId);
 	}
 
 	function cancelAgreement(uint256 _agreementId) external nonReentrant {
@@ -249,15 +228,11 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		escrow = _escrow;
 	}
 
-	function updateInspection(
-		address _inspection
-	) external onlyOwner {
+	function updateInspection(address _inspection) external onlyOwner {
 		inspection = _inspection;
 	}
 
-	function updateReputation(
-		address _reputation
-	) external onlyOwner {
+	function updateReputation(address _reputation) external onlyOwner {
 		reputation = _reputation;
 	}
 
@@ -267,21 +242,15 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		disputeResolution = _disputeResolution;
 	}
 
-	function updateSocialFi(
-		address _socialFi
-	) external onlyOwner {
+	function updateSocialFi(address _socialFi) external onlyOwner {
 		socialFi = _socialFi;
 	}
 
-	function updateMonetization(
-		address _monetization
-	) external onlyOwner {
+	function updateMonetization(address _monetization) external onlyOwner {
 		monetization = _monetization;
 	}
 
-	function updateUserIdentity(
-		address _userIdentity
-	) external onlyOwner {
+	function updateUserIdentity(address _userIdentity) external onlyOwner {
 		userIdentity = _userIdentity;
 	}
 

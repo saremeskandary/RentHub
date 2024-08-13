@@ -42,7 +42,7 @@ interface MyHardhatUserConfig extends HardhatUserConfig {
 
 const config: MyHardhatUserConfig = {
   solidity: {
-    version: "0.8.17",
+    version: "0.8.26",
     settings: {
       optimizer: {
         enabled: true,
