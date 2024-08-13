@@ -6,13 +6,28 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import { IUserIdentity, IEscrow, IInspection, ISocialFi, IMonetization, IEscrow, IReputation, IDisputeResolution } from "./interfaces";
 
 contract RentalAgreement is ReentrancyGuard, Ownable {
-	struct Asset { // FIXME add types and move it to interface
-		assetAddress; // 0xsomthing
-		tokenId; // bmw would be 0, 2, 3
-		name; // bmw, beach, iphonX
-		assetType; // car, home, cellphone
-		isActive;
-	}
+	    struct User {
+        uint256 validationTime;
+        bool isValidated;
+        uint256 reputationScore;
+        uint256 joinTime;
+    }
+
+	// struct Asset { // FIXME add types and move it to interface
+	// 	assetAddress; // 0xsomthing
+	// 	tokenId; // bmw would be 0, 2, 3
+	// 	name; // bmw, beach, iphonX
+	// 	assetType; // car, home, cellphone
+	// 	isActive;
+	// }
+	struct Asset {
+        address assetAddress;
+        uint256 tokenId;
+        string name;
+        string assetType;
+        bool isActive;
+        uint256 timesRented;
+    }
 
 	struct Agreement { // FIXME move it to interface
 		address owner; // FIXME this should be type User
@@ -25,9 +40,23 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		bool isActive; // FIXME change this to status including started , completed , rented , canceled  
 		bool isDisputed = false; // then true when dipute resolotion occured is active would be false.
 	}
+	struct Agreement {
+        User owner;
+        User renter;
+        Asset asset;
+        uint256 rentalPeriod;
+        uint256 cost;
+        uint256 deposit;
+        uint256 startTime;
+        uint256 registrationTime;
+        AgreementStatus status;
+        bool isDisputed;
+    }
+	enum AgreementStatus { Created, Started, Completed, Cancelled }
 
-	mapping(uint256 => Agreement) public agreements;
-	uint256 public agreementCounter;
+    mapping(address => User) public users;
+    mapping(uint256 => Agreement) public agreements;
+    uint256 public agreementCounter;
 
 	address public escrowContract;
 	address public inspectionContract;
@@ -69,36 +98,42 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		_;
 	}
 
-	function createAgreement(
-		address _renter,
-		uint256 _rentalPeriod,
-		uint256 _cost,
-		uint256 _deposit
-	)
-		external
-		nonReentrant
-		onlyVerifiedUser(msg.sender)
-		onlyVerifiedUser(_renter)
-		returns (uint256)
-	{
-		agreementCounter++;
-		agreements[agreementCounter] = Agreement({
-			owner: msg.sender,
-			renter: _renter,
-			rentalPeriod: _rentalPeriod,
-			cost: _cost,
-			deposit: _deposit,
-			startTime: block.timestamp,
-			isActive: true,
-			isCompleted: false
-		});
+    function createAgreement(
+        address _renter,
+        uint256 _assetId,
+        uint256 _rentalPeriod,
+        uint256 _cost,
+        uint256 _deposit
+    )
+        external
+        nonReentrant
+        onlyVerifiedUser(msg.sender)
+        onlyVerifiedUser(_renter)
+        returns (uint256)
+    {
+        agreementCounter++;
+        Asset storage asset = assets[_assetId];
+        require(asset.isActive, "Asset is not active");
 
-		emit AgreementCreated(agreementCounter, msg.sender, _renter);
+        agreements[agreementCounter] = Agreement({
+            owner: users[msg.sender],
+            renter: users[_renter],
+            asset: asset,
+            rentalPeriod: _rentalPeriod,
+            cost: _cost,
+            deposit: _deposit,
+            startTime: 0, // Will be set when the rental actually starts
+            registrationTime: block.timestamp,
+            status: AgreementStatus.Created,
+            isDisputed: false
+        });
 
-		IEscrow(escrowContract).lockFunds(agreementCounter, _cost + _deposit);
+        asset.timesRented++;
 
-		return agreementCounter;
-	}
+        emit AgreementCreated(agreementCounter, msg.sender, _renter);
+
+        return agreementCounter;
+    }
 
 	function completeAgreement(uint256 _agreementId) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
