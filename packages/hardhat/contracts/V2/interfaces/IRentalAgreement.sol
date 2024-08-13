@@ -45,6 +45,11 @@ interface IRentalAgreement {
 		COMPLETED,
 		CANCELLED
 	}
+
+	/**
+	 * @dev Thrown if the provided agreement is invalid.
+	 */
+	error InvalidAgreement();
 	/**
 	 * @dev Emitted when a new agreement is created
 	 * @param agreementId The ID of the newly created agreement
@@ -77,6 +82,13 @@ interface IRentalAgreement {
 	 * @param newRentalPeriod The new rental period
 	 */
 	event AgreementExtended(uint256 agreementId, uint256 newRentalPeriod);
+
+	/**
+	 * @dev Emitted when an agreement's arrival period is extended
+	 * @param agreementId The ID of the extended agreement
+	 * @param newRentalPeriod The new rental period
+	 */
+	event arrivalAgreement(uint256 agreementId, uint256 newRentalPeriod); // FIXME
 
 	/**
 	 * @dev Creates a new rental agreement
