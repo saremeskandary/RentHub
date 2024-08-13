@@ -3,60 +3,54 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import { IUserIdentity, IEscrow, IInspection, ISocialFi, IMonetization, IEscrow, IReputation, IDisputeResolution } from "./interfaces";
+import "./interfaces/IUserIdentity.sol";
+import "./interfaces/IEscrow.sol";
+import "./interfaces/IInspection.sol";
+import "./interfaces/ISocialFi.sol";
+import "./interfaces/IMonetization.sol";
+import "./interfaces/IReputation.sol";
+import "./interfaces/IDisputeResolution.sol";
+import "./interfaces/IRentalDAO.sol";
 
 contract RentalAgreement is ReentrancyGuard, Ownable {
-	    struct User {
-        uint256 validationTime;
-        bool isValidated;
-        uint256 reputationScore;
-        uint256 joinTime;
-    }
+	struct User {
+		uint256 validationTime;
+		bool isValidated;
+		uint256 reputationScore;
+		uint256 joinTime;
+	}
 
-	// struct Asset { // FIXME add types and move it to interface
-	// 	assetAddress; // 0xsomthing
-	// 	tokenId; // bmw would be 0, 2, 3
-	// 	name; // bmw, beach, iphonX
-	// 	assetType; // car, home, cellphone
-	// 	isActive;
-	// }
 	struct Asset {
-        address assetAddress;
-        uint256 tokenId;
-        string name;
-        string assetType;
-        bool isActive;
-        uint256 timesRented;
-    }
+		address assetAddress; // 0xsomthing
+		uint256 tokenId; // bmw would be 0, 2, 3
+		string name; // bmw, beach, iphonX
+		string assetType; // car, home, cellphone
+		bool isActive;
+		uint256 timesRented;
+	}
 
-	struct Agreement { // FIXME move it to interface
-		address owner; // FIXME this should be type User
-		address renter; // FIXME this should be type User
-		Asset asset; // TODO create asset struct
+	struct Agreement {
+		User owner;
+		User renter;
+		Asset asset;
 		uint256 rentalPeriod;
 		uint256 cost;
 		uint256 deposit;
-		uint256 startTime; // FIXME change this to rentTime and create another time for registration.
-		bool isActive; // FIXME change this to status including started , completed , rented , canceled  
-		bool isDisputed = false; // then true when dipute resolotion occured is active would be false.
+		uint256 startTime;
+		uint256 registrationTime;
+		AgreementStatus status;
+		bool isDisputed;
 	}
-	struct Agreement {
-        User owner;
-        User renter;
-        Asset asset;
-        uint256 rentalPeriod;
-        uint256 cost;
-        uint256 deposit;
-        uint256 startTime;
-        uint256 registrationTime;
-        AgreementStatus status;
-        bool isDisputed;
-    }
-	enum AgreementStatus { Created, Started, Completed, Cancelled }
+	enum AgreementStatus {
+		Created,
+		Started,
+		Completed,
+		Cancelled
+	}
 
-    mapping(address => User) public users;
-    mapping(uint256 => Agreement) public agreements;
-    uint256 public agreementCounter;
+	mapping(address => User) public users;
+	mapping(uint256 => Agreement) public agreements;
+	uint256 public agreementCounter;
 
 	address public escrowContract;
 	address public inspectionContract;
@@ -65,6 +59,7 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 	address public socialFiContract;
 	address public monetizationContract;
 	address public userIdentityContract;
+	address public daoContract;
 
 	event AgreementCreated(uint256 agreementId, address owner, address renter);
 	event AgreementCompleted(uint256 agreementId);
@@ -79,8 +74,38 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		address _disputeResolutionContract,
 		address _socialFiContract,
 		address _monetizationContract,
-		address _userIdentityContract
+		address _userIdentityContract,
+		address _daoContract
 	) {
+		require(
+			_escrowContract != address(0),
+			"Invalid escrow contract address"
+		);
+		require(
+			_inspectionContract != address(0),
+			"Invalid inspection contract address"
+		);
+		require(
+			_reputationContract != address(0),
+			"Invalid reputation contract address"
+		);
+		require(
+			_disputeResolutionContract != address(0),
+			"Invalid dispute resolution contract address"
+		);
+		require(
+			_socialFiContract != address(0),
+			"Invalid social fi contract address"
+		);
+		require(
+			_monetizationContract != address(0),
+			"Invalid monetization contract address"
+		);
+		require(
+			_userIdentityContract != address(0),
+			"Invalid user identity contract address"
+		);
+		require(_daoContract != address(0), "Invalid DAO contract address");
 		escrowContract = _escrowContract;
 		inspectionContract = _inspectionContract;
 		reputationContract = _reputationContract;
@@ -88,6 +113,7 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		socialFiContract = _socialFiContract;
 		monetizationContract = _monetizationContract;
 		userIdentityContract = _userIdentityContract;
+		daoContract = _daoContract;
 	}
 
 	modifier onlyVerifiedUser(address _user) {
@@ -98,7 +124,7 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		_;
 	}
 
-    function createAgreement(
+	function createAgreement(
 		address _renter,
 		uint256 _assetId,
 		uint256 _rentalPeriod,
@@ -112,10 +138,18 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		onlyVerifiedUser(_renter)
 		returns (uint256)
 	{
-		require(msg.value == _cost + _deposit, "Incorrect amount sent");
+		require(_renter != address(0), "Invalid renter address");
+		require(_cost > 0, "Cost must be greater than zero");
+		require(_deposit > 0, "Deposit must be greater than zero");
+
+		uint256 systemFee = IRentalDAO(daoContract).getSystemFee();
+		uint256 feeAmount = (_cost * systemFee) / 10000;
+		uint256 totalAmount = _cost + _deposit + feeAmount;
+
+		require(msg.value == totalAmount, "Incorrect amount sent");
 
 		agreementCounter++;
-		Asset storage asset = assets[_assetId];
+		Asset storage asset = assets[_assetId]; //FIXME Undeclared identifier. Did you mean "asset", "Asset" or "assert"?
 		require(asset.isActive, "Asset is not active");
 
 		agreements[agreementCounter] = Agreement({
@@ -134,12 +168,20 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		asset.timesRented++;
 
 		// Lock funds in the Escrow contract
-		IEscrow(escrowContract).lockFunds{value: msg.value}(agreementCounter, _cost, _deposit);
+		IEscrow(escrowContract).lockFunds{ value: _cost + _deposit }(
+			agreementCounter,
+			_cost,
+			_deposit
+		);
+
+		// Transfer system fee to the DAO contract
+		payable(daoContract).transfer(feeAmount);
 
 		emit AgreementCreated(agreementCounter, msg.sender, _renter);
 
 		return agreementCounter;
 	}
+
 	function completeAgreement(uint256 _agreementId) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
 		require(
@@ -276,5 +318,10 @@ contract RentalAgreement is ReentrancyGuard, Ownable {
 		address _userIdentityContract
 	) external onlyOwner {
 		userIdentityContract = _userIdentityContract;
+	}
+
+	function updateDAOContract(address _daoContract) external onlyOwner {
+		require(_daoContract != address(0), "Invalid DAO contract address");
+		daoContract = _daoContract;
 	}
 }

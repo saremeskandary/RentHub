@@ -20,6 +20,7 @@ contract Escrow is ReentrancyGuard {
     function lockFunds(uint256 _agreementId, uint256 _rentalFee, uint256 _deposit) external payable {
         require(escrows[_agreementId].lockedFunds == 0, "Funds already locked");
         require(msg.value == _rentalFee + _deposit, "Incorrect amount sent");
+        require(msg.sender != address(0), "Invalid sender address");
 
         escrows[_agreementId] = EscrowDetails({
             lockedFunds: _rentalFee,
@@ -35,12 +36,13 @@ contract Escrow is ReentrancyGuard {
         EscrowDetails storage escrow = escrows[_agreementId];
         require(escrow.lockedFunds > 0, "No funds locked for this agreement");
         require(escrow.renter == address(0), "Renter already confirmed");
+        require(msg.sender != address(0), "Invalid sender address");
 
         escrow.renter = msg.sender;
 
         emit FundsLocked(_agreementId, escrow.lockedFunds + escrow.deposit, escrow.owner, msg.sender);
     }
-
+    
     function releaseFunds(uint256 _agreementId) external nonReentrant {
         EscrowDetails storage escrow = escrows[_agreementId];
         require(escrow.lockedFunds > 0, "No funds to release");

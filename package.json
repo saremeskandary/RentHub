@@ -41,7 +41,7 @@
   "packageManager": "yarn@3.2.3",
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
-    "husky": "^8.0.1",
+    "husky": "^9.1.4",
     "lint-staged": "^13.0.3"
   },
   "engines": {
