@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./interfaces/IUserIdentity.sol";
-import "./interfaces/IEscrow.sol";
-import "./interfaces/IInspection.sol";
-import "./interfaces/ISocialFi.sol";
-import "./interfaces/IMonetization.sol";
-import "./interfaces/IReputation.sol";
-import "./interfaces/IDisputeResolution.sol";
-import "./interfaces/IRentalDAO.sol";
-import "./interfaces/IRentalAgreement.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
+import { IEscrow } from "./interfaces/IEscrow.sol";
+import { IInspection } from "./interfaces/IInspection.sol";
+import { ISocialFi } from "./interfaces/ISocialFi.sol";
+import { IMonetization } from "./interfaces/IMonetization.sol";
+import { IReputation } from "./interfaces/IReputation.sol";
+import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
+import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
+import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
 
 contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	mapping(address => User) public users;
 	mapping(uint256 => Agreement) public agreements;
+	mapping(uint256 => Asset) public assets;
 	uint256 public agreementCounter;
 
 	address public escrowContract;
@@ -27,11 +28,14 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	address public userIdentityContract;
 	address public daoContract;
 
-	event AgreementCreated(uint256 agreementId, address owner, address renter);
-	event AgreementCompleted(uint256 agreementId);
-	event DisputeRaised(uint256 agreementId);
-	event AgreementCancelled(uint256 agreementId);
-	event AgreementExtended(uint256 agreementId, uint256 newRentalPeriod);
+	modifier onlyVerifiedUser(address _user) {
+		require(
+			_user != address(0) &&
+				IUserIdentity(userIdentityContract).isVerifiedUser(_user),
+			"User not verified"
+		);
+		_;
+	}
 
 	constructor(
 		address _escrowContract,
@@ -72,27 +76,22 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 			"Invalid user identity contract address"
 		);
 		require(_daoContract != address(0), "Invalid DAO contract address");
-		escrowContract = _escrowContract;
-		inspectionContract = _inspectionContract;
-		reputationContract = _reputationContract;
-		disputeResolutionContract = _disputeResolutionContract;
-		socialFiContract = _socialFiContract;
-		monetizationContract = _monetizationContract;
-		userIdentityContract = _userIdentityContract;
-		daoContract = _daoContract;
-	}
 
-	modifier onlyVerifiedUser(address _user) {
-		require(
-			IUserIdentity(userIdentityContract).isVerifiedUser(_user),
-			"User not verified"
+		escrowContract = IEscrow(_escrowContract);
+		inspectionContract = IInspection(_inspectionContract);
+		reputationContract = IReputation(_reputationContract);
+		disputeResolutionContract = IDisputeResolution(
+			_disputeResolutionContract
 		);
-		_;
+		socialFiContract = ISocialFi(_socialFiContract);
+		monetizationContract = IMonetization(_monetizationContract);
+		userIdentityContract = IU(_userIdentityContract);
+		daoContract = IRentalDAO(_daoContract);
 	}
 
 	function createAgreement(
 		address _renter,
-		uint256 _assetId,
+		uint256 _tokenId,
 		uint256 _rentalPeriod,
 		uint256 _cost,
 		uint256 _deposit
@@ -104,22 +103,22 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		onlyVerifiedUser(_renter)
 		returns (uint256)
 	{
-		require(_renter != address(0), "Invalid renter address");
 		require(_cost > 0, "Cost must be greater than zero");
 		require(_deposit > 0, "Deposit must be greater than zero");
+		require(_rentalPeriod > 0, "Rental Period must be greater than zero");
 
-		uint256 systemFee = IRentalDAO(daoContract).getSystemFee();
+		uint256 systemFee = daoContract.getSystemFee();
 		uint256 feeAmount = (_cost * systemFee) / 10000;
 		uint256 totalAmount = _cost + _deposit + feeAmount;
 
 		require(msg.value == totalAmount, "Incorrect amount sent");
 
 		agreementCounter++;
-		Asset storage asset = assets[_assetId]; //FIXME Undeclared identifier. Did you mean "asset", "Asset" or "assert"?
+		Asset storage asset = assets[_tokenId]; // FIXME Undeclared identifier. Did you mean "asset", "Asset" or "assert"?
 		require(asset.isActive, "Asset is not active");
 
 		agreements[agreementCounter] = Agreement({
-			owner: users[msg.sender],
+			rentee: users[msg.sender],
 			renter: users[_renter],
 			asset: asset,
 			rentalPeriod: _rentalPeriod,
@@ -127,7 +126,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 			deposit: _deposit,
 			startTime: 0,
 			registrationTime: block.timestamp,
-			status: AgreementStatus.Created,
+			status: AgreementStatus.CREATED,
 			isDisputed: false
 		});
 
@@ -151,7 +150,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	function completeAgreement(uint256 _agreementId) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
 		require(
-			msg.sender == agreement.owner || msg.sender == agreement.renter,
+			msg.sender == agreement.rentee || msg.sender == agreement.renter,
 			"Not authorized"
 		);
 		require(agreement.isActive, "Agreement not active");
@@ -166,7 +165,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		// Consider using a better inspection mechanism or allow mutual agreement by both parties.
 		require(
 			isItemInGoodCondition ||
-				(msg.sender == agreement.owner &&
+				(msg.sender == agreement.rentee &&
 					agreement.renter == address(0)),
 			"Inspection failed"
 		);
@@ -177,7 +176,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		// require(agreement.isActive == false, "agreement is active"); FIXME do we need this when we have nonReentrant?
 		// require(agreement.isCompleted == true, "agreement is not completed"); FIXME do we need this when we have nonReentrant?
 		// Reward users via SocialFi contract
-		ISocialFi(socialFiContract).rewardUser(agreement.owner, 100); // Example reward
+		ISocialFi(socialFiContract).rewardUser(agreement.rentee, 100); // Example reward
 		ISocialFi(socialFiContract).rewardUser(agreement.renter, 100);
 
 		// Distribute revenue via Monetization contract
@@ -191,7 +190,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		IEscrow(escrowContract).releaseFunds(_agreementId);
 		IReputation(reputationContract).updateReputations(
 			_agreementId,
-			agreement.owner,
+			agreement.rentee,
 			agreement.renter,
 			true
 		);
@@ -200,7 +199,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	function raiseDispute(uint256 _agreementId) external {
 		Agreement storage agreement = agreements[_agreementId];
 		require(
-			msg.sender == agreement.owner || msg.sender == agreement.renter,
+			msg.sender == agreement.rentee || msg.sender == agreement.renter,
 			"Not authorized"
 		);
 		require(agreement.isActive, "Agreement not active");
@@ -215,7 +214,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	function cancelAgreement(uint256 _agreementId) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
 		require(
-			msg.sender == agreement.owner || msg.sender == agreement.renter,
+			msg.sender == agreement.rentee || msg.sender == agreement.renter,
 			"Not authorized"
 		);
 		require(agreement.isActive, "Agreement not active");
@@ -234,7 +233,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
 		require(
-			msg.sender == agreement.owner || msg.sender == agreement.renter,
+			msg.sender == agreement.rentee || msg.sender == agreement.renter,
 			"Not authorized"
 		);
 		require(agreement.isActive, "Agreement not active");

@@ -1,26 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-contract Reputation {
-	mapping(address => uint256) public reputationScores;
-	// FIXME chane that to this: mapping(address => User) public reputationScores;
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-	event ReputationUpdated(address user, uint256 newScore);
+contract Reputation is AccessControl {
+    bytes32 public constant UPDATER_ROLE = keccak256("UPDATER_ROLE");
 
-	function updateReputations(
-		address _owner,
-		address _renter,
-		bool _successful
-	) external {
-		if (_successful) {
-			reputationScores[_owner] += 10;
-			reputationScores[_renter] += 10;
-		} else {
-			reputationScores[_owner] -= 10;
-			reputationScores[_renter] -= 10;
-		}
+    mapping(address => int256) public reputationScores;
 
-		emit ReputationUpdated(_owner, reputationScores[_owner]);
-		emit ReputationUpdated(_renter, reputationScores[_renter]);
-	}
+    event ReputationUpdated(address user, int256 newScore);
+
+    constructor() {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(UPDATER_ROLE, msg.sender);
+    }
+
+    function updateReputation(address _user, int256 _change) external onlyRole(UPDATER_ROLE) {
+        require(_user != address(0), "Invalid user address");
+        
+        reputationScores[_user] += _change;
+
+        emit ReputationUpdated(_user, reputationScores[_user]);
+    }
+
+    function getReputation(address _user) external view returns (int256) {
+        return reputationScores[_user];
+    }
+
+    function addUpdater(address _updater) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(_updater != address(0), "Invalid updater address");
+        grantRole(UPDATER_ROLE, _updater);
+    }
+
+    function removeUpdater(address _updater) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        revokeRole(UPDATER_ROLE, _updater);
+    }
 }
