@@ -11,43 +11,9 @@ import "./interfaces/IMonetization.sol";
 import "./interfaces/IReputation.sol";
 import "./interfaces/IDisputeResolution.sol";
 import "./interfaces/IRentalDAO.sol";
+import "./interfaces/IRentalAgreement.sol";
 
-contract RentalAgreement is ReentrancyGuard, Ownable {
-	struct User {
-		uint256 validationTime;
-		bool isValidated;
-		uint256 reputationScore;
-		uint256 joinTime;
-	}
-
-	struct Asset {
-		address assetAddress; // 0xsomthing
-		uint256 tokenId; // bmw would be 0, 2, 3
-		string name; // bmw, beach, iphonX
-		string assetType; // car, home, cellphone
-		bool isActive;
-		uint256 timesRented;
-	}
-
-	struct Agreement {
-		User owner;
-		User renter;
-		Asset asset;
-		uint256 rentalPeriod;
-		uint256 cost;
-		uint256 deposit;
-		uint256 startTime;
-		uint256 registrationTime;
-		AgreementStatus status;
-		bool isDisputed;
-	}
-	enum AgreementStatus {
-		Created,
-		Started,
-		Completed,
-		Cancelled
-	}
-
+contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	mapping(address => User) public users;
 	mapping(uint256 => Agreement) public agreements;
 	uint256 public agreementCounter;

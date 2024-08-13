@@ -6,6 +6,40 @@ pragma solidity ^0.8.17;
  * @dev Interface for the RentalAgreement contract, defining key functions for managing rental agreements
  */
 interface IRentalAgreement {
+    	struct User {
+		uint256 validationTime;
+		bool isValidated;
+		uint256 reputationScore;
+		uint256 joinTime;
+	}
+
+	struct Asset {
+		address assetAddress; // 0xsomthing
+		uint256 tokenId; // bmw would be 0, 2, 3
+		string name; // bmw, beach, iphonX
+		string assetType; // car, home, cellphone
+		bool isActive;
+		uint256 timesRented;
+	}
+
+	struct Agreement {
+		User owner;
+		User renter;
+		Asset asset;
+		uint256 rentalPeriod;
+		uint256 cost;
+		uint256 deposit;
+		uint256 startTime;
+		uint256 registrationTime;
+		AgreementStatus status;
+		bool isDisputed;
+	}
+    	enum AgreementStatus {
+		Created,
+		Started,
+		Completed,
+		Cancelled
+	}
     /**
      * @dev Emitted when a new agreement is created
      * @param agreementId The ID of the newly created agreement
