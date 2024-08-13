@@ -87,19 +87,11 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		require(_deposit > 0, "Deposit must be greater than zero");
 		require(_rentalPeriod > 0, "Rental Period must be greater than zero");
 
-		uint256 systemFee = rentalDAO.getSystemFee();
-		uint256 feeAmount = (_cost * systemFee) / 10000;
-		uint256 totalAmount = _cost + _deposit + feeAmount;
-
-		require(msg.value == totalAmount, "Incorrect amount sent");
-
-		agreementCounter++;
-		Asset storage asset = assets[_tokenId]; // FIXME Undeclared identifier. Did you mean "asset", "Asset" or "assert"?
+		Asset storage asset = assets[_tokenId];
 		require(asset.isActive, "Asset is not active");
-
 		agreements[agreementCounter] = Agreement({
 			rentee: users[msg.sender],
-			renter: users[_renter],
+			renter: users[address(0)],
 			asset: asset,
 			rentalPeriod: _rentalPeriod,
 			cost: _cost,
@@ -110,21 +102,39 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 			isDisputed: false
 		});
 
-		asset.timesRented++;
+		agreementCounter++;
 
-		// Lock funds in the Escrow
-		IEscrow(escrow).lockFunds{ value: _cost + _deposit }(
-			agreementCounter,
-			_cost,
-			_deposit
-		);
-
-		// Transfer system fee to the DAO
-		payable(rentalDAO).transfer(feeAmount);
-
-		emit AgreementCreated(agreementCounter, msg.sender, _renter);
+		emit AgreementCreated(agreementCounter, msg.sender, _renter); // FIXME add better event for graph
 
 		return agreementCounter;
+	}
+
+	function ArrivalAgreement(uint256 agreemntId) external {
+		Agreement storage agreement = agreements[agreemntId];
+		if (
+			agreement.renter == users[address(0)] &&
+			agreement.isDisputed == false &&
+			agreement.status == AgreementStatus.CREATED
+		) revert InvalidAgreement();
+
+		uint256 systemFee = rentalDAO.getSystemFee();
+		uint256 feeAmount = (agreement.cost * systemFee) / 10000;
+		uint256 totalAmount = agreement.cost + agreement.deposit; // get fee from rentee instead of renter
+
+		require(msg.value >= totalAmount, "Incorrect amount sent");
+
+		require(agreement.asset.isActive, "Asset is not active");
+
+		// Lock funds in the Escrow
+		escrow.lockFunds(msg.sender, agreement.cost, agreement.deposit);
+
+		agreement.asset.timesRented++;
+
+		agreement.renter = users[msg.sender];
+		agreement.startTime = block.timestamp;
+		agreement.status = AgreementStatus.STARTED;
+
+		emit arrivalAgreement(); // FIXME
 	}
 
 	function completeAgreement(uint256 _agreementId) external nonReentrant {

@@ -30,11 +30,14 @@ contract Escrow is ReentrancyGuard {
 		uint256 _agreementId,
 		uint256 _rentalFee,
 		uint256 _deposit
-	) external payable {
+	) external payable { // FIXME this should change to transferFrom Cause it use ERC20token
 		require(escrows[_agreementId].lockedFunds == 0, "Funds already locked");
 		require(msg.value == _rentalFee + _deposit, "Incorrect amount sent");
 		require(msg.sender != address(0), "Invalid sender address");
 
+		// Transfer system fee to the DAO
+		rentalDAO.transfer(feeAmount);
+		
 		escrows[_agreementId] = EscrowDetails({
 			lockedFunds: _rentalFee,
 			deposit: _deposit,
@@ -86,5 +89,5 @@ contract Escrow is ReentrancyGuard {
 	}
 
 	// Allow the contract to receive payments
-	receive() external payable {}
+	receive() external payable {} // DELETEme
 }
