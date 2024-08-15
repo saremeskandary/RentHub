@@ -12,6 +12,12 @@ at the end of aggrement give back the garantee to the renter.
 
 add withdraw function for system fee.
 
+change require to if condition to make the gass less.
+e.g: 
+Using require:
+
+require(balance >= amount, "Insufficient balance");
+
 to Using if with custom error:
 
 error InsufficientBalance(uint256 available, uint256 required);

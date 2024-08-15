@@ -31,6 +31,7 @@ interface IRentalDAO {
 	error FeeExceedsMaximum(uint256 fee);
 	error InvalidAddress();
 	error Unauthorized();
+	error InsufficientBalance(uint256 available, uint256 required);
 
 	/**
 	 * @dev Proposes and updates the system fee

@@ -11,6 +11,8 @@ contract RentalDAO is IRentalDAO, AccessControl, ReentrancyGuard {
 	uint256 public systemFee; // Fee in basis points (1/100 of a percent)
 	uint256 public constant MAX_FEE = 1000; // 10% max fee
 
+	mapping(string => address) private contractAddresses;
+
 	constructor(uint256 _initialFee) {
 		if (_initialFee > MAX_FEE) revert FeeExceedsMaximum(_initialFee);
 		systemFee = _initialFee;
@@ -43,5 +45,29 @@ contract RentalDAO is IRentalDAO, AccessControl, ReentrancyGuard {
 
 	function getSystemFee() external view returns (uint256) {
 		return systemFee;
+	}
+
+	function withdrawFees(
+		address payable _recipient,
+		uint256 _amount
+	) external onlyRole(DEFAULT_ADMIN_ROLE) nonReentrant {
+		if (_recipient == address(0)) revert InvalidAddress();
+		if (_amount > address(this).balance)
+			revert InsufficientBalance(address(this).balance, _amount);
+		_recipient.transfer(_amount);
+	}
+
+	function updateContractAddress(
+		string memory _contractName,
+		address _newAddress
+	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+		if (_newAddress == address(0)) revert InvalidAddress();
+		contractAddresses[_contractName] = _newAddress;
+	}
+
+	function getContractAddress(
+		string memory _contractName
+	) external view returns (address) {
+		return contractAddresses[_contractName];
 	}
 }
