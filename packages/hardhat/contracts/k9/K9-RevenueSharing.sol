@@ -3,12 +3,14 @@ pragma solidity 0.8.26;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title RevenueSharing
  * @dev This contract manages the distribution of revenue, allowing the owner to set a platform fee and a K9 Finance DAO fee.
  */
 contract K9_RevenueSharing is Ownable {
+	using SafeERC20 for IERC20;
 	uint256 public platformFee = 50; // 5% platform fee
 	uint256 public k9FinanceDAOFee = 25; // 2.5% K9 Finance DAO fee
 	uint256 public constant DENOMINATOR = 1000;
@@ -40,7 +42,7 @@ contract K9_RevenueSharing is Ownable {
 			k9FinanceDAOAmount;
 
 		payable(owner()).transfer(platformAmount);
-		k9Token.transfer(address(K9_Finance_DAO), k9FinanceDAOAmount); // K9 Finance DAO address
+		k9Token.safeTransfer(address(K9_Finance_DAO), k9FinanceDAOAmount); // K9 Finance DAO address
 		payable(_recipient).transfer(recipientAmount);
 
 		emit RevenuePaid(_recipient, recipientAmount);

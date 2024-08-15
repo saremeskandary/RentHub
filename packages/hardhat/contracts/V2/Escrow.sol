@@ -2,8 +2,10 @@
 pragma solidity 0.8.26;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract Escrow is ReentrancyGuard {
+	using SafeERC20 for IERC20;
 	struct EscrowDetails {
 		uint256 lockedFunds;
 		uint256 deposit;
@@ -36,7 +38,7 @@ contract Escrow is ReentrancyGuard {
 		require(msg.sender != address(0), "Invalid sender address");
 
 		// Transfer system fee to the DAO
-		rentalDAO.transfer(feeAmount);
+		rentalDAO.safeTransfer(feeAmount);
 		
 		escrows[_agreementId] = EscrowDetails({
 			lockedFunds: _rentalFee,

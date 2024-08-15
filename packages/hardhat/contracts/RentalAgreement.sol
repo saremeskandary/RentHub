@@ -4,12 +4,14 @@ pragma solidity 0.8.26;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title RentalAgreement
  * @dev This contract manages rental agreements for items using ERC721 tokens.
  */
 contract RentalAgreement is ReentrancyGuard {
+	using SafeERC20 for IERC20;
 	struct Rental {
 		address renter;
 		address owner;
@@ -80,7 +82,11 @@ contract RentalAgreement is ReentrancyGuard {
 		});
 
 		// Transfer the collateral from the renter to the contract
-		collateralToken.transferFrom(msg.sender, address(this), _collateral);
+		collateralToken.safeTransferFrom(
+			msg.sender,
+			address(this),
+			_collateral
+		);
 
 		emit RentalCreated(
 			rentalId,
@@ -106,16 +112,18 @@ contract RentalAgreement is ReentrancyGuard {
 		);
 		require(rental.isActive, "Rental not active");
 
+		// Effect: Update the contract's state before making external calls
 		rental.isActive = false;
 		address owner = rental.owner;
 		uint256 price = rental.price;
 		uint256 collateral = rental.collateral;
 
-		(bool success, ) = owner.call{ value: price }("");
+		// Interaction: External call to transfer the rental price to the owner
+		(bool success, ) = owner.call{ value: price }(""); // wake-disable-line
 		require(success, "Failed to transfer rental price to owner");
 
-		// Return the collateral to the renter
-		collateralToken.transfer(rental.renter, collateral);
+		// Interaction: Return the collateral to the renter
+		collateralToken.safeTransfer(rental.renter, collateral);
 		emit CollateralReturned(_rentalId, rental.renter, collateral);
 
 		emit RentalEnded(_rentalId);
