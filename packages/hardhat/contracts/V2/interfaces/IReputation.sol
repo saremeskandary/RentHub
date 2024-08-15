@@ -4,6 +4,12 @@ pragma solidity 0.8.26;
 /// @title IReputation - Interface for the Reputation contract
 /// @notice Interface for managing user reputation scores
 interface IReputation {
+	event ReputationUpdated(address user, int256 newScore);
+
+	// Custom errors
+	error InvalidUserAddress(address user);
+	error InvalidUpdaterAddress(address updater);
+
 	/// @notice Updates the reputation of a user
 	/// @param _user The address of the user whose reputation is to be updated
 	/// @param _change The amount by which the user's reputation should change

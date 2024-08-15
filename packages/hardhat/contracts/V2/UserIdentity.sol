@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-contract UserIdentity {
+import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
+
+contract UserIdentity is IUserIdentity {
 	mapping(address => bool) public verifiedUsers;
 	address public admin;
 
-	event UserVerified(address indexed user);
-	event UserRevoked(address indexed user);
-
 	modifier onlyAdmin() {
-		require(msg.sender == admin, "Only admin can perform this action");
+		if (msg.sender != admin) revert OnlyAdmin();
 		_;
 	}
 
@@ -18,14 +17,14 @@ contract UserIdentity {
 	}
 
 	function verifyUser(address _user) external onlyAdmin {
-		require(!verifiedUsers[_user], "User is already verified");
+		if (verifiedUsers[_user]) revert UserAlreadyVerified(_user);
 		verifiedUsers[_user] = true;
 
 		emit UserVerified(_user);
 	}
 
 	function revokeUser(address _user) external onlyAdmin {
-		require(verifiedUsers[_user], "User is not verified");
+		if (!verifiedUsers[_user]) revert UserNotVerified(_user);
 		verifiedUsers[_user] = false;
 
 		emit UserRevoked(_user);
@@ -36,10 +35,7 @@ contract UserIdentity {
 	}
 
 	function transferAdmin(address _newAdmin) external onlyAdmin {
-		require(
-			_newAdmin != address(0),
-			"New admin cannot be the zero address"
-		);
+		if (_newAdmin == address(0)) revert ZeroAddress();
 		admin = _newAdmin;
 	}
 }

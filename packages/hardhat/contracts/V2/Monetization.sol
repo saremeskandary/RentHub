@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-contract Monetization {
+import { IMonetization } from "./interfaces/IMonetization.sol";
+
+contract Monetization is IMonetization {
 	mapping(uint256 => uint256) public agreementEarnings;
 
-	event RevenueDistributed(uint256 agreementId, uint256 amount);
-
 	function distributeRevenue(uint256 _agreementId, uint256 _amount) external {
-		require(_amount > 0, "Amount must be greater than zero");
+		if (_amount <= 0) revert AmountMustBeGreaterThanZero(_amount);
 
 		// Example logic: 10% fee, 90% to owner
 		uint256 platformFee = (_amount * 10) / 100;

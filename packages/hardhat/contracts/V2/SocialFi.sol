@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-contract SocialFi {
+import { ISocialFi } from "./interfaces/ISocialFi.sol";
+
+contract SocialFi is ISocialFi {
 	mapping(address => uint256) public rewards;
 
-	event UserRewarded(address indexed user, uint256 amount);
-
 	function rewardUser(address _user, uint256 _amount) external {
-		require(_amount > 0, "Reward amount must be greater than zero");
+		if (_amount <= 0) revert RewardAmountMustBeGreaterThanZero(_amount);
 		rewards[_user] += _amount;
 
 		emit UserRewarded(_user, _amount);
@@ -19,11 +19,11 @@ contract SocialFi {
 
 	function claimRewards() external {
 		uint256 amount = rewards[msg.sender];
-		require(amount > 0, "No rewards to claim");
+		if (amount <= 0) revert NoRewardsToClaim();
 
 		rewards[msg.sender] = 0;
 
-		// Logic to transfer the rewards to the user would be implemented here
+		// Logic to transfer the rewards to the user
 		payable(msg.sender).transfer(amount);
 	}
 

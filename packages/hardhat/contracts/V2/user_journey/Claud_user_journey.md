@@ -1,96 +1,57 @@
-Certainly! I'll provide a more detailed explanation of each step in the user journey, including the purpose of each action, the interactions between contracts, and the significance of the events emitted.
+# User Journey Documentation
 
-Detailed User Journey:
+## 1. User Registration and Verification
 
-1. User Verification:
-   - Purpose: Ensure only verified users can participate in rental agreements.
-   - Action: The admin of the UserIdentity contract calls `verifyUser()` for both the owner and renter.
-   - Details: This function sets the user's status to verified in the contract's mapping.
-   - Event: UserVerified is emitted for each user, allowing external systems to track new verified users.
-   - Importance: This step is crucial for preventing fraud and maintaining platform integrity.
+1. User signs up for the platform.
+2. User provides necessary documentation for identity verification.
+3. Platform admin or authorized verifier calls `verifyUser()` in the UserIdentity contract.
+4. User is now verified and can participate in rental agreements.
 
-2. Agreement Creation:
-   - Purpose: Initiate a new rental agreement between verified parties.
-   - Action: The owner calls `createAgreement()` in the RentalAgreement contract.
-   - Details: 
-     - This function creates a new Agreement struct with details like owner, renter, rental period, cost, and deposit.
-     - It increments the agreementCounter to assign a unique ID.
-     - The function checks if both parties are verified users.
-   - Event: AgreementCreated is emitted with the agreement ID, owner, and renter addresses.
-   - Internal calls:
-     - The Escrow contract's `lockFunds()` is called to secure the rental cost and deposit.
-   - Additional Event: FundsLocked is emitted from the Escrow contract, indicating the amount secured.
-   - Importance: This step establishes the terms of the rental and secures the necessary funds.
+## 2. Creating a Rental Agreement
 
-3. Inspection Before Rental:
-   - Purpose: Verify the condition of the rental item before the rental period begins.
-   - Action: The `inspectItem()` function in the Inspection contract is called.
-   - Details: This function simulates an AI-driven inspection (currently randomized for simplicity).
-   - Event: ItemInspected is emitted with the agreement ID and inspection result.
-   - Importance: This establishes the initial condition of the item, which is crucial for later comparisons.
+1. Asset owner initiates a new rental agreement by calling `createAgreement()` in the RentalAgreement contract.
+2. Owner specifies the renter, asset ID, rental period, cost, and deposit.
+3. The function checks if both parties are verified users.
+4. System fee is calculated based on the current fee set in the RentalDAO contract.
+5. Funds (cost + deposit + fee) are transferred to the contract.
+6. Agreement is created and stored in the contract.
+7. Funds are locked in the Escrow contract.
+8. System fee is transferred to the RentalDAO contract.
 
-4. During Rental Period:
-   - Purpose: Allow flexibility in the rental agreement.
-   - Potential Action: Either the owner or renter might call `extendRentalPeriod()` if needed.
-   - Details: This function increases the rental period of the agreement.
-   - Event: AgreementExtended is emitted with the new rental period.
-   - Importance: This feature adds flexibility to the rental process, accommodating user needs.
+## 3. During the Rental Period
 
-5. Potential Dispute:
-   - Purpose: Handle disagreements or issues during the rental period.
-   - Action: Either party can call `raiseDispute()` in the RentalAgreement contract.
-   - Details: This function marks the agreement as disputed and triggers the dispute resolution process.
-   - Events: 
-     - DisputeRaised is emitted from the RentalAgreement contract.
-     - DisputeInitiated is emitted from the DisputeResolution contract.
-   - Resolution: An admin or arbitrator calls `resolveDispute()` in the DisputeResolution contract.
-   - Event: DisputeResolved is emitted with the resolution outcome.
-   - Importance: This process ensures fair handling of conflicts, maintaining trust in the platform.
+1. Renter uses the asset for the agreed period.
+2. If needed, either party can call `extendRentalPeriod()` to lengthen the rental duration.
 
-6. Agreement Completion:
-   - Purpose: Conclude the rental agreement and handle all related processes.
-   - Action: The owner or renter calls `completeAgreement()` in the RentalAgreement contract.
-   - Details:
-     - The function checks if the rental period has ended and performs a final inspection.
-     - If successful, it triggers several internal processes:
-       a) Rewards users through the SocialFi contract.
-       b) Distributes revenue via the Monetization contract.
-       c) Releases funds from the Escrow contract.
-       d) Updates user reputations in the Reputation contract.
-   - Events:
-     - ItemInspected from the final inspection.
-     - AgreementCompleted from the RentalAgreement contract.
-     - UserRewarded for both parties from the SocialFi contract.
-     - RevenueDistributed from the Monetization contract.
-     - FundsReleased from the Escrow contract.
-     - ReputationUpdated for both users from the Reputation contract.
-   - Importance: This step concludes the agreement, ensuring all parties are appropriately compensated and their reputations updated.
+## 4. Completing the Agreement
 
-7. Alternative: Agreement Cancellation:
-   - Purpose: Allow for early termination of the agreement if necessary.
-   - Action: Either party can call `cancelAgreement()`.
-   - Details: This function marks the agreement as inactive and triggers a refund process.
-   - Events:
-     - AgreementCancelled from the RentalAgreement contract.
-     - DepositRefunded from the Escrow contract.
-   - Importance: This feature provides an exit mechanism for agreements that cannot be fulfilled.
+1. Once the rental period is over, either party can call `completeAgreement()`.
+2. The function checks if the rental period has ended and performs a final inspection.
+3. If successful:
+   - Rewards are distributed through the SocialFi contract.
+   - Revenue is distributed via the Monetization contract.
+   - Funds are released from the Escrow contract.
+   - User reputations are updated in the Reputation contract.
 
-8. Post-Rental Activities:
-   - Purpose: Allow users to check and claim their rewards and review their reputation.
-   - Actions:
-     - Users can query their reputation score.
-     - Users can check their reward balance and claim rewards.
-   - Details:
-     - Reputation scores are stored in the Reputation contract.
-     - Rewards are managed by the SocialFi contract, with `getRewardBalance()` and `claimRewards()` functions.
-   - Importance: These features incentivize good behavior and allow users to benefit from their positive platform interactions.
+## 5. Dispute Resolution
 
-9. Ongoing Platform Management:
-   - Purpose: Allow for updates and maintenance of the platform.
-   - Actions:
-     - The owner of RentalAgreement can update various contract addresses.
-     - The admin of UserIdentity can revoke user verification if necessary.
-   - Event: UserRevoked is emitted if a user's verification is revoked.
-   - Importance: These functions ensure the platform can be updated and maintained over time.
+1. If a dispute arises, either party can call `raiseDispute()` in the RentalAgreement contract.
+2. This initiates the dispute resolution process in the DisputeResolution contract.
+3. Arbiters vote on the dispute by calling `voteOnDispute()`.
+4. Once voting is complete, an arbiter calls `resolveDispute()`.
+5. The resolution updates user reputations and may revoke user validation if reputation falls below a threshold.
+6. Penalties may be applied to the losing party (e.g., forfeiting deposit).
 
-This detailed journey showcases the complex interactions between the various contracts, highlighting how they work together to create a comprehensive, secure, and flexible rental agreement system. Each step serves a specific purpose in the rental process, from ensuring user authenticity to handling disputes and rewarding good behavior.
+## 6. System Management
+
+1. DAO members can propose and update the system fee by calling `proposeAndUpdateSystemFee()` in the RentalDAO contract.
+2. Admins can withdraw accumulated system fees using `withdrawFees()`.
+3. Contract addresses can be updated as needed using `updateContractAddress()`.
+
+## 7. User Reputation
+
+1. User reputations are automatically updated based on successful completions of agreements and dispute resolutions.
+2. Users can check their reputation score at any time.
+3. If a user's reputation falls below a certain threshold, their verification may be revoked, preventing them from participating in new agreements until re-verified.
+
+This user journey provides a high-level overview of the main interactions users and administrators have with the rental platform. It covers the key processes from user registration to agreement completion or dispute resolution, as well as system management tasks.

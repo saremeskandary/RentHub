@@ -12,7 +12,15 @@ at the end of aggrement give back the garantee to the renter.
 
 add withdraw function for system fee.
 
-change require to if condition to make the gass less.
+to Using if with custom error:
+
+error InsufficientBalance(uint256 available, uint256 required);
+
+if (balance < amount) {
+    revert InsufficientBalance(balance, amount);
+}
+
+move errors, events, structs, enums from contracts to their interface
 
 set system fee dynamic and change it on dao on RevenueSharing
 

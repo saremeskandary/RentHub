@@ -27,6 +27,11 @@ interface IRentalDAO {
 	 */
 	event ContractAddressUpdated(string contractName, address newAddress);
 
+	// Custom errors
+	error FeeExceedsMaximum(uint256 fee);
+	error InvalidAddress();
+	error Unauthorized();
+
 	/**
 	 * @dev Proposes and updates the system fee
 	 * @param _newFee The proposed new fee (in basis points)

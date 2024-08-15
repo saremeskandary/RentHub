@@ -7,6 +7,7 @@ pragma solidity 0.8.26;
  */
 interface IRentalAgreement {
 	struct User {
+		address userAddress;
 		uint256 validationTime;
 		bool isValidated;
 		uint256 reputationScore;
@@ -49,7 +50,25 @@ interface IRentalAgreement {
 	/**
 	 * @dev Thrown if the provided agreement is invalid.
 	 */
+	error User_not_verified(address user);
 	error InvalidAgreement();
+	error Cost_must_be_greater_than_zero(uint256 cost);
+	error Deposit_must_be_greater_than_zero(uint256 deposit);
+	error Rental_Period_must_be_greater_than_zero(uint256 rentalPeriod);
+	error Asset_is_not_active(bool isActive);
+	error InvalidAddress(string name);
+	error UserNotVerified(address user);
+	error CostMustBeGreaterThanZero(uint256 cost);
+	error DepositMustBeGreaterThanZero(uint256 deposit);
+	error RentalPeriodMustBeGreaterThanZero(uint256 rentalPeriod);
+	error AssetIsNotActive(bool isActive);
+	error IncorrectAmountSent(uint256 sent, uint256 required);
+	error NotAuthorized(address user);
+	error AgreementNotActive(bool isActive);
+	error RentalPeriodNotOver(uint256 currentTime, uint256 endTime);
+	error InspectionFailed(bool itemCondition, address rentee, address renter);
+	error InvalidDAOAddress(address daoAddress);
+
 	/**
 	 * @dev Emitted when a new agreement is created
 	 * @param agreementId The ID of the newly created agreement
@@ -83,12 +102,12 @@ interface IRentalAgreement {
 	 */
 	event AgreementExtended(uint256 agreementId, uint256 newRentalPeriod);
 
-	/**
-	 * @dev Emitted when an agreement's arrival period is extended
-	 * @param agreementId The ID of the extended agreement
-	 * @param newRentalPeriod The new rental period
-	 */
-	event arrivalAgreement(uint256 agreementId, uint256 newRentalPeriod); // FIXME
+	event ArrivalAgreementEvent(
+		uint256 agreementId,
+		address rentee,
+		address renter,
+		uint256 arrivalTime
+	);
 
 	/**
 	 * @dev Creates a new rental agreement

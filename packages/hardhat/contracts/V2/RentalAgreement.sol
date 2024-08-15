@@ -29,11 +29,9 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	IRentalDAO public rentalDAO;
 
 	modifier onlyVerifiedUser(address _user) {
-		require(
-			_user != address(0) &&
-				IUserIdentity(userIdentity).isVerifiedUser(_user),
-			"User not verified"
-		);
+		if (_user == address(0) || !userIdentity.isVerifiedUser(_user)) {
+			revert UserNotVerified(_user);
+		}
 		_;
 	}
 
@@ -47,17 +45,15 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		address _userIdentity,
 		address _rentalDAO
 	) {
-		require(_escrow != address(0), "Invalid escrow  address");
-		require(_inspection != address(0), "Invalid inspection  address");
-		require(_reputation != address(0), "Invalid reputation  address");
-		require(
-			_disputeResolution != address(0),
-			"Invalid dispute resolution  address"
-		);
-		require(_socialFi != address(0), "Invalid social fi  address");
-		require(_monetization != address(0), "Invalid monetization  address");
-		require(_userIdentity != address(0), "Invalid user identity  address");
-		require(_rentalDAO != address(0), "Invalid DAO  address");
+		if (_escrow == address(0)) revert InvalidAddress("escrow");
+		if (_inspection == address(0)) revert InvalidAddress("inspection");
+		if (_reputation == address(0)) revert InvalidAddress("reputation");
+		if (_disputeResolution == address(0))
+			revert InvalidAddress("dispute resolution");
+		if (_socialFi == address(0)) revert InvalidAddress("social fi");
+		if (_monetization == address(0)) revert InvalidAddress("monetization");
+		if (_userIdentity == address(0)) revert InvalidAddress("user identity");
+		if (_rentalDAO == address(0)) revert InvalidAddress("DAO");
 
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
@@ -83,12 +79,14 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		onlyVerifiedUser(_renter)
 		returns (uint256)
 	{
-		require(_cost > 0, "Cost must be greater than zero");
-		require(_deposit > 0, "Deposit must be greater than zero");
-		require(_rentalPeriod > 0, "Rental Period must be greater than zero");
+		if (_cost <= 0) revert CostMustBeGreaterThanZero(_cost);
+		if (_deposit <= 0) revert DepositMustBeGreaterThanZero(_deposit);
+		if (_rentalPeriod <= 0)
+			revert RentalPeriodMustBeGreaterThanZero(_rentalPeriod);
 
 		Asset storage asset = assets[_tokenId];
-		require(asset.isActive, "Asset is not active");
+		if (!asset.isActive) revert AssetIsNotActive(asset.isActive);
+
 		agreements[agreementCounter] = Agreement({
 			rentee: users[msg.sender],
 			renter: users[address(0)],
@@ -104,116 +102,120 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 
 		agreementCounter++;
 
-		emit AgreementCreated(agreementCounter, msg.sender, _renter); // FIXME add better event for graph
+		emit AgreementCreated(agreementCounter, msg.sender, _renter);
 
 		return agreementCounter;
 	}
 
-	function ArrivalAgreement(uint256 agreemntId) external {
-		Agreement storage agreement = agreements[agreemntId];
+	function ArrivalAgreement(uint256 _agreementId) external {
+		Agreement storage agreement = agreements[_agreementId];
 		if (
-			agreement.renter == users[address(0)] &&
-			agreement.isDisputed == false &&
-			agreement.status == AgreementStatus.CREATED
-		) revert InvalidAgreement();
+			agreement.renter.userAddress != address(0) ||
+			agreement.isDisputed ||
+			agreement.status != AgreementStatus.CREATED
+		) {
+			revert InvalidAgreement();
+		}
 
 		uint256 systemFee = rentalDAO.getSystemFee();
 		uint256 feeAmount = (agreement.cost * systemFee) / 10000;
-		uint256 totalAmount = agreement.cost + agreement.deposit; // get fee from rentee instead of renter
+		uint256 totalAmount = agreement.cost + agreement.deposit;
 
-		require(msg.value >= totalAmount, "Incorrect amount sent");
-
-		require(agreement.asset.isActive, "Asset is not active");
+		if (msg.value < totalAmount)
+			revert IncorrectAmountSent(msg.value, totalAmount);
+		if (!agreement.asset.isActive)
+			revert AssetIsNotActive(agreement.asset.isActive);
 
 		// Lock funds in the Escrow
-		escrow.lockFunds(msg.sender, agreement.cost, agreement.deposit);
+		escrow.lockFunds(_agreementId, agreement.cost, agreement.deposit);
 
 		agreement.asset.timesRented++;
-
 		agreement.renter = users[msg.sender];
 		agreement.startTime = block.timestamp;
 		agreement.status = AgreementStatus.STARTED;
 
-		emit arrivalAgreement(); // FIXME
+		emit ArrivalAgreementEvent(
+			_agreementId,
+			agreement.rentee.userAddress,
+			agreement.renter.userAddress,
+			block.timestamp
+		);
 	}
 
 	function completeAgreement(uint256 _agreementId) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
-		require(
-			msg.sender == agreement.rentee || msg.sender == agreement.renter,
-			"Not authorized"
-		);
-		require(agreement.isActive, "Agreement not active");
-		require(
-			block.timestamp >= agreement.startTime + agreement.rentalPeriod,
-			"Rental period not over"
-		);
+		if (
+			msg.sender != agreement.rentee.userAddress &&
+			msg.sender != agreement.renter.userAddress
+		) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
+		if (block.timestamp <= agreement.startTime + agreement.rentalPeriod) {
+			revert RentalPeriodNotOver(
+				block.timestamp,
+				agreement.startTime + agreement.rentalPeriod
+			);
+		}
 
-		// Optionally, perform inspection before completion
-		bool isItemInGoodCondition = IInspection(inspection).inspectItem(
-			_agreementId
-		);
-		// Consider using a better inspection mechanism or allow mutual agreement by both parties.
-		require(
-			isItemInGoodCondition ||
-				(msg.sender == agreement.rentee &&
-					agreement.renter == address(0)),
-			"Inspection failed"
-		);
+		bool isItemInGoodCondition = inspection.inspectItem(_agreementId);
+		if (!isItemInGoodCondition) {
+			revert InspectionFailed(
+				isItemInGoodCondition,
+				agreement.rentee.userAddress,
+				agreement.renter.userAddress
+			);
+		}
 
 		agreement.isActive = false;
 		agreement.isCompleted = true;
 
-		// require(agreement.isActive == false, "agreement is active"); FIXME do we need this when we have nonReentrant?
-		// require(agreement.isCompleted == true, "agreement is not completed"); FIXME do we need this when we have nonReentrant?
-		// Reward users via SocialFi
-		ISocialFi(socialFi).rewardUser(agreement.rentee, 100); // Example reward
-		ISocialFi(socialFi).rewardUser(agreement.renter, 100);
+		socialFi.rewardUser(agreement.rentee.userAddress, 100);
+		socialFi.rewardUser(agreement.renter.userAddress, 100);
 
-		// Distribute revenue via Monetization
-		IMonetization(monetization).distributeRevenue(
-			_agreementId,
-			agreement.cost
-		);
+		monetization.distributeRevenue(_agreementId, agreement.cost);
 
 		emit AgreementCompleted(_agreementId);
 
-		IEscrow(escrow).releaseFunds(_agreementId);
-		IReputation(reputation).updateReputations(
+		escrow.releaseFunds(_agreementId);
+		reputation.updateReputations(
 			_agreementId,
-			agreement.rentee,
-			agreement.renter,
+			agreement.rentee.userAddress,
+			agreement.renter.userAddress,
 			true
 		);
 	}
 
 	function raiseDispute(uint256 _agreementId) external {
 		Agreement storage agreement = agreements[_agreementId];
-		require(
-			msg.sender == agreement.rentee || msg.sender == agreement.renter,
-			"Not authorized"
-		);
-		require(agreement.isActive, "Agreement not active");
+		if (
+			msg.sender != agreement.rentee.userAddress &&
+			msg.sender != agreement.renter.userAddress
+		) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
 
 		emit DisputeRaised(_agreementId);
 
-		IDisputeResolution(disputeResolution).initiateDispute(_agreementId);
+		disputeResolution.initiateDispute(_agreementId);
 	}
 
 	function cancelAgreement(uint256 _agreementId) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
-		require(
-			msg.sender == agreement.rentee || msg.sender == agreement.renter,
-			"Not authorized"
-		);
-		require(agreement.isActive, "Agreement not active");
+		if (
+			msg.sender != agreement.rentee.userAddress &&
+			msg.sender != agreement.renter.userAddress
+		) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
 
 		agreement.isActive = false;
 
 		emit AgreementCancelled(_agreementId);
 
-		// Refund the deposit back to the renter
-		IEscrow(escrow).refundDeposit(_agreementId);
+		escrow.refundDeposit(_agreementId);
 	}
 
 	function extendRentalPeriod(
@@ -221,35 +223,40 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		uint256 _additionalPeriod
 	) external nonReentrant {
 		Agreement storage agreement = agreements[_agreementId];
-		require(
-			msg.sender == agreement.rentee || msg.sender == agreement.renter,
-			"Not authorized"
-		);
-		require(agreement.isActive, "Agreement not active");
+		if (
+			msg.sender != agreement.rentee.userAddress &&
+			msg.sender != agreement.renter.userAddress
+		) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
 
 		agreement.rentalPeriod += _additionalPeriod;
 
 		emit AgreementExtended(_agreementId, agreement.rentalPeriod);
-
-		// Optionally lock additional funds in escrow if required
 	}
 
 	function updateEscrow(address _escrow) external onlyOwner {
-		escrow = _escrow;
+		if (_escrow == address(0)) revert InvalidAddress("escrow");
+		escrow = IEscrow(_escrow);
 	}
 
 	function updateInspection(address _inspection) external onlyOwner {
-		inspection = _inspection;
+		if (_inspection == address(0)) revert InvalidAddress("inspection");
+		inspection = IInspection(_inspection);
 	}
 
 	function updateReputation(address _reputation) external onlyOwner {
-		reputation = _reputation;
+		if (_reputation == address(0)) revert InvalidAddress("reputation");
+		reputation = IReputation(_reputation);
 	}
 
 	function updateDisputeResolution(
 		address _disputeResolution
 	) external onlyOwner {
-		disputeResolution = _disputeResolution;
+		if (_disputeResolution == address(0))
+			revert InvalidAddress("dispute resolution");
+		disputeResolution = IDisputeResolution(_disputeResolution);
 	}
 
 	function updateSocialFi(address _socialFi) external onlyOwner {
@@ -264,8 +271,8 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		userIdentity = _userIdentity;
 	}
 
-	function updateDAO(address _rentalDAO) external onlyOwner {
-		require(_rentalDAO != address(0), "Invalid DAO  address");
-		rentalDAO = _rentalDAO;
-	}
+    function updateDAO(address _rentalDAO) external onlyOwner {
+        if (_rentalDAO == address(0)) revert InvalidDAOAddress(_rentalDAO);
+        rentalDAO = _rentalDAO;
+    }
 }

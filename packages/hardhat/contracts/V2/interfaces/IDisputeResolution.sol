@@ -4,6 +4,27 @@ pragma solidity 0.8.26;
 /// @title IDisputeResolution - Interface for the DisputeResolution contract
 /// @notice Interface for managing and resolving disputes within the Rental DAO ecosystem
 interface IDisputeResolution {
+	struct Dispute {
+		bool isActive;
+		uint256 votesForOwner;
+		uint256 votesForRenter;
+		mapping(address => bool) hasVoted;
+	}
+
+	event DisputeInitiated(uint256 agreementId);
+	event DisputeResolved(uint256 agreementId, address winner, address loser);
+	event ArbitersVoted(
+		uint256 agreementId,
+		address arbiter,
+		bool votedForOwner
+	);
+
+	// Custom errors
+	error InvalidAddress(string field);
+	error DisputeAlreadyExists(uint256 agreementId);
+	error NoActiveDispute(uint256 agreementId);
+	error ArbiterAlreadyVoted(address arbiter, uint256 agreementId);
+
 	/// @notice Initiates a dispute for a specific rental agreement
 	/// @param _agreementId The ID of the rental agreement in dispute
 	function initiateDispute(uint256 _agreementId) external;

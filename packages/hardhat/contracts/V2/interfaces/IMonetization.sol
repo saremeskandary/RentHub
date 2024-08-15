@@ -4,6 +4,11 @@ pragma solidity 0.8.26;
 /// @title IMonetization - Interface for the Monetization contract
 /// @notice Interface for distributing revenue and tracking agreement earnings
 interface IMonetization {
+	event RevenueDistributed(uint256 agreementId, uint256 amount);
+
+	// Custom errors
+	error AmountMustBeGreaterThanZero(uint256 amount);
+
 	/// @notice Distributes revenue for a specific agreement
 	/// @param _agreementId The ID of the agreement for which the revenue is being distributed
 	/// @param _amount The total amount of revenue to be distributed

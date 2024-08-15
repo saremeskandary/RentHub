@@ -4,6 +4,12 @@ pragma solidity 0.8.26;
 /// @title ISocialFi - Interface for the SocialFi contract
 /// @notice Interface for managing user rewards
 interface ISocialFi {
+	event UserRewarded(address indexed user, uint256 amount);
+
+	// Custom errors
+	error RewardAmountMustBeGreaterThanZero(uint256 amount);
+	error NoRewardsToClaim();
+
 	/// @notice Rewards a user with a specific amount
 	/// @param _user The address of the user to be rewarded
 	/// @param _amount The amount of the reward

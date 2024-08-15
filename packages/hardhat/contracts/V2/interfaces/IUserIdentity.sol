@@ -4,6 +4,15 @@ pragma solidity 0.8.26;
 /// @title IUserIdentity - Interface for the UserIdentity contract
 /// @notice Interface for managing user verification and admin functions in the UserIdentity system
 interface IUserIdentity {
+	event UserVerified(address indexed user);
+	event UserRevoked(address indexed user);
+
+	// Custom errors
+	error OnlyAdmin();
+	error UserAlreadyVerified(address user);
+	error UserNotVerified(address user);
+	error ZeroAddress();
+
 	/// @notice Verifies a user and marks them as verified
 	/// @param _user The address of the user to be verified
 	function verifyUser(address _user) external;

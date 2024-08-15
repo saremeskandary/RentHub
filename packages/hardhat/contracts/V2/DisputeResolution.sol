@@ -12,16 +12,10 @@ import { IReputation } from "./interfaces/IReputation.sol";
 import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
+import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 
-contract DisputeResolution is AccessControl {
+contract DisputeResolution is IDisputeResolution, AccessControl {
 	bytes32 public constant ARBITER_ROLE = keccak256("ARBITER_ROLE");
-
-	struct Dispute {
-		bool isActive;
-		uint256 votesForOwner;
-		uint256 votesForRenter;
-		mapping(address => bool) hasVoted;
-	}
 
 	mapping(uint256 => Dispute) public disputes;
 
@@ -32,25 +26,15 @@ contract DisputeResolution is AccessControl {
 	uint256 public constant REPUTATION_PENALTY = 50;
 	uint256 public constant VALIDATION_REVOCATION_THRESHOLD = 3;
 
-	event DisputeInitiated(uint256 agreementId);
-	event DisputeResolved(uint256 agreementId, address winner, address loser);
-	event ArbitersVoted(
-		uint256 agreementId,
-		address arbiter,
-		bool votedForOwner
-	);
-
 	constructor(
 		address _rentalAgreement,
 		address _reputation,
 		address _userIdentity
 	) {
-		require(
-			_rentalAgreement != address(0),
-			"Invalid rental agreement address"
-		);
-		require(_reputation != address(0), "Invalid reputation address");
-		require(_userIdentity != address(0), "Invalid user identity address");
+		if (_rentalAgreement == address(0))
+			revert InvalidAddress("rental agreement");
+		if (_reputation == address(0)) revert InvalidAddress("reputation");
+		if (_userIdentity == address(0)) revert InvalidAddress("user identity");
 
 		rentalAgreement = IRentalAgreement(_rentalAgreement);
 		reputation = IReputation(_reputation);
@@ -61,7 +45,8 @@ contract DisputeResolution is AccessControl {
 	}
 
 	function initiateDispute(uint256 _agreementId) external {
-		require(!disputes[_agreementId].isActive, "Dispute already exists");
+		if (disputes[_agreementId].isActive)
+			revert DisputeAlreadyExists(_agreementId);
 
 		disputes[_agreementId].isActive = true;
 		emit DisputeInitiated(_agreementId);
@@ -72,8 +57,9 @@ contract DisputeResolution is AccessControl {
 		bool _voteForOwner
 	) external onlyRole(ARBITER_ROLE) {
 		Dispute storage dispute = disputes[_agreementId];
-		require(dispute.isActive, "No active dispute");
-		require(!dispute.hasVoted[msg.sender], "Arbiter has already voted");
+		if (!dispute.isActive) revert NoActiveDispute(_agreementId);
+		if (dispute.hasVoted[msg.sender])
+			revert ArbiterAlreadyVoted(msg.sender, _agreementId);
 
 		if (_voteForOwner) {
 			dispute.votesForOwner++;
@@ -90,7 +76,7 @@ contract DisputeResolution is AccessControl {
 		uint256 _agreementId
 	) external onlyRole(ARBITER_ROLE) {
 		Dispute storage dispute = disputes[_agreementId];
-		require(dispute.isActive, "No active dispute");
+		if (!dispute.isActive) revert NoActiveDispute(_agreementId);
 
 		(address owner, address renter) = rentalAgreement.getAgreementParties(
 			_agreementId
@@ -131,7 +117,7 @@ contract DisputeResolution is AccessControl {
 	function addArbiter(
 		address _arbiter
 	) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		require(_arbiter != address(0), "Invalid arbiter address");
+		if (_arbiter == address(0)) revert InvalidAddress("arbiter");
 		grantRole(ARBITER_ROLE, _arbiter);
 	}
 
@@ -139,5 +125,16 @@ contract DisputeResolution is AccessControl {
 		address _arbiter
 	) external onlyRole(DEFAULT_ADMIN_ROLE) {
 		revokeRole(ARBITER_ROLE, _arbiter);
+	}
+
+	function getDispute(
+		uint256 _disputeId
+	) external view returns (bool, uint256, uint256) {
+		Dispute storage dispute = disputes[_disputeId];
+		return (
+			dispute.isActive,
+			dispute.votesForOwner,
+			dispute.votesForRenter
+		);
 	}
 }

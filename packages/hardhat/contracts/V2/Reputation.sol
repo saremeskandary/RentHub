@@ -2,13 +2,12 @@
 pragma solidity 0.8.26;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import { IReputation } from "./interfaces/IReputation.sol";
 
-contract Reputation is AccessControl {
+contract Reputation is IReputation, AccessControl {
 	bytes32 public constant UPDATER_ROLE = keccak256("UPDATER_ROLE");
 
 	mapping(address => int256) public reputationScores;
-
-	event ReputationUpdated(address user, int256 newScore);
 
 	constructor() {
 		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -19,7 +18,7 @@ contract Reputation is AccessControl {
 		address _user,
 		int256 _change
 	) external onlyRole(UPDATER_ROLE) {
-		require(_user != address(0), "Invalid user address");
+		if (_user == address(0)) revert InvalidUserAddress(_user);
 
 		reputationScores[_user] += _change;
 
@@ -33,7 +32,7 @@ contract Reputation is AccessControl {
 	function addUpdater(
 		address _updater
 	) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		require(_updater != address(0), "Invalid updater address");
+		if (_updater == address(0)) revert InvalidUpdaterAddress(_updater);
 		grantRole(UPDATER_ROLE, _updater);
 	}
 
