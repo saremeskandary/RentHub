@@ -41,7 +41,7 @@ interface IEscrow {
 		uint256 _agreementId,
 		uint256 _rentalFee,
 		uint256 _deposit
-	) external payable;
+	) external;
 
 	/// @notice Confirms the rental agreement by the renter
 	/// @param _agreementId The ID of the agreement to be confirmed
