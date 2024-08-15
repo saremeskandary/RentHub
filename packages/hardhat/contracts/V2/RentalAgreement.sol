@@ -1,30 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IInspection } from "./interfaces/IInspection.sol";
 import { ISocialFi } from "./interfaces/ISocialFi.sol";
-import { IMonetization } from "./interfaces/IMonetization.sol";
 import { IReputation } from "./interfaces/IReputation.sol";
 import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
 
-contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
+contract RentalAgreement is IRentalAgreement, Ownable {
+	using SafeERC20 for IERC20;
+
 	mapping(address => User) public users;
 	mapping(uint256 => Agreement) public agreements;
 	mapping(uint256 => Asset) public assets;
 	uint256 public agreementCounter;
+
+	IERC20 public token;
 
 	IEscrow public escrow;
 	IInspection public inspection;
 	IReputation public reputation;
 	IDisputeResolution public disputeResolution;
 	ISocialFi public socialFi;
-	IMonetization public monetization;
 	IUserIdentity public userIdentity;
 	IRentalDAO public rentalDAO;
 
@@ -36,12 +38,12 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	}
 
 	constructor(
+		IERC20 _token,
 		address _escrow,
 		address _inspection,
 		address _reputation,
 		address _disputeResolution,
 		address _socialFi,
-		address _monetization,
 		address _userIdentity,
 		address _rentalDAO
 	) {
@@ -51,16 +53,14 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		if (_disputeResolution == address(0))
 			revert InvalidAddress("dispute resolution");
 		if (_socialFi == address(0)) revert InvalidAddress("social fi");
-		if (_monetization == address(0)) revert InvalidAddress("monetization");
 		if (_userIdentity == address(0)) revert InvalidAddress("user identity");
 		if (_rentalDAO == address(0)) revert InvalidAddress("DAO");
-
+		token = _token;
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
 		reputation = IReputation(_reputation);
 		disputeResolution = IDisputeResolution(_disputeResolution);
 		socialFi = ISocialFi(_socialFi);
-		monetization = IMonetization(_monetization);
 		userIdentity = IUserIdentity(_userIdentity);
 		rentalDAO = IRentalDAO(_rentalDAO);
 	}
@@ -73,8 +73,6 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		uint256 _deposit
 	)
 		external
-		payable
-		nonReentrant
 		onlyVerifiedUser(msg.sender)
 		onlyVerifiedUser(_renter)
 		returns (uint256)
@@ -85,7 +83,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 			revert RentalPeriodMustBeGreaterThanZero(_rentalPeriod);
 
 		Asset storage asset = assets[_tokenId];
-		if (!asset.isActive) revert AssetIsNotActive(asset.isActive);
+		if (!asset.isActive) revert AssetIsNotActive();
 
 		agreements[agreementCounter] = Agreement({
 			rentee: users[msg.sender],
@@ -117,14 +115,14 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 			revert InvalidAgreement();
 		}
 
-		uint256 systemFee = rentalDAO.getSystemFee();
-		uint256 feeAmount = (agreement.cost * systemFee) / 10000;
 		uint256 totalAmount = agreement.cost + agreement.deposit;
 
-		if (msg.value < totalAmount)
-			revert IncorrectAmountSent(msg.value, totalAmount);
-		if (!agreement.asset.isActive)
-			revert AssetIsNotActive(agreement.asset.isActive);
+		if (IERC20(token).balanceOf(msg.sender) < totalAmount)
+			revert IncorrectAmountSent(
+				IERC20(token).balanceOf(msg.sender),
+				totalAmount
+			);
+		if (!agreement.asset.isActive) revert AssetIsNotActive();
 
 		// Lock funds in the Escrow
 		escrow.lockFunds(_agreementId, agreement.cost, agreement.deposit);
@@ -132,7 +130,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		agreement.asset.timesRented++;
 		agreement.renter = users[msg.sender];
 		agreement.startTime = block.timestamp;
-		agreement.status = AgreementStatus.STARTED;
+		agreement.status = AgreementStatus.REQUESTED;
 
 		emit ArrivalAgreementEvent(
 			_agreementId,
@@ -142,7 +140,7 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		);
 	}
 
-	function completeAgreement(uint256 _agreementId) external nonReentrant {
+	function completeAgreement(uint256 _agreementId) external {
 		Agreement storage agreement = agreements[_agreementId];
 		if (
 			msg.sender != agreement.rentee.userAddress &&
@@ -150,40 +148,54 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		) {
 			revert NotAuthorized(msg.sender);
 		}
-		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
-		if (block.timestamp <= agreement.startTime + agreement.rentalPeriod) {
+		if (agreement.status != AgreementStatus.STARTED)
+			revert AgreementNotActive();
+		if (block.timestamp <= agreement.startTime + agreement.rentalPeriod)
 			revert RentalPeriodNotOver(
 				block.timestamp,
 				agreement.startTime + agreement.rentalPeriod
 			);
-		}
 
 		bool isItemInGoodCondition = inspection.inspectItem(_agreementId);
-		if (!isItemInGoodCondition) {
+		if (!isItemInGoodCondition)
 			revert InspectionFailed(
 				isItemInGoodCondition,
 				agreement.rentee.userAddress,
 				agreement.renter.userAddress
 			);
-		}
 
-		agreement.isActive = false;
-		agreement.isCompleted = true;
+		agreement.status = AgreementStatus.COMPLETED;
 
 		socialFi.rewardUser(agreement.rentee.userAddress, 100);
 		socialFi.rewardUser(agreement.renter.userAddress, 100);
 
-		monetization.distributeRevenue(_agreementId, agreement.cost);
+		escrow.distributeRevenue(
+			_agreementId,
+			agreement.deposit,
+			agreement.cost,
+			agreement.rentee.userAddress,
+			agreement.renter.userAddress
+		);
 
 		emit AgreementCompleted(_agreementId);
 
 		escrow.releaseFunds(_agreementId);
-		reputation.updateReputations(
-			_agreementId,
-			agreement.rentee.userAddress,
-			agreement.renter.userAddress,
-			true
-		);
+		// reputation.updateReputation(_agreementId, msg.sender, change);
+	}
+
+	function cancelAgreement(uint256 _agreementId) external {
+		Agreement storage agreement = agreements[_agreementId];
+		if (msg.sender != agreement.renter.userAddress) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (agreement.status != AgreementStatus.STARTED)
+			revert AgreementNotActive();
+
+		agreement.status = AgreementStatus.CANCELLED;
+
+		emit AgreementCancelled(_agreementId);
+
+		escrow.refundDeposit(_agreementId);
 	}
 
 	function raiseDispute(uint256 _agreementId) external {
@@ -191,49 +203,54 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 		if (
 			msg.sender != agreement.rentee.userAddress &&
 			msg.sender != agreement.renter.userAddress
-		) {
-			revert NotAuthorized(msg.sender);
-		}
-		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
+		) revert NotAuthorized(msg.sender);
+
+		if (agreement.status != AgreementStatus.STARTED)
+			revert AgreementNotActive();
 
 		emit DisputeRaised(_agreementId);
 
 		disputeResolution.initiateDispute(_agreementId);
 	}
 
-	function cancelAgreement(uint256 _agreementId) external nonReentrant {
+	function extendRentalPeriodRentee(
+		uint256 _agreementId,
+		uint256 _additionalPeriod,
+		uint256 _newCost
+	) external {
 		Agreement storage agreement = agreements[_agreementId];
-		if (
-			msg.sender != agreement.rentee.userAddress &&
-			msg.sender != agreement.renter.userAddress
-		) {
+		if (msg.sender != agreement.rentee.userAddress) {
 			revert NotAuthorized(msg.sender);
 		}
-		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
+		if (agreement.status != AgreementStatus.STARTED) {
+			revert AgreementNotActive();
+		}
 
-		agreement.isActive = false;
+		agreement.rentalPeriod += _additionalPeriod;
+		agreement.cost = _newCost;
 
-		emit AgreementCancelled(_agreementId);
-
-		escrow.refundDeposit(_agreementId);
+		emit AgreementExtendedRentee(
+			_agreementId,
+			agreement.rentalPeriod,
+			_newCost
+		);
 	}
 
-	function extendRentalPeriod(
+	function extendRentalPeriodRenter(
 		uint256 _agreementId,
 		uint256 _additionalPeriod
-	) external nonReentrant {
+	) external {
 		Agreement storage agreement = agreements[_agreementId];
-		if (
-			msg.sender != agreement.rentee.userAddress &&
-			msg.sender != agreement.renter.userAddress
-		) {
+		if (msg.sender != agreement.renter.userAddress) {
 			revert NotAuthorized(msg.sender);
 		}
-		if (!agreement.isActive) revert AgreementNotActive(agreement.isActive);
+		if (agreement.status != AgreementStatus.STARTED) {
+			revert AgreementNotActive();
+		}
 
 		agreement.rentalPeriod += _additionalPeriod;
 
-		emit AgreementExtended(_agreementId, agreement.rentalPeriod);
+		emit AgreementExtendedRenter(_agreementId, agreement.rentalPeriod);
 	}
 
 	function updateEscrow(address _escrow) external onlyOwner {
@@ -260,19 +277,19 @@ contract RentalAgreement is IRentalAgreement, ReentrancyGuard, Ownable {
 	}
 
 	function updateSocialFi(address _socialFi) external onlyOwner {
-		socialFi = _socialFi;
-	}
-
-	function updateMonetization(address _monetization) external onlyOwner {
-		monetization = _monetization;
+		socialFi = ISocialFi(_socialFi);
 	}
 
 	function updateUserIdentity(address _userIdentity) external onlyOwner {
-		userIdentity = _userIdentity;
+		userIdentity = IUserIdentity(_userIdentity);
 	}
 
-    function updateDAO(address _rentalDAO) external onlyOwner {
-        if (_rentalDAO == address(0)) revert InvalidDAOAddress(_rentalDAO);
-        rentalDAO = _rentalDAO;
-    }
+	function updateDAO(address _rentalDAO) external onlyOwner {
+		if (_rentalDAO == address(0)) revert InvalidDAOAddress(_rentalDAO);
+		rentalDAO = IRentalDAO(_rentalDAO);
+	}
+
+	function getAgreementParties(
+		uint256 _agreementId
+	) external view returns (address rentee, address renter) {}
 }

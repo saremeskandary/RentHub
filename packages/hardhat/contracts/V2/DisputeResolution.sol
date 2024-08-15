@@ -7,14 +7,18 @@ import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IInspection } from "./interfaces/IInspection.sol";
 import { ISocialFi } from "./interfaces/ISocialFi.sol";
-import { IMonetization } from "./interfaces/IMonetization.sol";
 import { IReputation } from "./interfaces/IReputation.sol";
 import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
 import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
+import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
-contract DisputeResolution is IDisputeResolution, AccessControl {
+contract DisputeResolution is
+	IDisputeResolution,
+	AccessControl,
+	IAccessRestriction
+{
 	bytes32 public constant ARBITER_ROLE = keccak256("ARBITER_ROLE");
 
 	mapping(uint256 => Dispute) public disputes;
@@ -22,14 +26,26 @@ contract DisputeResolution is IDisputeResolution, AccessControl {
 	IRentalAgreement public rentalAgreement;
 	IReputation public reputation;
 	IUserIdentity public userIdentity;
+	IAccessRestriction public accessRestriction;
 
 	uint256 public constant REPUTATION_PENALTY = 50;
 	uint256 public constant VALIDATION_REVOCATION_THRESHOLD = 3;
 
+	modifier onlyArbiter() {
+		accessRestriction.ifArbiter(msg.sender);
+		_;
+	}
+
+	modifier onlyAdmin() {
+		accessRestriction.ifAdmin(msg.sender);
+		_;
+	}
+
 	constructor(
 		address _rentalAgreement,
 		address _reputation,
-		address _userIdentity
+		address _userIdentity,
+		address _accessRestriction
 	) {
 		if (_rentalAgreement == address(0))
 			revert InvalidAddress("rental agreement");
@@ -39,9 +55,7 @@ contract DisputeResolution is IDisputeResolution, AccessControl {
 		rentalAgreement = IRentalAgreement(_rentalAgreement);
 		reputation = IReputation(_reputation);
 		userIdentity = IUserIdentity(_userIdentity);
-
-		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-		_setupRole(ARBITER_ROLE, msg.sender);
+		accessRestriction = IAccessRestriction(_accessRestriction);
 	}
 
 	function initiateDispute(uint256 _agreementId) external {
@@ -54,43 +68,41 @@ contract DisputeResolution is IDisputeResolution, AccessControl {
 
 	function voteOnDispute(
 		uint256 _agreementId,
-		bool _voteForOwner
-	) external onlyRole(ARBITER_ROLE) {
+		bool _voteForRentee
+	) external onlyArbiter {
 		Dispute storage dispute = disputes[_agreementId];
 		if (!dispute.isActive) revert NoActiveDispute(_agreementId);
 		if (dispute.hasVoted[msg.sender])
 			revert ArbiterAlreadyVoted(msg.sender, _agreementId);
 
-		if (_voteForOwner) {
-			dispute.votesForOwner++;
+		if (_voteForRentee) {
+			dispute.votesForRentee++;
 		} else {
 			dispute.votesForRenter++;
 		}
 
 		dispute.hasVoted[msg.sender] = true;
 
-		emit ArbitersVoted(_agreementId, msg.sender, _voteForOwner);
+		emit ArbitersVoted(_agreementId, msg.sender, _voteForRentee);
 	}
 
-	function resolveDispute(
-		uint256 _agreementId
-	) external onlyRole(ARBITER_ROLE) {
+	function resolveDispute(uint256 _agreementId) external onlyArbiter {
 		Dispute storage dispute = disputes[_agreementId];
 		if (!dispute.isActive) revert NoActiveDispute(_agreementId);
 
-		(address owner, address renter) = rentalAgreement.getAgreementParties(
+		(address rentee, address renter) = rentalAgreement.getAgreementParties(
 			_agreementId
 		);
 
 		address winner;
 		address loser;
 
-		if (dispute.votesForOwner > dispute.votesForRenter) {
-			winner = owner;
+		if (dispute.votesForRentee > dispute.votesForRenter) {
+			winner = rentee;
 			loser = renter;
 		} else {
 			winner = renter;
-			loser = owner;
+			loser = rentee;
 		}
 
 		// Update reputations
@@ -114,17 +126,13 @@ contract DisputeResolution is IDisputeResolution, AccessControl {
 		// IEscrow(escrowContract).applyPenalty(_agreementId, loser);
 	}
 
-	function addArbiter(
-		address _arbiter
-	) external onlyRole(DEFAULT_ADMIN_ROLE) {
+	function addArbiter(address _arbiter) external onlyAdmin {
 		if (_arbiter == address(0)) revert InvalidAddress("arbiter");
-		grantRole(ARBITER_ROLE, _arbiter);
+		accessRestriction.grantRole(ARBITER_ROLE, _arbiter);
 	}
 
-	function removeArbiter(
-		address _arbiter
-	) external onlyRole(DEFAULT_ADMIN_ROLE) {
-		revokeRole(ARBITER_ROLE, _arbiter);
+	function removeArbiter(address _arbiter) external onlyAdmin {
+		accessRestriction.revokeRole(ARBITER_ROLE, _arbiter);
 	}
 
 	function getDispute(
@@ -133,7 +141,7 @@ contract DisputeResolution is IDisputeResolution, AccessControl {
 		Dispute storage dispute = disputes[_disputeId];
 		return (
 			dispute.isActive,
-			dispute.votesForOwner,
+			dispute.votesForRentee,
 			dispute.votesForRenter
 		);
 	}

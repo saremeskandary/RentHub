@@ -16,8 +16,6 @@ contract RentalDAO is IRentalDAO, AccessControl, ReentrancyGuard {
 	constructor(uint256 _initialFee) {
 		if (_initialFee > MAX_FEE) revert FeeExceedsMaximum(_initialFee);
 		systemFee = _initialFee;
-		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-		_setupRole(DAO_MEMBER_ROLE, msg.sender);
 	}
 
 	function proposeAndUpdateSystemFee(

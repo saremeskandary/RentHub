@@ -42,6 +42,7 @@ interface IRentalAgreement {
 	}
 	enum AgreementStatus {
 		CREATED,
+		REQUESTED,
 		STARTED,
 		COMPLETED,
 		CANCELLED
@@ -50,21 +51,21 @@ interface IRentalAgreement {
 	/**
 	 * @dev Thrown if the provided agreement is invalid.
 	 */
-	error User_not_verified(address user);
+	error User_not_verified();
 	error InvalidAgreement();
-	error Cost_must_be_greater_than_zero(uint256 cost);
-	error Deposit_must_be_greater_than_zero(uint256 deposit);
-	error Rental_Period_must_be_greater_than_zero(uint256 rentalPeriod);
-	error Asset_is_not_active(bool isActive);
-	error InvalidAddress(string name);
+	error Cost_must_be_greater_than_zero();
+	error Deposit_must_be_greater_than_zero();
+	error Rental_Period_must_be_greater_than_zero();
+	error Asset_is_not_active();
+	error InvalidAddress();
 	error UserNotVerified(address user);
 	error CostMustBeGreaterThanZero(uint256 cost);
 	error DepositMustBeGreaterThanZero(uint256 deposit);
 	error RentalPeriodMustBeGreaterThanZero(uint256 rentalPeriod);
-	error AssetIsNotActive(bool isActive);
+	error AssetIsNotActive();
 	error IncorrectAmountSent(uint256 sent, uint256 required);
 	error NotAuthorized(address user);
-	error AgreementNotActive(bool isActive);
+	error AgreementNotActive();
 	error RentalPeriodNotOver(uint256 currentTime, uint256 endTime);
 	error InspectionFailed(bool itemCondition, address rentee, address renter);
 	error InvalidDAOAddress(address daoAddress);
@@ -95,12 +96,12 @@ interface IRentalAgreement {
 	 */
 	event AgreementCancelled(uint256 agreementId);
 
-	/**
-	 * @dev Emitted when an agreement's rental period is extended
-	 * @param agreementId The ID of the extended agreement
-	 * @param newRentalPeriod The new rental period
-	 */
-	event AgreementExtended(uint256 agreementId, uint256 newRentalPeriod);
+	event AgreementExtendedRentee(
+		uint256 _agreementId,
+		uint256 _rentalPeriod,
+		uint256 _newCost
+	);
+	event AgreementExtendedRenter(uint256 _agreementId, uint256 _rentalPeriod);
 
 	event ArrivalAgreementEvent(
 		uint256 agreementId,
@@ -124,7 +125,9 @@ interface IRentalAgreement {
 		uint256 _rentalPeriod,
 		uint256 _cost,
 		uint256 _deposit
-	) external payable returns (uint256);
+	) external returns (uint256);
+
+	function ArrivalAgreement(uint256 _agreementId) external;
 
 	/**
 	 * @dev Completes an existing agreement
@@ -133,26 +136,46 @@ interface IRentalAgreement {
 	function completeAgreement(uint256 _agreementId) external;
 
 	/**
-	 * @dev Raises a dispute for an existing agreement
-	 * @param _agreementId The ID of the agreement to dispute
-	 */
-	function raiseDispute(uint256 _agreementId) external;
-
-	/**
 	 * @dev Cancels an existing agreement
 	 * @param _agreementId The ID of the agreement to cancel
 	 */
 	function cancelAgreement(uint256 _agreementId) external;
 
 	/**
+	 * @dev Raises a dispute for an existing agreement
+	 * @param _agreementId The ID of the agreement to dispute
+	 */
+	function raiseDispute(uint256 _agreementId) external;
+
+	/**
 	 * @dev Extends the rental period of an existing agreement
 	 * @param _agreementId The ID of the agreement to extend
 	 * @param _additionalPeriod The additional rental period
 	 */
-	function extendRentalPeriod(
+	function extendRentalPeriodRentee(
+		uint256 _agreementId,
+		uint256 _additionalPeriod,
+		uint256 _newCost
+	) external;
+
+	function extendRentalPeriodRenter(
 		uint256 _agreementId,
 		uint256 _additionalPeriod
 	) external;
+
+	function updateEscrow(address _escrow) external;
+
+	function updateInspection(address _inspection) external;
+
+	function updateReputation(address _reputation) external;
+
+	function updateDisputeResolution(address _disputeResolution) external;
+
+	function updateSocialFi(address _socialFi) external;
+
+	function updateUserIdentity(address _userIdentity) external;
+
+	function updateDAO(address _rentalDAO) external;
 
 	/**
 	 * @dev Retrieves the parties involved in an agreement
@@ -163,10 +186,4 @@ interface IRentalAgreement {
 	function getAgreementParties(
 		uint256 _agreementId
 	) external view returns (address rentee, address renter);
-
-	/**
-	 * @dev Updates the address of the DAO contract
-	 * @param _daoContract New address of the DAO contract
-	 */
-	function updateDAOContract(address _daoContract) external;
 }

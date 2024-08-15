@@ -9,12 +9,8 @@ contract Reputation is IReputation, AccessControl {
 
 	mapping(address => int256) public reputationScores;
 
-	constructor() {
-		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-		_setupRole(UPDATER_ROLE, msg.sender);
-	}
-
 	function updateReputation(
+		uint256 _agreementId,
 		address _user,
 		int256 _change
 	) external onlyRole(UPDATER_ROLE) {
@@ -22,7 +18,12 @@ contract Reputation is IReputation, AccessControl {
 
 		reputationScores[_user] += _change;
 
-		emit ReputationUpdated(_user, reputationScores[_user]);
+		emit ReputationUpdated(
+			_agreementId,
+			_user,
+			_change,
+			reputationScores[_user]
+		);
 	}
 
 	function getReputation(address _user) external view returns (int256) {
