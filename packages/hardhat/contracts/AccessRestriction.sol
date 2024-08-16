@@ -11,6 +11,7 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 	bytes32 public constant SCRIPT_ROLE = keccak256("SCRIPT_ROLE");
 	bytes32 public constant ARBITER_ROLE = keccak256("ARBITER_ROLE");
+	bytes32 public constant DAO_ROLE = keccak256("DAO_ROLE");
 	bytes32 public constant APPROVED_CONTRACT_ROLE =
 		keccak256("APPROVED_CONTRACT_ROLE");
 
@@ -122,6 +123,12 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 		}
 	}
 
+	function ifDAO(address _address) external view override {
+		if (!isDAO(_address)) {
+			revert NotDAO(_address);
+		}
+	}
+
 	/**
 	 * @dev Checks if contract is not paused
 	 */
@@ -193,5 +200,9 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 
 	function isArbiter(address _address) public view override returns (bool) {
 		return hasRole(ARBITER_ROLE, _address);
+	}
+
+	function isDAO(address _address) public view override returns (bool) {
+		return hasRole(DAO_ROLE, _address);
 	}
 }

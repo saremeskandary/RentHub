@@ -24,6 +24,7 @@ interface IDisputeResolution {
 	error DisputeAlreadyExists(uint256 agreementId);
 	error NoActiveDispute(uint256 agreementId);
 	error ArbiterAlreadyVoted(address arbiter, uint256 agreementId);
+	error NotAdmin(address caller);
 
 	/// @notice Initiates a dispute for a specific rental agreement
 	/// @param _agreementId The ID of the rental agreement in dispute

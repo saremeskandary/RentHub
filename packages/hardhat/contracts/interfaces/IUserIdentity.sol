@@ -8,7 +8,7 @@ interface IUserIdentity {
 	event UserRevoked(address indexed user);
 
 	// Custom errors
-	error OnlyAdmin();
+	error NotAdmin(address caller);
 	error UserAlreadyVerified(address user);
 	error UserNotVerified(address user);
 	error ZeroAddress();

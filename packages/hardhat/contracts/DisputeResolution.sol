@@ -32,10 +32,7 @@ contract DisputeResolution is IDisputeResolution {
 	}
 
 	modifier onlyAdmin() {
-		require(
-			accessRestriction.isAdmin(msg.sender),
-			"Caller is not an admin"
-		);
+		if (!accessRestriction.isAdmin(msg.sender)) revert NotAdmin(msg.sender);
 		_;
 	}
 

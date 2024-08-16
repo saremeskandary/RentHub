@@ -2,18 +2,21 @@
 pragma solidity 0.8.26;
 
 import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
+import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
 contract UserIdentity is IUserIdentity {
 	mapping(address => bool) public verifiedUsers;
 	address public admin;
+	IAccessRestriction public accessRestriction;
 
 	modifier onlyAdmin() {
-		if (msg.sender != admin) revert OnlyAdmin();
+		if (!accessRestriction.isAdmin(msg.sender)) revert NotAdmin(msg.sender);
 		_;
 	}
 
-	constructor() {
+	constructor(address _accessRestriction) {
 		admin = msg.sender;
+		accessRestriction = IAccessRestriction(_accessRestriction);
 	}
 
 	function verifyUser(address _user) external onlyAdmin {

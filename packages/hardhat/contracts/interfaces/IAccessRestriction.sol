@@ -16,6 +16,7 @@ interface IAccessRestriction is IAccessControl {
 	error NotApprovedContract(address caller);
 	error NotScript(address caller);
 	error NotArbiter(address caller);
+	error NotDAO(address caller);
 	error ContractPaused();
 	error ContractNotPaused();
 
@@ -89,6 +90,8 @@ interface IAccessRestriction is IAccessControl {
 
 	function isArbiter(address _address) external view returns (bool);
 
+	function isDAO(address _address) external view returns (bool);
+
 	/**
 	 * @dev Checks if given address has script role
 	 * @param _address Address to check
@@ -96,6 +99,8 @@ interface IAccessRestriction is IAccessControl {
 	function ifScript(address _address) external view;
 
 	function ifArbiter(address _address) external view;
+
+	function ifDAO(address _address) external view;
 
 	/**
 	 * @dev Checks if given address is admin or has script role

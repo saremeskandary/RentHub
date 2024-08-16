@@ -32,6 +32,8 @@ interface IRentalDAO {
 	error InvalidAddress();
 	error Unauthorized();
 	error InsufficientBalance(uint256 available, uint256 required);
+	error OnlyDAO();
+	error OnlyAdmin();
 
 	/**
 	 * @dev Proposes and updates the system fee
