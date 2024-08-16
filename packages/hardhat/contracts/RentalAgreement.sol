@@ -1,131 +1,315 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
+import { IEscrow } from "./interfaces/IEscrow.sol";
+import { IInspection } from "./interfaces/IInspection.sol";
+import { ISocialFi } from "./interfaces/ISocialFi.sol";
+import { IReputation } from "./interfaces/IReputation.sol";
+import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
+import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
+import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
+import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
-/**
- * @title RentalAgreement
- * @dev This contract manages rental agreements for items using ERC721 tokens.
- */
-contract RentalAgreement is ReentrancyGuard {
+contract RentalAgreement is IRentalAgreement {
 	using SafeERC20 for IERC20;
-	struct Rental {
-		address renter;
-		address owner;
-		uint256 itemId;
-		uint256 startTime;
-		uint256 endTime;
-		uint256 price;
-		uint256 collateral;
-		bool isActive;
+
+	mapping(address => User) public users;
+	mapping(uint256 => Agreement) public agreements;
+	mapping(uint256 => Asset) public assets;
+	uint256 public agreementCounter;
+
+	IERC20 public token;
+
+	IEscrow public escrow;
+	IInspection public inspection;
+	IReputation public reputation;
+	IDisputeResolution public disputeResolution;
+	ISocialFi public socialFi;
+	IUserIdentity public userIdentity;
+	IRentalDAO public rentalDAO;
+	IAccessRestriction public accessRestriction;
+
+	modifier onlyVerifiedUser(address _user) {
+		if (_user == address(0) || !userIdentity.isVerifiedUser(_user)) {
+			revert UserNotVerified(_user);
+		}
+		_;
 	}
 
-	mapping(uint256 => Rental) public rentals;
-	uint256 public rentalCount;
-
-	IERC721 public erc721Contract;
-	IERC20 public collateralToken;
-
-	event RentalCreated(
-		uint256 rentalId,
-		address indexed renter,
-		address indexed owner,
-		uint256 itemId,
-		uint256 startTime,
-		uint256 endTime,
-		uint256 price,
-		uint256 collateral
-	);
-	event RentalEnded(uint256 rentalId);
-	event CollateralReturned(
-		uint256 rentalId,
-		address indexed recipient,
-		uint256 amount
-	);
-
-	constructor(address _erc721Contract, address _collateralToken) {
-		erc721Contract = IERC721(_erc721Contract);
-		collateralToken = IERC20(_collateralToken);
+	constructor(
+		IERC20 _token,
+		address _escrow,
+		address _inspection,
+		address _reputation,
+		address _disputeResolution,
+		address _socialFi,
+		address _userIdentity,
+		address _rentalDAO
+	) {
+		// Pass msg.sender to Ownable constructor
+		if (_escrow == address(0)) revert InvalidAddress();
+		if (_inspection == address(0)) revert InvalidAddress();
+		if (_reputation == address(0)) revert InvalidAddress();
+		if (_disputeResolution == address(0)) revert InvalidAddress();
+		if (_socialFi == address(0)) revert InvalidAddress();
+		if (_userIdentity == address(0)) revert InvalidAddress();
+		if (_rentalDAO == address(0)) revert InvalidAddress();
+		token = _token;
+		escrow = IEscrow(_escrow);
+		inspection = IInspection(_inspection);
+		reputation = IReputation(_reputation);
+		disputeResolution = IDisputeResolution(_disputeResolution);
+		socialFi = ISocialFi(_socialFi);
+		userIdentity = IUserIdentity(_userIdentity);
+		rentalDAO = IRentalDAO(_rentalDAO);
 	}
 
 	/**
-	 * @notice Create a rental agreement for an item
-	 * @param _owner The address of the item's owner
-	 * @param _itemId The ID of the item being rented
-	 * @param _duration The duration of the rental in seconds
-	 * @param _price The rental price
-	 * @param _collateral The collateral amount
+	 * @dev Modifier to restrict access to the owner.
 	 */
-	function createRental(
-		address _owner,
-		uint256 _itemId,
-		uint256 _duration,
-		uint256 _price,
-		uint256 _collateral
-	) external payable nonReentrant {
-		require(msg.value == _price, "Incorrect payment amount");
-		require(_collateral > 0, "Collateral amount must be greater than 0");
+	modifier onlyOwner() {
+		accessRestriction.ifOwner(msg.sender);
+		_;
+	}
 
-		uint256 rentalId = rentalCount++;
-		rentals[rentalId] = Rental({
-			renter: msg.sender,
-			owner: _owner,
-			itemId: _itemId,
-			startTime: block.timestamp,
-			endTime: block.timestamp + _duration,
-			price: _price,
-			collateral: _collateral,
-			isActive: true
+	function createAgreement(
+		address _renter,
+		uint256 _tokenId,
+		uint256 _rentalPeriod,
+		uint256 _cost,
+		uint256 _deposit
+	)
+		external
+		onlyVerifiedUser(msg.sender)
+		onlyVerifiedUser(_renter)
+		returns (uint256)
+	{
+		if (_cost <= 0) revert CostMustBeGreaterThanZero(_cost);
+		if (_deposit <= 0) revert DepositMustBeGreaterThanZero(_deposit);
+		if (_rentalPeriod <= 0)
+			revert RentalPeriodMustBeGreaterThanZero(_rentalPeriod);
+
+		Asset storage asset = assets[_tokenId];
+		if (!asset.isActive) revert AssetIsNotActive();
+
+		agreements[agreementCounter] = Agreement({
+			rentee: users[msg.sender],
+			renter: users[address(0)],
+			asset: asset,
+			rentalPeriod: _rentalPeriod,
+			cost: _cost,
+			deposit: _deposit,
+			startTime: 0,
+			registrationTime: block.timestamp,
+			status: AgreementStatus.CREATED,
+			isDisputed: false
 		});
 
-		// Transfer the collateral from the renter to the contract
-		collateralToken.safeTransferFrom(
-			msg.sender,
-			address(this),
-			_collateral
-		);
+		agreementCounter++;
 
-		emit RentalCreated(
-			rentalId,
-			msg.sender,
-			_owner,
-			_itemId,
-			block.timestamp,
-			block.timestamp + _duration,
-			_price,
-			_collateral
+		emit AgreementCreated(agreementCounter, msg.sender, _renter);
+
+		return agreementCounter;
+	}
+
+	function ArrivalAgreement(uint256 _agreementId) external {
+		Agreement storage agreement = agreements[_agreementId];
+		if (
+			agreement.renter.userAddress != address(0) ||
+			agreement.isDisputed ||
+			agreement.status != AgreementStatus.CREATED
+		) {
+			revert InvalidAgreement();
+		}
+
+		uint256 totalAmount = agreement.cost + agreement.deposit;
+
+		if (IERC20(token).balanceOf(msg.sender) < totalAmount)
+			revert IncorrectAmountSent(
+				IERC20(token).balanceOf(msg.sender),
+				totalAmount
+			);
+		if (!agreement.asset.isActive) revert AssetIsNotActive();
+
+		// Lock funds in the Escrow
+		escrow.lockFunds(_agreementId, agreement.cost, agreement.deposit);
+
+		agreement.asset.timesRented++;
+		agreement.renter = users[msg.sender];
+		agreement.startTime = block.timestamp;
+		agreement.status = AgreementStatus.REQUESTED;
+
+		emit ArrivalAgreementEvent(
+			_agreementId,
+			agreement.rentee.userAddress,
+			agreement.renter.userAddress,
+			block.timestamp
 		);
 	}
 
-	/**
-	 * @notice End a rental agreement
-	 * @param _rentalId The ID of the rental agreement to be ended
-	 */
-	function endRental(uint256 _rentalId) external nonReentrant {
-		Rental storage rental = rentals[_rentalId];
-		require(
-			msg.sender == rental.owner || msg.sender == rental.renter,
-			"Not authorized"
+	function completeAgreement(uint256 _agreementId) external {
+		Agreement storage agreement = agreements[_agreementId];
+		if (
+			msg.sender != agreement.rentee.userAddress &&
+			msg.sender != agreement.renter.userAddress
+		) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (agreement.status != AgreementStatus.STARTED)
+			revert AgreementNotActive();
+		if (block.timestamp <= agreement.startTime + agreement.rentalPeriod)
+			revert RentalPeriodNotOver(
+				block.timestamp,
+				agreement.startTime + agreement.rentalPeriod
+			);
+
+		bool isItemInGoodCondition = inspection.inspectItem(_agreementId);
+		if (!isItemInGoodCondition)
+			revert InspectionFailed(
+				isItemInGoodCondition,
+				agreement.rentee.userAddress,
+				agreement.renter.userAddress
+			);
+
+		agreement.status = AgreementStatus.COMPLETED;
+
+		socialFi.rewardUser(agreement.rentee.userAddress, 100);
+		socialFi.rewardUser(agreement.renter.userAddress, 100);
+
+		escrow.distributeRevenue(
+			_agreementId,
+			agreement.deposit,
+			agreement.cost,
+			agreement.rentee.userAddress,
+			agreement.renter.userAddress
 		);
-		require(rental.isActive, "Rental not active");
 
-		// Effect: Update the contract's state before making external calls
-		rental.isActive = false;
-		address owner = rental.owner;
-		uint256 price = rental.price;
-		uint256 collateral = rental.collateral;
+		emit AgreementCompleted(_agreementId);
 
-		// Interaction: External call to transfer the rental price to the owner
-		(bool success, ) = owner.call{ value: price }(""); // wake-disable-line
-		require(success, "Failed to transfer rental price to owner");
-
-		// Interaction: Return the collateral to the renter
-		collateralToken.safeTransfer(rental.renter, collateral);
-		emit CollateralReturned(_rentalId, rental.renter, collateral);
-
-		emit RentalEnded(_rentalId);
+		escrow.refundDeposit(
+			_agreementId,
+			agreement.deposit,
+			agreement.cost,
+			agreement.rentee.userAddress,
+			agreement.renter.userAddress
+		);
+		// reputation.updateReputation(_agreementId, msg.sender, change);
 	}
+
+	function cancelAgreement(uint256 _agreementId) external {
+		Agreement storage agreement = agreements[_agreementId];
+		if (msg.sender != agreement.renter.userAddress) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (agreement.status != AgreementStatus.STARTED)
+			revert AgreementNotActive();
+
+		agreement.status = AgreementStatus.CANCELLED;
+
+		emit AgreementCancelled(_agreementId);
+
+		escrow.refundDeposit(
+			_agreementId,
+			agreement.deposit,
+			agreement.cost,
+			agreement.rentee.userAddress,
+			agreement.renter.userAddress
+		);
+	}
+
+	function raiseDispute(uint256 _agreementId) external {
+		Agreement storage agreement = agreements[_agreementId];
+		if (
+			msg.sender != agreement.rentee.userAddress &&
+			msg.sender != agreement.renter.userAddress
+		) revert NotAuthorized(msg.sender);
+
+		if (agreement.status != AgreementStatus.STARTED)
+			revert AgreementNotActive();
+
+		emit DisputeRaised(_agreementId);
+
+		disputeResolution.initiateDispute(_agreementId);
+	}
+
+	function extendRentalPeriodRentee(
+		uint256 _agreementId,
+		uint256 _additionalPeriod,
+		uint256 _newCost
+	) external {
+		Agreement storage agreement = agreements[_agreementId];
+		if (msg.sender != agreement.rentee.userAddress) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (agreement.status != AgreementStatus.STARTED) {
+			revert AgreementNotActive();
+		}
+
+		agreement.rentalPeriod += _additionalPeriod;
+		agreement.cost = _newCost;
+
+		emit AgreementExtendedRentee(
+			_agreementId,
+			agreement.rentalPeriod,
+			_newCost
+		);
+	}
+
+	function extendRentalPeriodRenter(
+		uint256 _agreementId,
+		uint256 _additionalPeriod
+	) external {
+		Agreement storage agreement = agreements[_agreementId];
+		if (msg.sender != agreement.renter.userAddress) {
+			revert NotAuthorized(msg.sender);
+		}
+		if (agreement.status != AgreementStatus.STARTED) {
+			revert AgreementNotActive();
+		}
+
+		agreement.rentalPeriod += _additionalPeriod;
+
+		emit AgreementExtendedRenter(_agreementId, agreement.rentalPeriod);
+	}
+
+	function updateEscrow(address _escrow) external onlyOwner {
+		if (_escrow == address(0)) revert InvalidAddress();
+		escrow = IEscrow(_escrow);
+	}
+
+	function updateInspection(address _inspection) external onlyOwner {
+		if (_inspection == address(0)) revert InvalidAddress();
+		inspection = IInspection(_inspection);
+	}
+
+	function updateReputation(address _reputation) external onlyOwner {
+		if (_reputation == address(0)) revert InvalidAddress();
+		reputation = IReputation(_reputation);
+	}
+
+	function updateDisputeResolution(
+		address _disputeResolution
+	) external onlyOwner {
+		if (_disputeResolution == address(0)) revert InvalidAddress();
+		disputeResolution = IDisputeResolution(_disputeResolution);
+	}
+
+	function updateSocialFi(address _socialFi) external onlyOwner {
+		socialFi = ISocialFi(_socialFi);
+	}
+
+	function updateUserIdentity(address _userIdentity) external onlyOwner {
+		userIdentity = IUserIdentity(_userIdentity);
+	}
+
+	function updateDAO(address _rentalDAO) external onlyOwner {
+		if (_rentalDAO == address(0)) revert InvalidDAOAddress(_rentalDAO);
+		rentalDAO = IRentalDAO(_rentalDAO);
+	}
+
+	function getAgreementParties(
+		uint256 _agreementId
+	) external view returns (address rentee, address renter) {}
 }
