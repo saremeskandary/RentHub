@@ -24,10 +24,7 @@ contract DisputeResolution is IDisputeResolution {
 	uint256 public constant VALIDATION_REVOCATION_THRESHOLD = 3;
 
 	modifier onlyArbiter() {
-		require(
-			accessRestriction.isArbiter(msg.sender),
-			"Caller is not an arbiter"
-		);
+		if (!accessRestriction.isAdmin(msg.sender)) revert NotArbiter(msg.sender);
 		_;
 	}
 
