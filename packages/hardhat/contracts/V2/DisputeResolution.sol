@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
-
 import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IInspection } from "./interfaces/IInspection.sol";
@@ -11,16 +9,10 @@ import { IReputation } from "./interfaces/IReputation.sol";
 import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
-import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
-contract DisputeResolution is
-	IDisputeResolution,
-	AccessControl,
-	IAccessRestriction
-{
+contract DisputeResolution is IDisputeResolution {
 	bytes32 public constant ARBITER_ROLE = keccak256("ARBITER_ROLE");
-
 	mapping(uint256 => Dispute) public disputes;
 
 	IRentalAgreement public rentalAgreement;
@@ -32,12 +24,18 @@ contract DisputeResolution is
 	uint256 public constant VALIDATION_REVOCATION_THRESHOLD = 3;
 
 	modifier onlyArbiter() {
-		accessRestriction.ifArbiter(msg.sender);
+		require(
+			accessRestriction.isArbiter(msg.sender),
+			"Caller is not an arbiter"
+		);
 		_;
 	}
 
 	modifier onlyAdmin() {
-		accessRestriction.ifAdmin(msg.sender);
+		require(
+			accessRestriction.isAdmin(msg.sender),
+			"Caller is not an admin"
+		);
 		_;
 	}
 
@@ -51,6 +49,8 @@ contract DisputeResolution is
 			revert InvalidAddress("rental agreement");
 		if (_reputation == address(0)) revert InvalidAddress("reputation");
 		if (_userIdentity == address(0)) revert InvalidAddress("user identity");
+		if (_accessRestriction == address(0))
+			revert InvalidAddress("access restriction");
 
 		rentalAgreement = IRentalAgreement(_rentalAgreement);
 		reputation = IReputation(_reputation);
@@ -106,8 +106,16 @@ contract DisputeResolution is
 		}
 
 		// Update reputations
-		reputation.updateReputation(winner, int256(REPUTATION_PENALTY));
-		reputation.updateReputation(loser, -int256(REPUTATION_PENALTY));
+		reputation.updateReputation(
+			_agreementId,
+			winner,
+			int256(REPUTATION_PENALTY)
+		);
+		reputation.updateReputation(
+			_agreementId,
+			loser,
+			-int256(REPUTATION_PENALTY)
+		);
 
 		// Check for validation revocation
 		if (
@@ -120,10 +128,6 @@ contract DisputeResolution is
 		dispute.isActive = false;
 
 		emit DisputeResolved(_agreementId, winner, loser);
-
-		// Implement penalties for the loser (e.g., forfeit deposit)
-		// This would typically involve calling a function on the Escrow contract
-		// IEscrow(escrowContract).applyPenalty(_agreementId, loser);
 	}
 
 	function addArbiter(address _arbiter) external onlyAdmin {

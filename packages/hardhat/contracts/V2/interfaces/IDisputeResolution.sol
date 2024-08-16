@@ -6,7 +6,7 @@ pragma solidity 0.8.26;
 interface IDisputeResolution {
 	struct Dispute {
 		bool isActive;
-		uint256 votesForOwner;
+		uint256 votesForRentee;
 		uint256 votesForRenter;
 		mapping(address => bool) hasVoted;
 	}
@@ -16,7 +16,7 @@ interface IDisputeResolution {
 	event ArbitersVoted(
 		uint256 agreementId,
 		address arbiter,
-		bool votedForOwner
+		bool votedForRentee
 	);
 
 	// Custom errors
@@ -31,8 +31,8 @@ interface IDisputeResolution {
 
 	/// @notice Casts a vote on an active dispute
 	/// @param _agreementId The ID of the rental agreement in dispute
-	/// @param _voteForOwner True if voting for the owner, false if voting for the renter
-	function voteOnDispute(uint256 _agreementId, bool _voteForOwner) external;
+	/// @param _voteForRentee True if voting for the Rentee, false if voting for the renter
+	function voteOnDispute(uint256 _agreementId, bool _voteForRentee) external;
 
 	/// @notice Resolves a dispute based on the votes cast and updates reputations accordingly
 	/// @param _agreementId The ID of the rental agreement in dispute
@@ -45,4 +45,8 @@ interface IDisputeResolution {
 	/// @notice Removes an arbiter from the system
 	/// @param _arbiter The address of the arbiter to be removed
 	function removeArbiter(address _arbiter) external;
+
+	function getDispute(
+		uint256 _disputeId
+	) external view returns (bool, uint256, uint256);
 }

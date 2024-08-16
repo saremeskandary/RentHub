@@ -2,7 +2,6 @@
 pragma solidity 0.8.26;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IInspection } from "./interfaces/IInspection.sol";
@@ -11,8 +10,9 @@ import { IReputation } from "./interfaces/IReputation.sol";
 import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
+import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
-contract RentalAgreement is IRentalAgreement, Ownable {
+contract RentalAgreement is IRentalAgreement {
 	using SafeERC20 for IERC20;
 
 	mapping(address => User) public users;
@@ -29,6 +29,7 @@ contract RentalAgreement is IRentalAgreement, Ownable {
 	ISocialFi public socialFi;
 	IUserIdentity public userIdentity;
 	IRentalDAO public rentalDAO;
+	IAccessRestriction public accessRestriction;
 
 	modifier onlyVerifiedUser(address _user) {
 		if (_user == address(0) || !userIdentity.isVerifiedUser(_user)) {
@@ -47,14 +48,14 @@ contract RentalAgreement is IRentalAgreement, Ownable {
 		address _userIdentity,
 		address _rentalDAO
 	) {
-		if (_escrow == address(0)) revert InvalidAddress("escrow");
-		if (_inspection == address(0)) revert InvalidAddress("inspection");
-		if (_reputation == address(0)) revert InvalidAddress("reputation");
-		if (_disputeResolution == address(0))
-			revert InvalidAddress("dispute resolution");
-		if (_socialFi == address(0)) revert InvalidAddress("social fi");
-		if (_userIdentity == address(0)) revert InvalidAddress("user identity");
-		if (_rentalDAO == address(0)) revert InvalidAddress("DAO");
+		// Pass msg.sender to Ownable constructor
+		if (_escrow == address(0)) revert InvalidAddress();
+		if (_inspection == address(0)) revert InvalidAddress();
+		if (_reputation == address(0)) revert InvalidAddress();
+		if (_disputeResolution == address(0)) revert InvalidAddress();
+		if (_socialFi == address(0)) revert InvalidAddress();
+		if (_userIdentity == address(0)) revert InvalidAddress();
+		if (_rentalDAO == address(0)) revert InvalidAddress();
 		token = _token;
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
@@ -63,6 +64,14 @@ contract RentalAgreement is IRentalAgreement, Ownable {
 		socialFi = ISocialFi(_socialFi);
 		userIdentity = IUserIdentity(_userIdentity);
 		rentalDAO = IRentalDAO(_rentalDAO);
+	}
+
+	/**
+	 * @dev Modifier to restrict access to the owner.
+	 */
+	modifier onlyOwner() {
+		accessRestriction.ifOwner(msg.sender);
+		_;
 	}
 
 	function createAgreement(
@@ -179,7 +188,7 @@ contract RentalAgreement is IRentalAgreement, Ownable {
 
 		emit AgreementCompleted(_agreementId);
 
-		escrow.releaseFunds(_agreementId);
+		escrow.refundDeposit(_agreementId);
 		// reputation.updateReputation(_agreementId, msg.sender, change);
 	}
 
@@ -254,25 +263,24 @@ contract RentalAgreement is IRentalAgreement, Ownable {
 	}
 
 	function updateEscrow(address _escrow) external onlyOwner {
-		if (_escrow == address(0)) revert InvalidAddress("escrow");
+		if (_escrow == address(0)) revert InvalidAddress();
 		escrow = IEscrow(_escrow);
 	}
 
 	function updateInspection(address _inspection) external onlyOwner {
-		if (_inspection == address(0)) revert InvalidAddress("inspection");
+		if (_inspection == address(0)) revert InvalidAddress();
 		inspection = IInspection(_inspection);
 	}
 
 	function updateReputation(address _reputation) external onlyOwner {
-		if (_reputation == address(0)) revert InvalidAddress("reputation");
+		if (_reputation == address(0)) revert InvalidAddress();
 		reputation = IReputation(_reputation);
 	}
 
 	function updateDisputeResolution(
 		address _disputeResolution
 	) external onlyOwner {
-		if (_disputeResolution == address(0))
-			revert InvalidAddress("dispute resolution");
+		if (_disputeResolution == address(0)) revert InvalidAddress();
 		disputeResolution = IDisputeResolution(_disputeResolution);
 	}
 

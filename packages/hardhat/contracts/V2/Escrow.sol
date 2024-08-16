@@ -5,15 +5,16 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
+import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 
-contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction {
+contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction, IRentalDAO {
 	using SafeERC20 for IERC20;
 
 	mapping(uint256 => bool) public escrows;
 	mapping(uint256 => uint256) public agreementEarnings;
 
 	IERC20 public token;
-	address public rentalDAO;
+	IRentalDAO public rentalDAO;
 	uint256 public feeAmount;
 	IAccessRestriction public accessRestriction;
 
@@ -28,11 +29,10 @@ contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction {
 		uint256 _feeAmount,
 		address _accessRestriction
 	) {
-		token = _token;
-		rentalDAO = _rentalDAO;
-		feeAmount = _feeAmount;
-		feeAmount = _feeAmount;
+		rentalDAO = IRentalDAO(_rentalDAO);
 		accessRestriction = IAccessRestriction(_accessRestriction);
+		token = _token;
+		feeAmount = _feeAmount;
 	}
 
 	function lockFunds(
@@ -48,14 +48,8 @@ contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction {
 		token.safeTransferFrom(msg.sender, address(this), totalAmount);
 
 		// Transfer fee to the DAO
-		token.safeTransfer(rentalDAO, feeAmount);
+		token.safeTransfer(address(rentalDAO), feeAmount);
 
-		// escrows[_agreementId] = EscrowDetails({
-		// 	lockedFunds: _cost,
-		// 	deposit: _deposit,
-		// 	owner: msg.sender,
-		// 	renter: address(0) // Will be set when the renter confirms
-		// });
 		escrows[_agreementId] = true;
 
 		emit FundsLocked(_agreementId);
@@ -101,17 +95,5 @@ contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction {
 
 	function getEarnings(uint256 _agreementId) external view returns (uint256) {
 		return agreementEarnings[_agreementId];
-	}
-
-	function releaseFunds(uint256 _agreementId) external nonReentrant {
-		EscrowDetails storage escrow = escrows[_agreementId];
-		if (escrow.lockedFunds == 0) revert No_funds_to_release();
-
-		uint256 amountToRelease = escrow.lockedFunds;
-		escrow.lockedFunds = 0;
-
-		token.safeTransfer(escrow.owner, amountToRelease);
-
-		emit FundsReleased(_agreementId, amountToRelease, escrow.owner);
 	}
 }

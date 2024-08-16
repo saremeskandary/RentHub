@@ -32,19 +32,15 @@ interface IEscrow {
 		uint256 _cost
 	) external;
 
-	/// @notice Confirms the rental agreement by the renter
-	/// @param _agreementId The ID of the agreement to be confirmed
-	// function confirmRental(uint256 _agreementId) external;
-
-	/// @notice Releases the locked funds to the owner
-	/// @param _agreementId The ID of the agreement for which the funds are being released
-	function releaseFunds(uint256 _agreementId) external;
-
-	/// @notice Refunds the deposit to the renter
-	/// @param _agreementId The ID of the agreement for which the deposit is being refunded
-	function refundDeposit(uint256 _agreementId) external;
-
 	function distributeRevenue(
+		uint256 _agreementId,
+		uint256 _deposit,
+		uint256 _cost,
+		address _rentee,
+		address _renter
+	) external;
+
+	function refundDeposit(
 		uint256 _agreementId,
 		uint256 _deposit,
 		uint256 _cost,

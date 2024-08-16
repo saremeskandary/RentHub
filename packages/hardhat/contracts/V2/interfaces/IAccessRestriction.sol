@@ -87,11 +87,15 @@ interface IAccessRestriction is IAccessControl {
 	 */
 	function isScript(address _address) external view returns (bool);
 
+	function isArbiter(address _address) external view returns (bool);
+
 	/**
 	 * @dev Checks if given address has script role
 	 * @param _address Address to check
 	 */
 	function ifScript(address _address) external view;
+
+	function ifArbiter(address _address) external view;
 
 	/**
 	 * @dev Checks if given address is admin or has script role
