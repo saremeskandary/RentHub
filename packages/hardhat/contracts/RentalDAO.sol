@@ -38,12 +38,12 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 	}
 
 	function addDAOMember(address _member) external onlyAdmin {
-		if (_member == address(0)) revert InvalidAddress("_member");
+		if (_member == address(0)) revert InvalidAddress("member");
 		accessRestriction.grantRole(DAO_ROLE, _member);
 	}
 
 	function removeDAOMember(address _member) external onlyAdmin {
-		if (_member == address(0)) revert InvalidAddress("_member");
+		if (_member == address(0)) revert InvalidAddress("member");
 		accessRestriction.revokeRole(DAO_ROLE, _member);
 	}
 
@@ -55,17 +55,19 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 		address payable _recipient,
 		uint256 _amount
 	) external onlyAdmin nonReentrant {
-		if (_recipient == address(0)) revert InvalidAddress("_recipient");
+		if (_recipient == address(0)) revert InvalidAddress("recipient");
 		if (_amount > address(this).balance)
 			revert InsufficientBalance(address(this).balance, _amount);
+		if (_amount == 0) revert MustBeGraterThanZero("amount");
 		_recipient.transfer(_amount);
+		emit Withdrawn(_recipient, _amount);
 	}
 
 	function updateContractAddress(
 		string memory _contractName,
 		address _newAddress
 	) external onlyAdmin {
-		if (_newAddress == address(0)) revert InvalidAddress("_newAddress");
+		if (_newAddress == address(0)) revert InvalidAddress("newAddress");
 		contractAddresses[_contractName] = _newAddress;
 	}
 
