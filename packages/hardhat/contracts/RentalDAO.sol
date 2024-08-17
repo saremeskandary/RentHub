@@ -63,14 +63,6 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 		emit Withdrawn(_recipient, _amount);
 	}
 
-	function updateContractAddress(
-		string memory _contractName,
-		address _newAddress
-	) external onlyAdmin {
-		if (_newAddress == address(0)) revert InvalidAddress("newAddress");
-		contractAddresses[_contractName] = _newAddress;
-	}
-
 	function getContractAddress(
 		string memory _contractName
 	) external view returns (address) {

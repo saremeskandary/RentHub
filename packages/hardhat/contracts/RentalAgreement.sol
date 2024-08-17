@@ -6,9 +6,7 @@ import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IInspection } from "./interfaces/IInspection.sol";
 import { ISocialFi } from "./interfaces/ISocialFi.sol";
-import { IReputation } from "./interfaces/IReputation.sol";
 import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
-import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
@@ -24,11 +22,9 @@ contract RentalAgreement is IRentalAgreement {
 
 	IEscrow public escrow;
 	IInspection public inspection;
-	IReputation public reputation;
 	IDisputeResolution public disputeResolution;
 	ISocialFi public socialFi;
 	IUserIdentity public userIdentity;
-	IRentalDAO public rentalDAO;
 	IAccessRestriction public accessRestriction;
 
 	modifier onlyVerifiedUser(address _user) {
@@ -42,29 +38,23 @@ contract RentalAgreement is IRentalAgreement {
 		IERC20 _token,
 		address _escrow,
 		address _inspection,
-		address _reputation,
 		address _disputeResolution,
 		address _socialFi,
-		address _userIdentity,
-		address _rentalDAO
+		address _userIdentity
 	) {
 		// Pass msg.sender to Ownable constructor
 		if (_escrow == address(0)) revert InvalidAddress("escrow");
 		if (_inspection == address(0)) revert InvalidAddress("inspection");
-		if (_reputation == address(0)) revert InvalidAddress("reputation");
 		if (_disputeResolution == address(0))
 			revert InvalidAddress("disputeResolution");
 		if (_socialFi == address(0)) revert InvalidAddress("socialFi");
 		if (_userIdentity == address(0)) revert InvalidAddress("userIdentity");
-		if (_rentalDAO == address(0)) revert InvalidAddress("rentalDAO");
 		token = _token;
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
-		reputation = IReputation(_reputation);
 		disputeResolution = IDisputeResolution(_disputeResolution);
 		socialFi = ISocialFi(_socialFi);
 		userIdentity = IUserIdentity(_userIdentity);
-		rentalDAO = IRentalDAO(_rentalDAO);
 	}
 
 	/**
@@ -195,7 +185,6 @@ contract RentalAgreement is IRentalAgreement {
 			agreement.rentee.userAddress,
 			agreement.renter.userAddress
 		);
-		// reputation.updateReputation(_agreementId, msg.sender, change);
 	}
 
 	function cancelAgreement(uint256 _agreementId) external {
@@ -272,42 +261,6 @@ contract RentalAgreement is IRentalAgreement {
 		agreement.rentalPeriod += _additionalPeriod;
 
 		emit AgreementExtendedRenter(_agreementId, agreement.rentalPeriod);
-	}
-
-	function updateEscrow(address _escrow) external onlyOwner {
-		if (_escrow == address(0)) revert InvalidAddress("escrow");
-		escrow = IEscrow(_escrow);
-	}
-
-	function updateInspection(address _inspection) external onlyOwner {
-		if (_inspection == address(0)) revert InvalidAddress("inspection");
-		inspection = IInspection(_inspection);
-	}
-
-	function updateReputation(address _reputation) external onlyOwner {
-		if (_reputation == address(0)) revert InvalidAddress("reputation");
-		reputation = IReputation(_reputation);
-	}
-
-	function updateDisputeResolution(
-		address _disputeResolution
-	) external onlyOwner {
-		if (_disputeResolution == address(0))
-			revert InvalidAddress("dispute resolution");
-		disputeResolution = IDisputeResolution(_disputeResolution);
-	}
-
-	function updateSocialFi(address _socialFi) external onlyOwner {
-		socialFi = ISocialFi(_socialFi);
-	}
-
-	function updateUserIdentity(address _userIdentity) external onlyOwner {
-		userIdentity = IUserIdentity(_userIdentity);
-	}
-
-	function updateDAO(address _rentalDAO) external onlyOwner {
-		if (_rentalDAO == address(0)) revert InvalidDAOAddress(_rentalDAO);
-		rentalDAO = IRentalDAO(_rentalDAO);
 	}
 
 	function getAgreementParties(

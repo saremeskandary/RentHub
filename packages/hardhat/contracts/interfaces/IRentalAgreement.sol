@@ -222,48 +222,6 @@ interface IRentalAgreement is ICommonErrors {
 	) external;
 
 	/**
-	 * @notice Updates the address of the Escrow contract
-	 * @param _escrow The new address of the Escrow contract
-	 */
-	function updateEscrow(address _escrow) external;
-
-	/**
-	 * @notice Updates the address of the Inspection contract
-	 * @param _inspection The new address of the Inspection contract
-	 */
-	function updateInspection(address _inspection) external;
-
-	/**
-	 * @notice Updates the address of the Reputation contract
-	 * @param _reputation The new address of the Reputation contract
-	 */
-	function updateReputation(address _reputation) external;
-
-	/**
-	 * @notice Updates the address of the DisputeResolution contract
-	 * @param _disputeResolution The new address of the DisputeResolution contract
-	 */
-	function updateDisputeResolution(address _disputeResolution) external;
-
-	/**
-	 * @notice Updates the address of the SocialFi contract
-	 * @param _socialFi The new address of the SocialFi contract
-	 */
-	function updateSocialFi(address _socialFi) external;
-
-	/**
-	 * @notice Updates the address of the UserIdentity contract
-	 * @param _userIdentity The new address of the UserIdentity contract
-	 */
-	function updateUserIdentity(address _userIdentity) external;
-
-	/**
-	 * @notice Updates the address of the DAO contract
-	 * @param _rentalDAO The new address of the DAO contract
-	 */
-	function updateDAO(address _rentalDAO) external;
-
-	/**
 	 * @notice Retrieves the parties involved in an agreement
 	 * @param _agreementId ID of the agreement
 	 * @return rentee Address of the asset rentee

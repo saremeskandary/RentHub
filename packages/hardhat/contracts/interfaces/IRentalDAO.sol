@@ -69,16 +69,6 @@ interface IRentalDAO is ICommonErrors {
 	function withdrawFees(address payable _recipient, uint256 _amount) external;
 
 	/**
-	 * @dev Updates the address of a contract in the system
-	 * @param _contractName The name of the contract to update
-	 * @param _newAddress The new address of the contract
-	 */
-	function updateContractAddress(
-		string memory _contractName,
-		address _newAddress
-	) external;
-
-	/**
 	 * @dev Retrieves the address of a contract in the system
 	 * @param _contractName The name of the contract
 	 * @return The address of the specified contract
