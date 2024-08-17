@@ -15,12 +15,12 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 	mapping(string => address) private contractAddresses;
 
 	modifier onlyDAO() {
-		if (!accessRestriction.isDAO(msg.sender)) revert notDAO();
+		if (!accessRestriction.isDAO(msg.sender)) revert NotDAO(msg.sender);
 		_;
 	}
 
 	modifier onlyAdmin() {
-		if (!accessRestriction.isAdmin(msg.sender)) revert NotAdmin();
+		if (!accessRestriction.isAdmin(msg.sender)) revert NotAdmin(msg.sender);
 		_;
 	}
 
@@ -38,13 +38,13 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 	}
 
 	function addDAOMember(address _member) external onlyAdmin {
-		if (_member == address(0)) revert InvalidAddress();
+		if (_member == address(0)) revert InvalidAddress("_member");
 		accessRestriction.grantRole(DAO_ROLE, _member);
 	}
 
 	function removeDAOMember(address _member) external onlyAdmin {
-		if (_member == address(0)) revert InvalidAddress();
-		accessRestriction.revokeUser(DAO_ROLE, _member);
+		if (_member == address(0)) revert InvalidAddress("_member");
+		accessRestriction.revokeRole(DAO_ROLE, _member);
 	}
 
 	function getSystemFee() external view returns (uint256) {
@@ -55,7 +55,7 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 		address payable _recipient,
 		uint256 _amount
 	) external onlyAdmin nonReentrant {
-		if (_recipient == address(0)) revert InvalidAddress();
+		if (_recipient == address(0)) revert InvalidAddress("_recipient");
 		if (_amount > address(this).balance)
 			revert InsufficientBalance(address(this).balance, _amount);
 		_recipient.transfer(_amount);
@@ -65,7 +65,7 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 		string memory _contractName,
 		address _newAddress
 	) external onlyAdmin {
-		if (_newAddress == address(0)) revert InvalidAddress();
+		if (_newAddress == address(0)) revert InvalidAddress("_newAddress");
 		contractAddresses[_contractName] = _newAddress;
 	}
 

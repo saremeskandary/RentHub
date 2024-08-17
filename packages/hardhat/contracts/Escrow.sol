@@ -7,7 +7,7 @@ import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 
-contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction, IRentalDAO {
+contract Escrow is IEscrow, ReentrancyGuard {
 	using SafeERC20 for IERC20;
 
 	mapping(uint256 => bool) public escrows;
@@ -15,7 +15,6 @@ contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction, IRentalDAO {
 
 	IERC20 public token;
 	IRentalDAO public rentalDAO;
-	uint256 public feeAmount;
 	IAccessRestriction public accessRestriction;
 
 	modifier onlyApprovedContract() {
@@ -23,16 +22,10 @@ contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction, IRentalDAO {
 		_;
 	}
 
-	constructor(
-		IERC20 _token,
-		address _rentalDAO,
-		uint256 _feeAmount,
-		address _accessRestriction
-	) {
+	constructor(IERC20 _token, address _rentalDAO, address _accessRestriction) {
 		rentalDAO = IRentalDAO(_rentalDAO);
 		accessRestriction = IAccessRestriction(_accessRestriction);
 		token = _token;
-		feeAmount = _feeAmount;
 	}
 
 	function lockFunds(
@@ -44,6 +37,8 @@ contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction, IRentalDAO {
 
 		uint256 systemFee = rentalDAO.getSystemFee();
 		uint256 totalAmount = _cost + _deposit;
+		uint256 feeAmount = systemFee * totalAmount;
+
 		// Transfer tokens from sender to this contract
 		token.safeTransferFrom(msg.sender, address(this), totalAmount);
 

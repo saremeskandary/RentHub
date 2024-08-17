@@ -52,13 +52,10 @@ interface IEscrow is ICommonErrors {
 
 	// Custom errors
 	error Funds_already_locked();
-	error Incorrect_amount_sent();
-	error Invalid_sender_address();
 	error No_funds_locked_for_this_agreement();
 	error No_funds_to_release();
 	error Renter_already_confirmed();
 	error No_deposit_to_refund();
-	error Not_authorized();
 
 	/**
 	 * @notice Locks funds in escrow for a specific agreement

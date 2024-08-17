@@ -69,7 +69,7 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   const escrow = await deploy("Escrow", {
     from: deployer,
-    args: [tokenAddress, rentalDAO.address, 100, accessRestriction.address],
+    args: [tokenAddress, rentalDAO.address, accessRestriction.address],
     log: true,
   });
 

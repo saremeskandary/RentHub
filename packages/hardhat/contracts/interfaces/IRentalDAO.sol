@@ -32,8 +32,8 @@ interface IRentalDAO is ICommonErrors {
 	// Custom errors
 	error FeeExceedsMaximum(uint256 fee);
 	error Unauthorized();
-	error OnlyDAO();
 	error OnlyAdmin();
+	error NotDAO(address caller);
 
 	/**
 	 * @dev Proposes and updates the system fee
