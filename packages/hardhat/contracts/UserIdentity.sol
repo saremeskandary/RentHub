@@ -38,7 +38,7 @@ contract UserIdentity is IUserIdentity {
 	}
 
 	function transferAdmin(address _newAdmin) external onlyAdmin {
-		if (_newAdmin == address(0)) revert ZeroAddress();
+		if (_newAdmin == address(0)) revert InvalidAddress("_newAdmin");
 		admin = _newAdmin;
 	}
 }

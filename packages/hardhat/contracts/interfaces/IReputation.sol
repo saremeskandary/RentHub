@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
+import { ICommonErrors } from "./ICommonErrors.sol";
+
 /// @title IReputation - Interface for the Reputation contract
 /// @notice Interface for managing user reputation scores
-interface IReputation {
+interface IReputation is ICommonErrors {
 	event ReputationUpdated(
 		uint256 agreementId,
 		address user,
@@ -12,7 +14,7 @@ interface IReputation {
 	);
 
 	// Custom errors
-	error InvalidUserAddress(address user);
+	error InvalidAddress(address user);
 	error InvalidUpdaterAddress(address updater);
 
 	/// @notice Updates the reputation of a user

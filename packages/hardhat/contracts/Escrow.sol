@@ -62,7 +62,7 @@ contract Escrow is IEscrow, ReentrancyGuard, IAccessRestriction, IRentalDAO {
 		address _rentee,
 		address _renter
 	) external {
-		if (_deposit <= 0) revert AmountMustBeGreaterThanZero();
+		if (_deposit <= 0) revert MustBeGraterThanZero("deposit");
 
 		uint256 systemFee = rentalDAO.getSystemFee();
 		uint256 renteeEarnings = _cost - systemFee;

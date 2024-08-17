@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
+import { ICommonErrors } from "./ICommonErrors.sol";
+
 /**
  * @title IRentalDAO
  * @dev Interface for the RentalDAO contract, defining key functions for system fee management and contract address updates
  */
-interface IRentalDAO {
+interface IRentalDAO is ICommonErrors {
 	/**
 	 * @dev Emitted when the system fee is updated
 	 * @param oldFee The previous system fee
@@ -29,9 +31,7 @@ interface IRentalDAO {
 
 	// Custom errors
 	error FeeExceedsMaximum(uint256 fee);
-	error InvalidAddress();
 	error Unauthorized();
-	error InsufficientBalance(uint256 available, uint256 required);
 	error OnlyDAO();
 	error OnlyAdmin();
 

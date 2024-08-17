@@ -14,7 +14,7 @@ contract Reputation is IReputation, AccessControl {
 		address _user,
 		int256 _change
 	) external onlyRole(UPDATER_ROLE) {
-		if (_user == address(0)) revert InvalidUserAddress(_user);
+		if (_user == address(0)) revert InvalidAddress(_user);
 
 		reputationScores[_user] += _change;
 

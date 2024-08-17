@@ -49,13 +49,14 @@ contract RentalAgreement is IRentalAgreement {
 		address _rentalDAO
 	) {
 		// Pass msg.sender to Ownable constructor
-		if (_escrow == address(0)) revert InvalidAddress();
-		if (_inspection == address(0)) revert InvalidAddress();
-		if (_reputation == address(0)) revert InvalidAddress();
-		if (_disputeResolution == address(0)) revert InvalidAddress();
-		if (_socialFi == address(0)) revert InvalidAddress();
-		if (_userIdentity == address(0)) revert InvalidAddress();
-		if (_rentalDAO == address(0)) revert InvalidAddress();
+		if (_escrow == address(0)) revert InvalidAddress("escrow");
+		if (_inspection == address(0)) revert InvalidAddress("inspection");
+		if (_reputation == address(0)) revert InvalidAddress("reputation");
+		if (_disputeResolution == address(0))
+			revert InvalidAddress("disputeResolution");
+		if (_socialFi == address(0)) revert InvalidAddress("socialFi");
+		if (_userIdentity == address(0)) revert InvalidAddress("userIdentity");
+		if (_rentalDAO == address(0)) revert InvalidAddress("rentalDAO");
 		token = _token;
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
@@ -86,10 +87,9 @@ contract RentalAgreement is IRentalAgreement {
 		onlyVerifiedUser(_renter)
 		returns (uint256)
 	{
-		if (_cost <= 0) revert CostMustBeGreaterThanZero(_cost);
-		if (_deposit <= 0) revert DepositMustBeGreaterThanZero(_deposit);
-		if (_rentalPeriod <= 0)
-			revert RentalPeriodMustBeGreaterThanZero(_rentalPeriod);
+		if (_cost <= 0) revert MustBeGraterThanZero("cost");
+		if (_deposit <= 0) revert MustBeGraterThanZero("deposit");
+		if (_rentalPeriod <= 0) revert MustBeGraterThanZero("rentalPeriod");
 
 		Asset storage asset = assets[_tokenId];
 		if (!asset.isActive) revert AssetIsNotActive();
@@ -127,7 +127,7 @@ contract RentalAgreement is IRentalAgreement {
 		uint256 totalAmount = agreement.cost + agreement.deposit;
 
 		if (IERC20(token).balanceOf(msg.sender) < totalAmount)
-			revert IncorrectAmountSent(
+			revert InsufficientBalance(
 				IERC20(token).balanceOf(msg.sender),
 				totalAmount
 			);
@@ -155,7 +155,7 @@ contract RentalAgreement is IRentalAgreement {
 			msg.sender != agreement.rentee.userAddress &&
 			msg.sender != agreement.renter.userAddress
 		) {
-			revert NotAuthorized(msg.sender);
+			revert NotAuthorized();
 		}
 		if (agreement.status != AgreementStatus.STARTED)
 			revert AgreementNotActive();
@@ -201,7 +201,7 @@ contract RentalAgreement is IRentalAgreement {
 	function cancelAgreement(uint256 _agreementId) external {
 		Agreement storage agreement = agreements[_agreementId];
 		if (msg.sender != agreement.renter.userAddress) {
-			revert NotAuthorized(msg.sender);
+			revert NotAuthorized();
 		}
 		if (agreement.status != AgreementStatus.STARTED)
 			revert AgreementNotActive();
@@ -224,7 +224,7 @@ contract RentalAgreement is IRentalAgreement {
 		if (
 			msg.sender != agreement.rentee.userAddress &&
 			msg.sender != agreement.renter.userAddress
-		) revert NotAuthorized(msg.sender);
+		) revert NotAuthorized();
 
 		if (agreement.status != AgreementStatus.STARTED)
 			revert AgreementNotActive();
@@ -241,7 +241,7 @@ contract RentalAgreement is IRentalAgreement {
 	) external {
 		Agreement storage agreement = agreements[_agreementId];
 		if (msg.sender != agreement.rentee.userAddress) {
-			revert NotAuthorized(msg.sender);
+			revert NotAuthorized();
 		}
 		if (agreement.status != AgreementStatus.STARTED) {
 			revert AgreementNotActive();
@@ -263,7 +263,7 @@ contract RentalAgreement is IRentalAgreement {
 	) external {
 		Agreement storage agreement = agreements[_agreementId];
 		if (msg.sender != agreement.renter.userAddress) {
-			revert NotAuthorized(msg.sender);
+			revert NotAuthorized();
 		}
 		if (agreement.status != AgreementStatus.STARTED) {
 			revert AgreementNotActive();
@@ -275,24 +275,25 @@ contract RentalAgreement is IRentalAgreement {
 	}
 
 	function updateEscrow(address _escrow) external onlyOwner {
-		if (_escrow == address(0)) revert InvalidAddress();
+		if (_escrow == address(0)) revert InvalidAddress("escrow");
 		escrow = IEscrow(_escrow);
 	}
 
 	function updateInspection(address _inspection) external onlyOwner {
-		if (_inspection == address(0)) revert InvalidAddress();
+		if (_inspection == address(0)) revert InvalidAddress("inspection");
 		inspection = IInspection(_inspection);
 	}
 
 	function updateReputation(address _reputation) external onlyOwner {
-		if (_reputation == address(0)) revert InvalidAddress();
+		if (_reputation == address(0)) revert InvalidAddress("reputation");
 		reputation = IReputation(_reputation);
 	}
 
 	function updateDisputeResolution(
 		address _disputeResolution
 	) external onlyOwner {
-		if (_disputeResolution == address(0)) revert InvalidAddress();
+		if (_disputeResolution == address(0))
+			revert InvalidAddress("dispute resolution");
 		disputeResolution = IDisputeResolution(_disputeResolution);
 	}
 

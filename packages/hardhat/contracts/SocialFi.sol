@@ -16,7 +16,7 @@ contract SocialFi is ISocialFi, ReentrancyGuard {
 	mapping(address => uint256) public rewards;
 
 	function rewardUser(address _user, uint256 _amount) external {
-		if (_amount <= 0) revert RewardAmountMustBeGreaterThanZero(_amount);
+		if (_amount <= 0) revert MustBeGraterThanZero("amount");
 		rewards[_user] += _amount;
 
 		emit UserRewarded(_user, _amount);
