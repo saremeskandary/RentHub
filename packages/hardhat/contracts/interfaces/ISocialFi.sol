@@ -7,6 +7,7 @@ import { ICommonErrors } from "./ICommonErrors.sol";
 /// @notice Interface for managing user rewards
 interface ISocialFi is ICommonErrors {
 	event UserRewarded(address indexed user, uint256 amount);
+	event RewardClaimed(address recipiant, uint256 amount);
 
 	// Custom errors
 	error NoRewardsToClaim();
