@@ -2,8 +2,7 @@
 pragma solidity 0.8.26;
 
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
-import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
-
+import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
 contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
@@ -12,6 +11,7 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 	bytes32 public constant SCRIPT_ROLE = keccak256("SCRIPT_ROLE");
 	bytes32 public constant ARBITER_ROLE = keccak256("ARBITER_ROLE");
 	bytes32 public constant DAO_ROLE = keccak256("DAO_ROLE");
+	bytes32 public constant VERFIED_USER_ROLE = keccak256("VERFIED_USER_ROLE");
 	bytes32 public constant APPROVED_CONTRACT_ROLE =
 		keccak256("APPROVED_CONTRACT_ROLE");
 
@@ -129,6 +129,12 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 		}
 	}
 
+	function ifVerifiedUser(address _address) external view override {
+		if (!isVerifiedUser(_address)) {
+			revert NotVerifiedUser(_address);
+		}
+	}
+
 	/**
 	 * @dev Checks if contract is not paused
 	 */
@@ -204,5 +210,11 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 
 	function isDAO(address _address) public view override returns (bool) {
 		return hasRole(DAO_ROLE, _address);
+	}
+
+	function isVerifiedUser(
+		address _address
+	) public view override returns (bool) {
+		return hasRole(VERFIED_USER_ROLE, _address);
 	}
 }

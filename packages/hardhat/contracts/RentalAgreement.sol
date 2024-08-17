@@ -2,7 +2,6 @@
 pragma solidity 0.8.26;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IInspection } from "./interfaces/IInspection.sol";
 import { ISocialFi } from "./interfaces/ISocialFi.sol";
@@ -24,13 +23,10 @@ contract RentalAgreement is IRentalAgreement {
 	IInspection public inspection;
 	IDisputeResolution public disputeResolution;
 	ISocialFi public socialFi;
-	IUserIdentity public userIdentity;
 	IAccessRestriction public accessRestriction;
 
 	modifier onlyVerifiedUser(address _user) {
-		if (_user == address(0) || !userIdentity.isVerifiedUser(_user)) {
-			revert UserNotVerified(_user);
-		}
+		if (!accessRestriction.isVerifiedUser(_user)) revert NotVerifiedUser(_user);
 		_;
 	}
 
@@ -40,7 +36,7 @@ contract RentalAgreement is IRentalAgreement {
 		address _inspection,
 		address _disputeResolution,
 		address _socialFi,
-		address _userIdentity
+		address _accessRestriction
 	) {
 		// Pass msg.sender to Ownable constructor
 		if (_escrow == address(0)) revert InvalidAddress("escrow");
@@ -48,13 +44,14 @@ contract RentalAgreement is IRentalAgreement {
 		if (_disputeResolution == address(0))
 			revert InvalidAddress("disputeResolution");
 		if (_socialFi == address(0)) revert InvalidAddress("socialFi");
-		if (_userIdentity == address(0)) revert InvalidAddress("userIdentity");
+		if (_accessRestriction == address(0))
+			revert InvalidAddress("accessRestriction");
 		token = _token;
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
 		disputeResolution = IDisputeResolution(_disputeResolution);
 		socialFi = ISocialFi(_socialFi);
-		userIdentity = IUserIdentity(_userIdentity);
+		accessRestriction = IAccessRestriction(_accessRestriction);
 	}
 
 	/**

@@ -25,6 +25,7 @@ interface IAccessRestriction is IAccessControl, ICommonErrors {
 	error NotArbiter(address caller);
 	/// @dev Thrown when a function restricted to the DAO is called by an unauthorized address.
 	error NotDAO(address caller);
+	error NotVerifiedUser(address caller);
 	/// @dev Thrown when trying to execute a function while the contract is paused.
 	error ContractPaused();
 	/// @dev Thrown when trying to pause an already paused contract.
@@ -120,6 +121,13 @@ interface IAccessRestriction is IAccessControl, ICommonErrors {
 	function isDAO(address _address) external view returns (bool);
 
 	/**
+	 * @dev Checks if the given address has the Verified User role.
+	 * @param _address The address to check.
+	 * @return bool True if the address has the Verified User role, false otherwise.
+	 */
+	function isVerifiedUser(address _address) external view returns (bool);
+
+	/**
 	 * @dev Checks if the given address has the script role.
 	 * @param _address The address to check.
 	 * @notice Reverts with NotScript error if the address does not have the script role.
@@ -139,6 +147,13 @@ interface IAccessRestriction is IAccessControl, ICommonErrors {
 	 * @notice Reverts with NotDAO error if the address does not have the DAO role.
 	 */
 	function ifDAO(address _address) external view;
+
+	/**
+	 * @dev Checks if the given address has the Verified user role.
+	 * @param _address The address to check.
+	 * @notice Reverts with NotVerifiedUser error if the address does not have the Verified user role.
+	 */
+	function ifVerifiedUser(address _address) external view;
 
 	/**
 	 * @dev Checks if the given address is an admin or has the script role.

@@ -24,7 +24,7 @@ contract Reputation is IReputation {
 		address _user,
 		int256 _change
 	) external onlyApprovedContract {
-		if (_user == address(0)) revert InvalidAddress(_user);
+		if (_user == address(0)) revert InvalidAddress("user");
 
 		reputationScores[_user] += _change;
 

@@ -97,6 +97,7 @@ interface IRentalAgreement is ICommonErrors {
 	error RentalPeriodNotOver(uint256 currentTime, uint256 endTime);
 	error InspectionFailed(bool itemCondition, address rentee, address renter);
 	error InvalidDAOAddress(address daoAddress);
+	error NotVerifiedUser(address caller);
 
 	/**
 	 * @dev Emitted when a new agreement is created

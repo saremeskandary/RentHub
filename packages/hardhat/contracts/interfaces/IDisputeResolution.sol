@@ -77,7 +77,6 @@ interface IDisputeResolution is ICommonErrors {
 	function init(
 		address _rentalAgreement,
 		address _reputation,
-		address _userIdentity,
 		address _accessRestriction
 	) external;
 

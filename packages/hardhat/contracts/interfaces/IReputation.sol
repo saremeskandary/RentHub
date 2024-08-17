@@ -14,7 +14,6 @@ interface IReputation is ICommonErrors {
 	);
 
 	// Custom errors
-	error InvalidAddress(address user);
 	error InvalidUpdaterAddress(address updater);
 
 	/// @notice Updates the reputation of a user

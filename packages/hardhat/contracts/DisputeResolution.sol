@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-import { IUserIdentity } from "./interfaces/IUserIdentity.sol";
 import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IInspection } from "./interfaces/IInspection.sol";
 import { ISocialFi } from "./interfaces/ISocialFi.sol";
@@ -13,11 +12,11 @@ import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
 contract DisputeResolution is IDisputeResolution {
 	bytes32 public constant ARBITER_ROLE = keccak256("ARBITER_ROLE");
+	bytes32 public constant VERFIED_USER_ROLE = keccak256("VERFIED_USER_ROLE");
 	mapping(uint256 => Dispute) public disputes;
 
 	IRentalAgreement public rentalAgreement;
 	IReputation public reputation;
-	IUserIdentity public userIdentity;
 	IAccessRestriction public accessRestriction;
 
 	uint256 public constant REPUTATION_PENALTY = 50;
@@ -37,19 +36,16 @@ contract DisputeResolution is IDisputeResolution {
 	function init(
 		address _rentalAgreement,
 		address _reputation,
-		address _userIdentity,
 		address _accessRestriction
 	) public {
 		if (_rentalAgreement == address(0))
 			revert InvalidAddress("rental agreement");
 		if (_reputation == address(0)) revert InvalidAddress("reputation");
-		if (_userIdentity == address(0)) revert InvalidAddress("user identity");
 		if (_accessRestriction == address(0))
 			revert InvalidAddress("access restriction");
 
 		rentalAgreement = IRentalAgreement(_rentalAgreement);
 		reputation = IReputation(_reputation);
-		userIdentity = IUserIdentity(_userIdentity);
 		accessRestriction = IAccessRestriction(_accessRestriction);
 	}
 
@@ -117,7 +113,7 @@ contract DisputeResolution is IDisputeResolution {
 			reputation.getReputation(loser) <=
 			-int256(VALIDATION_REVOCATION_THRESHOLD * REPUTATION_PENALTY)
 		) {
-			userIdentity.revokeUser(loser);
+			accessRestriction.revokeRole(VERFIED_USER_ROLE, loser);
 		}
 
 		dispute.isActive = false;
