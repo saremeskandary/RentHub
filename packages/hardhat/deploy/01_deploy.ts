@@ -12,12 +12,11 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   // If deploying on local networks, deploy a mock USDT
   if (["hardhat", "localhost", "anvil", "truffleDashboard"].includes(network)) {
-    const mockERC20 = await deploy("MockERC20", {
+    const mockToken = await deploy("MockToken", {
       from: deployer,
-      args: ["USDT", "USDT", 18],
       log: true,
     });
-    tokenAddress = mockERC20.address;
+    tokenAddress = mockToken.address;
   } else if (network === "mainnet") {
     tokenAddress = process.env.USDT_ADDRESS || "0xYourMainnetUSDTAddress"; // CHANGEME
   } else if (network === "crossfiTestnet") {
@@ -39,14 +38,9 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
     log: true,
   });
 
-  const userIdentity = await deploy("UserIdentity", {
-    from: deployer,
-    args: [accessRestriction.address],
-    log: true,
-  });
-
   const reputation = await deploy("Reputation", {
     from: deployer,
+    args: [accessRestriction.address],
     log: true,
   });
 
@@ -85,10 +79,8 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
       tokenAddress,
       escrow.address,
       inspection.address,
-      reputation.address,
       disputeResolution.address,
       socialFi.address,
-      userIdentity.address,
       rentalDAO.address,
     ],
     log: true,
@@ -98,18 +90,8 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
   const disputeResolutionContract = await hre.ethers.getContract<Contract>("DisputeResolution", deployer);
   console.log(
     "👋 Initiate Dispute Resolution Contract",
-    await disputeResolutionContract.init(
-      rentalAgreement.address,
-      reputation.address,
-      userIdentity.address,
-      accessRestriction.address,
-    ),
+    await disputeResolutionContract.init(rentalAgreement.address, reputation.address, accessRestriction.address),
   );
-
-  // Update DisputeResolution with RentalAgreement address
-  await hre.ethers.getContractAt("DisputeResolution", disputeResolution.address).then(async contract => {
-    await contract.updateRentalAgreement(rentalAgreement.address);
-  });
 };
 
 export default deployContracts;
