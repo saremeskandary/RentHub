@@ -31,12 +31,4 @@ interface IReputation is ICommonErrors {
 	/// @param _user The address of the user whose reputation score is being queried
 	/// @return The reputation score of the user
 	function getReputation(address _user) external view returns (int256);
-
-	/// @notice Grants the UPDATER_ROLE to a specific address
-	/// @param _updater The address to be granted the UPDATER_ROLE
-	function addUpdater(address _updater) external;
-
-	/// @notice Revokes the UPDATER_ROLE from a specific address
-	/// @param _updater The address to be revoked the UPDATER_ROLE
-	function removeUpdater(address _updater) external;
 }
