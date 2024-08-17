@@ -144,7 +144,7 @@ const config: MyHardhatUserConfig = {
       accounts: [deployerPrivateKey],
       chainId: 157,
     },
-    crossfi: {
+    "crossfi-testnet": {
       url: "https://rpc.testnet.ms",
       accounts: [deployerPrivateKey],
       chainId: 4157,
