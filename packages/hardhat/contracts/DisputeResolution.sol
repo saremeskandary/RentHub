@@ -24,7 +24,8 @@ contract DisputeResolution is IDisputeResolution {
 	uint256 public constant VALIDATION_REVOCATION_THRESHOLD = 3;
 
 	modifier onlyArbiter() {
-		if (!accessRestriction.isAdmin(msg.sender)) revert NotArbiter(msg.sender);
+		if (!accessRestriction.isAdmin(msg.sender))
+			revert NotArbiter(msg.sender);
 		_;
 	}
 
@@ -33,12 +34,12 @@ contract DisputeResolution is IDisputeResolution {
 		_;
 	}
 
-	constructor(
+	function init(
 		address _rentalAgreement,
 		address _reputation,
 		address _userIdentity,
 		address _accessRestriction
-	) {
+	) public {
 		if (_rentalAgreement == address(0))
 			revert InvalidAddress("rental agreement");
 		if (_reputation == address(0)) revert InvalidAddress("reputation");
