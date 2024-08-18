@@ -23,17 +23,7 @@ const Home: NextPage = () => {
             <Address address={connectedAddress} />
           </div>
           <p className="text-center text-lg">
-            Get started by editing{" "}
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
+            Get started by Rental <Link href={"rental-agreement"} className="bg-primary p-1 rounded-lg">Agreement contract</Link>
           </p>
         </div>
 
