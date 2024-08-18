@@ -1,0 +1,41 @@
+// Button
+.btn {
+  text-align: center;
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 10px;
+  transition: all 0.3s ease 0s;
+}
+
+// Input
+input[type='text'],
+input[type='email'],
+input[type='number'],
+input[type='radio'] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type='file'] {
+  display: none;
+}
+
+textarea {
+  resize: none;
+
+  &:focus {
+    outline: none !important;
+  }
+}
+
+.input {
+  display: block;
+  width: 100%;
+  font-size: 14px;
+
+  &::placeholder {
+    color: #c4c4c4;
+  }
+}
