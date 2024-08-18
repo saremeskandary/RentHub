@@ -1,3 +1,34 @@
+```
+change require to if condition to make the gass less.
+e.g:
+Using require:
+
+require(balance >= amount, "Insufficient balance");
+
+to Using if with custom error:
+
+error InsufficientBalance(uint256 available, uint256 required);
+
+if (balance < amount) {
+    revert InsufficientBalance(balance, amount);
+}
+```
+
+DAO
+AI
+ERC1155
+Natspec
+Test
+Deploy
+Code Cleaning
+
+add theses to proper
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+
+import { ERC721Holder } from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import { ERC1155Holder, ERC1155Receiver } from "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+
 1. Setup and Initial Configuration:
    - Clone the scaffold-eth-2 repository and set it up for your project.
    - Customize the configuration to fit RentHub's needs, including network settings for the various blockchains you plan to support (Shibarium, CrossFi, ICP, etc.).
