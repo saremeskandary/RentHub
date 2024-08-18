@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* :root {
+  --color-brand-100: #FFF8E1;
+  --color-brand-200: #FFE082;
+  --color-brand-300: #FFC107;
+  --color-brand-400: #F57F17;
+  --color-brand-500: #E65100;
+}
+
+body {
+  @apply bg-brand-100 text-brand-500;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading;
+}
+
+p, span, div {
+  @apply font-body;
+}
+
+Add any custom components or overrides here */
