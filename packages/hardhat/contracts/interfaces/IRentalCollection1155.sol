@@ -5,6 +5,7 @@ import { ICommonErrors } from "./ICommonErrors.sol";
 
 interface IRentalCollection1155 is ICommonErrors {
 	error DuplicateCollectionName();
+	error InvalidParentToken();
 
 	function name() external view returns (string memory);
 
