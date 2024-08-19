@@ -19,6 +19,7 @@ contract DisputeResolution is IDisputeResolution {
 	IReputation public reputation;
 	IAccessRestriction public accessRestriction;
 
+	bool private initialized = false;
 	uint256 public constant REPUTATION_PENALTY = 50;
 	uint256 public constant VALIDATION_REVOCATION_THRESHOLD = 3;
 
@@ -33,11 +34,19 @@ contract DisputeResolution is IDisputeResolution {
 		_;
 	}
 
+	modifier onlyOnce() {
+		if (initialized) revert ContractAlreadyInitialized();
+		_;
+		initialized = true;
+	}
+
+	constructor() {}
+
 	function init(
 		address _rentalAgreement,
 		address _reputation,
 		address _accessRestriction
-	) public {
+	) public onlyOnce {
 		if (_rentalAgreement == address(0))
 			revert InvalidAddress("rental agreement");
 		if (_reputation == address(0)) revert InvalidAddress("reputation");

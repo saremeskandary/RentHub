@@ -49,6 +49,7 @@ interface IDisputeResolution is ICommonErrors {
 		bool votedForRentee
 	);
 
+	error ContractAlreadyInitialized();
 	/**
 	 * @dev Error thrown when attempting to initiate a dispute for an agreement that already has an active dispute
 	 * @param agreementId The ID of the rental agreement
