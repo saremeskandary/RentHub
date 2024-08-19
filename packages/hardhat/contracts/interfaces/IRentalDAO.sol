@@ -28,7 +28,7 @@ interface IRentalDAO is ICommonErrors {
 	 * @param newAddress The new address of the contract
 	 */
 	event ContractAddressUpdated(string contractName, address newAddress);
-	
+
 	event Withdrawn(address recipient, uint256 amount);
 
 	// Custom errors
