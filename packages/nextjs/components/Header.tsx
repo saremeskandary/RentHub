@@ -1,14 +1,12 @@
 "use client";
 
-import { FC, useCallback, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeftRight, House, MessageCircle, User } from "lucide-react";
 import { useMediaQuery } from "react-responsive";
-import { Bars3Icon, BugAntIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import { useOutsideClick } from "~~/hooks/scaffold-eth";
 
 type HeaderMenuLink = {
   label: string;
@@ -54,13 +52,9 @@ export const Header: FC = () => {
       <div className="px-3">
         <div className="flex h-[70px] items-center gap-10">
           {!isTablet && (
-            <Link href="/" className="flex gap-5">
+            <Link href="/" className="flex items-center gap-5">
               <Image alt="SE2 logo" src="/logo.svg" width={40} height={40} />
-
-              <div className="flex flex-col">
-                <span className="font-bold leading-tight">Scaffold-ETH</span>
-                <span className="text-xs">Ethereum dev stack</span>
-              </div>
+              <span className="font-bold leading-tight">RentHub</span>
             </Link>
           )}
 
