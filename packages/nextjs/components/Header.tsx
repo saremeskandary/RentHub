@@ -92,7 +92,7 @@ export const Header: FC = () => {
             </nav>
           </div>
 
-          <div className="relative z-[600] flex">
+          <div className="relative z-[600] flex items-center">
             <RainbowKitCustomConnectButton />
             <FaucetButton />
           </div>
