@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useCallback, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ArrowLeftRight, House, MessageCircle, User } from "lucide-react";
+import { useMediaQuery } from "react-responsive";
 import { Bars3Icon, BugAntIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
@@ -18,98 +20,84 @@ export const menuLinks: HeaderMenuLink[] = [
   {
     label: "Home",
     href: "/",
+    icon: <House size={20} />,
   },
   {
-    label: "Rental Agreement",
-    href: "/rental-agreement",
-    icon: <DocumentIcon className="h-4 w-4" />,
+    label: "Listings",
+    href: "/listings",
+    icon: <ArrowLeftRight size={20} />,
   },
   {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
+    label: "SocialFI",
+    href: "/socialfi",
+    icon: <MessageCircle size={20} />,
+  },
+  {
+    label: "Profile",
+    href: "/profile",
+    icon: <User size={20} />,
   },
 ];
 
-export const HeaderMenuLinks = () => {
+export const Header: FC = () => {
+  const [menu, setMenu] = useState<boolean>(false);
+  const isTablet = useMediaQuery({ maxWidth: 992.98 });
   const pathname = usePathname();
 
+  useEffect(() => {
+    if (menu) document.body.classList.add("lock");
+    else document.body.classList.remove("lock");
+  }, [menu]);
+
   return (
-    <>
-      {menuLinks.map(({ label, href, icon }) => {
-        const isActive = pathname === href;
-        return (
-          <li key={href}>
-            <Link
-              href={href}
-              passHref
-              className={`${
-                isActive ? "bg-secondary shadow-md" : ""
-              } hover:bg-secondary hover:shadow-md focus:!bg-secondary active:!text-neutral py-1.5 px-3 text-sm rounded-full gap-2 grid grid-flow-col`}
-            >
-              {icon}
-              <span>{label}</span>
+    <header className="fixed z-[999] w-full bg-white shadow-md">
+      <div className="px-3">
+        <div className="flex h-[70px] items-center gap-10">
+          {!isTablet && (
+            <Link href="/" className="flex gap-5">
+              <Image alt="SE2 logo" src="/logo.svg" width={40} height={40} />
+
+              <div className="flex flex-col">
+                <span className="font-bold leading-tight">Scaffold-ETH</span>
+                <span className="text-xs">Ethereum dev stack</span>
+              </div>
             </Link>
-          </li>
-        );
-      })}
-    </>
-  );
-};
-
-/**
- * Site header
- */
-export const Header = () => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const burgerMenuRef = useRef<HTMLDivElement>(null);
-  useOutsideClick(
-    burgerMenuRef,
-    useCallback(() => setIsDrawerOpen(false), []),
-  );
-
-  return (
-    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary px-0 sm:px-2">
-      <div className="navbar-start w-auto lg:w-1/2">
-        <div className="lg:hidden dropdown" ref={burgerMenuRef}>
-          <label
-            tabIndex={0}
-            className={`ml-1 btn btn-ghost ${isDrawerOpen ? "hover:bg-secondary" : "hover:bg-transparent"}`}
-            onClick={() => {
-              setIsDrawerOpen(prevIsOpenState => !prevIsOpenState);
-            }}
-          >
-            <Bars3Icon className="h-1/2" />
-          </label>
-          {isDrawerOpen && (
-            <ul
-              tabIndex={0}
-              className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
-              onClick={() => {
-                setIsDrawerOpen(false);
-              }}
-            >
-              <HeaderMenuLinks />
-            </ul>
           )}
+
+          <div className="flex-1">
+            <div onClick={() => setMenu(!menu)} className={`icon-menu ${menu ? "active" : ""}`}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <nav className={`menu__body ${menu ? "active" : ""}`}>
+              <ul className="flex items-center gap-5 md2:flex-col">
+                {menuLinks.map(({ label, href, icon }) => (
+                  <li key={href}>
+                    <Link
+                      onClick={() => setMenu(false)}
+                      href={href}
+                      passHref
+                      className={`${
+                        pathname === href ? "bg-secondary shadow-md" : ""
+                      } flex gap-2 rounded-full px-3 py-2 text-sm transition hover:bg-secondary hover:shadow-md`}
+                    >
+                      {icon}
+                      <span>{label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+
+          <div className="relative z-[600] flex">
+            <RainbowKitCustomConnectButton />
+            <FaucetButton />
+          </div>
         </div>
-        <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
-            <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-bold leading-tight">Scaffold-ETH</span>
-            <span className="text-xs">Ethereum dev stack</span>
-          </div>
-        </Link>
-        <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
-          <HeaderMenuLinks />
-        </ul>
       </div>
-      <div className="navbar-end flex-grow mr-4">
-        <RainbowKitCustomConnectButton />
-        <FaucetButton />
-      </div>
-    </div>
+    </header>
   );
 };

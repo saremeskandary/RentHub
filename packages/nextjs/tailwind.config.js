@@ -1,7 +1,55 @@
+const plugin = require("tailwindcss/plugin");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}", "./utils/**/*.{js,ts,jsx,tsx}"],
-  plugins: [require("daisyui")],
+  plugins: [
+    require("daisyui"),
+    plugin(function ({ addComponents }) {
+      addComponents({
+        ".icon-menu": {
+          "@media (max-width: 992.98px)": {
+            display: "block",
+            position: "relative",
+            width: "30px",
+            height: "20px",
+            cursor: "pointer",
+            zIndex: "600",
+            span: {
+              transition: "all .3s ease 0s",
+              top: "8px",
+              left: "0",
+              position: "absolute",
+              width: "100%",
+              height: "4px",
+              borderRadius: "10px",
+              backgroundColor: "#333333",
+              "&:first-child": {
+                top: "0",
+              },
+              "&:last-child": {
+                top: "auto",
+                bottom: "0",
+              },
+            },
+            "&.active": {
+              span: {
+                transform: "scale(0)",
+                "&:first-child": {
+                  transform: "rotate(-45deg)",
+                  top: "8px",
+                },
+                "&:last-child": {
+                  transform: "rotate(45deg)",
+                  bottom: "8px",
+                },
+              },
+            },
+          },
+        },
+      });
+    }),
+  ],
   darkTheme: "dark",
   darkMode: ["selector", "[data-theme='dark']"],
   // DaisyUI theme colors
@@ -75,9 +123,17 @@ module.exports = {
     ],
   },
   theme: {
+    screens: {
+      xl: { min: "1600px" },
+      md1: { max: "1200px" },
+      md2: { max: "992.98px" },
+      md3: { max: "767.98px" },
+      md4: { max: "500px" },
+    },
     extend: {
       boxShadow: {
         center: "0 0 12px -2px rgb(0 0 0 / 0.05)",
+        custom: "0 0 10px 2px rgba(34, 60, 80, 0.1)",
       },
       animation: {
         "pulse-fast": "pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite",
