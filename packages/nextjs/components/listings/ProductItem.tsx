@@ -2,10 +2,10 @@ import { FC } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const ProductItem: FC<{ id: number; img: string; title: string; text: string }> = ({ id, img, title, text }) => {
+const ProductItem: FC<{ img: string; title: string; text: string, id:number }> = ({ img, title, text, id }) => {
   return (
     <Link
-      className="overflow-hidden rounded bg-white shadow-custom transition-transform hover:-translate-y-2"
+      className="shadow-custom overflow-hidden rounded bg-white transition-transform hover:-translate-y-2"
       href={`/listings/${id}`}
     >
       <div className="relative pb-[80%]">

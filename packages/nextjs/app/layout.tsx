@@ -2,8 +2,7 @@ import "../styles/global.scss";
 import "@rainbow-me/rainbowkit/styles.css";
 import type { Metadata } from "next";
 import { ScaffoldEthAppWithProviders } from "~~/components/ScaffoldEthAppWithProviders";
-
-// import { ThemeProvider } from "~~/components/ThemeProvider";
+import { ThemeProvider } from "~~/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: {
@@ -19,9 +18,9 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   return (
     <html suppressHydrationWarning>
       <body>
-        {/* <ThemeProvider enableSystem> */}
-        <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
-        {/* </ThemeProvider> */}
+        <ThemeProvider enableSystem>
+          <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
+        </ThemeProvider>
       </body>
     </html>
   );

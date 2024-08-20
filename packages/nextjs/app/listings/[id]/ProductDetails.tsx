@@ -4,30 +4,29 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import ProductDescription from "~~/components/product-details/ProductDescription";
+import styles from "~~/components/product-details/ProductDetails.module.scss";
 import { productsService } from "~~/services/products.service";
 
 export default function ProductDetails() {
   const { id } = useParams();
-
   const { data } = useQuery({
     queryKey: ["products", id],
     queryFn: () => productsService.getProductsById(id),
   });
 
   return (
-    <section className="pb-5 pt-32">
-      <div className="mx-auto max-w-[1200px] px-3">
-        <div className="flex rounded bg-white shadow-custom md3:flex-col">
-          <div className="relative flex-[0_1_65%] overflow-hidden rounded md2:flex-[0_1_55%] md3:pb-[70%]">
+    <section className={styles.product_details}>
+      <div className="mx-auto max-w-[1200px] p-3">
+        <div className={styles.product_details__body}>
+          <div className="h-[100vh]">
             <Image
-              src={data ? data?.img : ""}
+              src={data ? data.img : ""}
               alt="product-details"
               width={1000}
               height={1000}
-              className="absolute left-0 top-0 h-full w-full object-cover object-center"
+              className="aspect-video !h-full !object-cover"
             />
           </div>
-
           <ProductDescription {...data} />
         </div>
       </div>
