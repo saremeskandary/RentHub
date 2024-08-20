@@ -1,6 +1,6 @@
-import { FC } from "react";
-import styles from "./CreateProduct.module.scss";
-import { HandCoins, ImagePlus, LetterText, Plus, Text } from "lucide-react";
+import { HandCoins, ImagePlus, LetterText, Plus, Text } from 'lucide-react'
+import { FC } from 'react'
+import styles from './CreateProduct.module.scss'
 
 const ProductForm: FC<{ setImage: (i: string) => void }> = ({ setImage }) => {
   return (
@@ -10,40 +10,28 @@ const ProductForm: FC<{ setImage: (i: string) => void }> = ({ setImage }) => {
           <ImagePlus size={20} color="#9095a9" />
           <input
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              if (e.target.files && e.target.files[0]) setImage(e.target.files[0].name);
+              if (e.target.files && e.target.files[0]) setImage(e.target.files[0].name)
             }}
             id="file"
             type="file"
-            className="block w-full appearance-none bg-white text-sm outline-none"
+            className="input"
           />
           <label htmlFor="file">Add image</label>
         </div>
 
         <div className={styles.product_create__input}>
           <LetterText size={20} color="#9095a9" />
-          <input
-            type="text"
-            className="block w-full appearance-none bg-white text-sm outline-none"
-            placeholder="Title"
-          />
+          <input type="text" className="input" placeholder="Title" />
         </div>
 
         <div className={styles.product_create__input}>
           <Text size={20} color="#9095a9" />
-          <textarea
-            className="block w-full appearance-none bg-white text-sm outline-none"
-            placeholder="Text"
-            rows={7}
-          />
+          <textarea className="input" placeholder="Text" rows={7} />
         </div>
 
         <div className={styles.product_create__input}>
           <HandCoins size={20} color="#9095a9" />
-          <input
-            type="text"
-            className="block w-full appearance-none bg-white text-sm outline-none"
-            placeholder="Price"
-          />
+          <input type="text" className="input" placeholder="Price" />
         </div>
 
         <div className={styles.product_create__condition}>
@@ -64,7 +52,7 @@ const ProductForm: FC<{ setImage: (i: string) => void }> = ({ setImage }) => {
         <span>Create a new ad</span>
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default ProductForm;
+export default ProductForm
