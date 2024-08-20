@@ -1,42 +1,35 @@
 "use client";
 
-import { SetStateAction, useEffect, useState } from "react";
-import Link from "next/link";
-import { getAgreementParties } from "../../utils/scaffold-eth/contractInteractions";
-import { ContractInput, ContractUI, getInitialFormState } from "../debug/_components/contract";
-import { Abi, AbiFunction } from "abitype";
+import { useReducer, useState } from "react";
 import type { NextPage } from "next";
-import { Address as ViemAddress } from "viem";
-import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { WriteOnlyFunctionForm } from "~~/app/debug/_components/contract";
-import { Address, InputBase } from "~~/components/scaffold-eth";
-import { useTargetNetwork, useTransactor } from "~~/hooks/scaffold-eth";
+import { useAccount, useWriteContract } from "wagmi";
+import { Address } from "~~/components/scaffold-eth";
+import { BasicWriteOnlyFunctionForm } from "~~/components/scaffold-eth/form/BasicWriteOnlyFunctionForm";
+import { useDeployedContractInfo, useTargetNetwork, useTransactor } from "~~/hooks/scaffold-eth";
 
 const contractName = "RentalAgreement"; // Contract name used in ContractUI
 
 const RentalAgreement: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
-  const [agreementParties, setAgreementParties] = useState<{ rentee: ViemAddress; renter: ViemAddress } | null>(null);
-  const [agreementId, setAgreementId] = useState<number>(0);
-  // const [form, setForm] = useState<Record<string, any>>(() => getInitialFormState(abiFunction));
-  const [txValue, setTxValue] = useState<string | bigint>("");
-  const { chain } = useAccount();
-  const writeTxn = useTransactor();
   const { targetNetwork } = useTargetNetwork();
-  const writeDisabled = !chain || chain?.id !== targetNetwork.id;
+  const { address: connectedAddress } = useAccount();
+  const { data: deployedContractData, isLoading: deployedContractLoading } = useDeployedContractInfo(contractName);
+  const [refreshDisplayVariables, triggerRefreshDisplayVariables] = useReducer(value => !value, false);
 
-  const { data: result, isPending, writeContractAsync } = useWriteContract();
+  if (deployedContractLoading) {
+    return (
+      <div className="mt-14">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    const fetchAgreementParties = async () => {
-      if (agreementId > 0) {
-        const parties = await getAgreementParties(contractName, BigInt(agreementId));
-        setAgreementParties(parties);
-      }
-    };
-
-    fetchAgreementParties();
-  }, [agreementId]);
+  if (!deployedContractData) {
+    return (
+      <p className="text-3xl mt-14">
+        {`No contract found by the name of "${contractName}" on chain "${targetNetwork.name}"!`}
+      </p>
+    );
+  }
 
   return (
     <>
@@ -59,19 +52,22 @@ const RentalAgreement: NextPage = () => {
                         <p className="my-0 text-sm">Write</p>
                       </div>
                     </div>
-                    <div className="p-5 divide-y divide-base-300">
-                      {/* <ContractInput
-                        setForm={function (value: SetStateAction<Record<string, any>>): void {
-                          throw new Error("Function not implemented.");
-                        }}
-                        form={undefined}
-                        stateObjectKey={""}
-                        paramType={{type:"tuple",name: "sdf"}}
-                      /> */}
-                      {/* <ContractWriteMethods
+                    {/* <ContractVariables
+                    refreshDisplayVariables={refreshDisplayVariables}
                     deployedContractData={deployedContractData}
-                    onChange={triggerRefreshDisplayVariables}
                   /> */}
+                    <div className="p-5 divide-y divide-base-300">
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
+                        name={"createAgreement"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
+                      {/* <ContractWriteMethods
+                      deployedContractData={deployedContractData}
+                      onChange={triggerRefreshDisplayVariables}
+                    /> */}
                     </div>
                   </div>
                 </div>
@@ -79,7 +75,6 @@ const RentalAgreement: NextPage = () => {
             </div>
           </div>
         </div>
-        <ContractUI contractName={contractName} className={"mt-10"} />
       </div>
     </>
   );
