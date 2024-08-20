@@ -22,6 +22,17 @@ type ContractInputProps = {
 };
 
 /**
+ * Utility function to format parameter names
+ */
+const formatParamName = (name: string) => {
+  if (!name) return "";
+  // Remove underscores and split camel case
+  const formattedName = name.replace(/_/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
+  // Capitalize each word
+  return formattedName.replace(/\b\w/g, char => char.toUpperCase());
+};
+
+/**
  * Generic Input component to handle input's based on their function param type
  */
 export const ContractInput = ({ setForm, form, stateObjectKey, paramType }: ContractInputProps) => {
@@ -75,7 +86,9 @@ export const ContractInput = ({ setForm, form, stateObjectKey, paramType }: Cont
   return (
     <div className="flex flex-col gap-1.5 w-full">
       <div className="flex items-center ml-2">
-        {paramType.name && <span className="text-xs font-medium mr-2 leading-none">{paramType.name}</span>}
+        {paramType.name && (
+          <span className="text-xs font-medium mr-2 leading-none">{formatParamName(paramType.name)}</span>
+        )}
         <span className="block text-xs font-extralight leading-none">{paramType.type}</span>
       </div>
       {renderInput()}
