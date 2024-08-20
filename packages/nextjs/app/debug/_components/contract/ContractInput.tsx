@@ -82,6 +82,14 @@ export const ContractInput = ({ setForm, form, stateObjectKey, paramType, format
             {formatName ? formatParamName(paramType.name) : paramType.name}
           </span>
         )}
+<<<<<<< HEAD
+=======
+        {paramType.name && (
+          <span className="text-xs font-medium mr-2 leading-none">
+            {formatName ? formatParamName(paramType.name) : paramType.name}
+          </span>
+        )}
+>>>>>>> a52c17680c5c1e818b2f5320350f374ee3f607ca
         <span className="block text-xs font-extralight leading-none">{paramType.type}</span>
       </div>
       {renderInput()}
