@@ -10,7 +10,7 @@ interface IProductDescription {
 
 const ProductDescription: FC<IProductDescription | any> = ({ title, text, price, date }) => {
   return (
-    <div className="md3:min-h-auto flex h-full min-h-[500px] flex-[0_1_35%] flex-col p-5 md2:flex-[0_1_45%]">
+    <div className="flex h-full min-h-[500px] flex-[0_1_35%] flex-col p-5 md2:flex-[0_1_45%] md3:min-h-0">
       <div className="mn-3 flex flex-wrap justify-between gap-3">
         <h2 className="text-lg font-semibold">{title}</h2>
         <p className="text-lg font-semibold">{price}</p>
@@ -46,7 +46,7 @@ const ProductDescription: FC<IProductDescription | any> = ({ title, text, price,
         </div>
       </div>
 
-      <button className="mt-auto flex w-full items-center justify-center gap-3 rounded bg-gray-400 px-5 py-2 text-white transition-colors hover:bg-gray-300">
+      <button className="mt-auto flex w-full items-center justify-center gap-3 rounded bg-gray-400 px-5 py-2 text-white transition-colors hover:bg-gray-300 md3:mt-5">
         <ShoppingCart size={18} color="#fff" />
         <span>Initiate rental</span>
       </button>
