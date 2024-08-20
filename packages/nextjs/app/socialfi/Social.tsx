@@ -40,7 +40,7 @@ export default function SocialFi() {
 
   return (
     <section className={styles.social}>
-      <div className="container">
+      <div className="mx-auto max-w-[1200px] px-3">
         <div className={styles.social__body}>
           <div className={styles.social__column}>
             <div className={styles.social__tabs}>

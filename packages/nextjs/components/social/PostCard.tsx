@@ -1,14 +1,20 @@
-import { CircleUserRound, MessagesSquare, Redo2, ThumbsUp } from 'lucide-react'
-import { FC } from 'react'
-
-import { useMediaQuery } from 'react-responsive'
-import styles from './Social.module.scss'
+import { FC, useState } from "react";
+import Popup from "./Popup";
+import styles from "./Social.module.scss";
+import { CircleUserRound, MessagesSquare, Redo2, ThumbsUp } from "lucide-react";
+import { useMediaQuery } from "react-responsive";
 
 const PostCard: FC<Record<string, string>> = ({ user, text, img }) => {
-  const isMobile = useMediaQuery({ maxWidth: 479.98 })
+  const isMobile = useMediaQuery({ maxWidth: 479.98 });
+
+  const [like, setLike] = useState<number>(0);
+  const [comments, setComments] = useState(["Great post!", "Thanks for sharing!", "Interesting read!"]);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   return (
     <div className={styles.post_card}>
+      <Popup isOpen={isPopupOpen} setIsPopupOpen={setIsPopupOpen} comments={comments} setComments={setComments} />
+
       <div className={styles.post_card__user}>
         <CircleUserRound color="#4f4f4f" />
         <span>{user}</span>
@@ -21,23 +27,25 @@ const PostCard: FC<Record<string, string>> = ({ user, text, img }) => {
       </div>
 
       <div className={styles.post_card__social}>
-        <button>
+        <button onClick={() => setLike(like + 1)}>
           <ThumbsUp size={18} color="#4f4f4f" />
-          <span>4.1k</span>
+          <span>{like}</span>
         </button>
 
-        <button>
+        <button onClick={() => setIsPopupOpen(true)}>
           <MessagesSquare size={18} color="#4f4f4f" />
-          <span>255 {!isMobile && 'comments'}</span>
+          <span>
+            {comments.length} {!isMobile && "comments"}
+          </span>
         </button>
 
         <button>
           <Redo2 size={18} color="#4f4f4f" />
-          <span>69 {!isMobile && 'shares'}</span>
+          <span>69 {!isMobile && "shares"}</span>
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PostCard
+export default PostCard;
