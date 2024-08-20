@@ -1,6 +1,7 @@
 "use client";
 
 import { FC, useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./ProductDetails.module.scss";
 import { ShoppingCart } from "lucide-react";
@@ -22,10 +23,12 @@ const ProductDescription: FC<
   const [currentTime, setCurrentTime] = useState<string>("");
   const [endTime, setEndTime] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [totalKPrice, setTotalKPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0); // State to track the calculated price
   const router = useRouter();
 
-  const hourlyRate = 8; // Example rate: $8 per hour
+  const hourlyRate = 8;
+  const hourlyKRate = 378000; // Example rate: $8 per hour
 
   useEffect(() => {
     // Set current date and time in the proper format
@@ -36,6 +39,23 @@ const ProductDescription: FC<
     setCurrentDate(formattedDate);
     setCurrentTime(formattedTime);
   }, []);
+
+  const calculatedKPrice = () => {
+    if (!bookingDate || !bookingTime || !endDate || !endTime) {
+      return 0;
+    }
+
+    const start = new Date(`${bookingDate}T${bookingTime}`);
+    const end = new Date(`${endDate}T${endTime}`);
+    const durationInHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Duration in hours
+
+    // Ensure the duration is positive
+    if (durationInHours > 0) {
+      return durationInHours * hourlyKRate;
+    }
+
+    return 0;
+  };
 
   const calculatePrice = () => {
     if (!bookingDate || !bookingTime || !endDate || !endTime) {
@@ -50,6 +70,7 @@ const ProductDescription: FC<
     if (durationInHours > 0) {
       return durationInHours * hourlyRate;
     }
+
     return 0;
   };
 
@@ -67,6 +88,7 @@ const ProductDescription: FC<
 
     const calculatedPrice = calculatePrice();
     setTotalPrice(calculatedPrice);
+    setTotalKPrice(calculatedKPrice);
     setShowModal(true); // Show modal on button click
   };
 
@@ -100,8 +122,23 @@ const ProductDescription: FC<
       <div className={styles.product_details__title}>
         <h2>{title}</h2>
         <p>{text}</p>
-        <p className="font-semibold">Price: ${hourlyRate} per hour</p>
-        <p className="font-semibold">Total Price: ${totalPrice.toFixed(2)}</p>
+        <div className="my-3">
+          <p className="flex items-center gap-[6px] font-semibold">
+            Price: ${hourlyRate} -
+            <span className="flex items-center">
+              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} />
+              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> K9 {hourlyKRate}
+            </span>
+            (per hour)
+          </p>
+          <p className="flex items-center gap-[6px] font-semibold">
+            Total Price: ${totalPrice.toFixed(2)} -
+            <span className="flex items-center">
+              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} />
+              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
+            </span>
+          </p>
+        </div>
       </div>
 
       <div className={styles.product_details__condition}>
@@ -193,8 +230,12 @@ const ProductDescription: FC<
               <p>
                 <strong>End Time:</strong> {endTime}
               </p>
-              <p>
-                <strong>Total Price:</strong> ${totalPrice.toFixed(2)}
+              <p className="flex items-center gap-[5px]">
+                <strong>Total Price: </strong> ${totalPrice.toFixed(2)} -
+                <span className="flex items-center">
+                  <Image src="/k9-logo.png" alt="xfi" width={15} height={15} />
+                  <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
+                </span>
               </p>
             </div>
             <div className="flex justify-end space-x-4">
