@@ -2,10 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-// @import "./styles-base/variables";
-// @import "./styles-base/nullstyle";
-// @import "./styles-base/forms";
-// @import "./styles-base/base";
+body {
+  color: #333;
+  background: #fff;
+}
+
+input {
+  background: #fff;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.7;
+}
 
 body.lock {
   position: relative;
@@ -41,6 +51,36 @@ body.lock {
       left: 0;
     }
   }
+}
+
+.cheked-input {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #333;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+
+  &:checked::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background-color: #333;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 .leaflet-control-zoom,

@@ -37,7 +37,7 @@ const ListingsFilter: FC<{
 
   return (
     <div
-      className={`fixed left-0 top-0 z-10 h-full w-[350px] overflow-auto bg-white p-[125px_20px_20px_20px] shadow-center md2:w-[300px] md3:-left-full md3:w-full md3:transition-all ${visible ? "md3:left-0" : ""}`}
+      className={`scrollbar-none fixed left-0 top-0 z-10 h-full w-[350px] overflow-auto bg-white p-[125px_20px_20px_20px] shadow-center md2:w-[300px] md3:-left-full md3:w-full md3:transition-all ${visible ? "md3:left-0" : ""}`}
     >
       {isMobile ? (
         <div className="mb-5 w-full text-right">

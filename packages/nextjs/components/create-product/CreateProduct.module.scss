@@ -1,7 +1,7 @@
-@import '../../styles/styles-base/variables';
+@import "../../styles/styles-base/variables";
 
 .product_create {
-  padding: 40px 0 100px 0;
+  padding: 100px 0 20px 0;
   flex: 1 1 100%;
   display: flex;
   align-items: center;
@@ -77,7 +77,7 @@
       cursor: pointer;
 
       &:checked::before {
-        content: '';
+        content: "";
         width: 8px;
         height: 8px;
         background-color: $text-primary;

@@ -2,7 +2,6 @@
 
 import { FC, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import products from "../staticdata/Products";
 import styles from "./ProductDetails.module.scss";
 import { ShoppingCart } from "lucide-react";
 
@@ -14,7 +13,7 @@ const ProductDescription: FC<
       img: string;
     }
   | any
-> = ({ title, text, id, img }) => {
+> = ({ title, text, id }) => {
   const [showModal, setShowModal] = useState(false); // Modal state
   const [isBooked, setIsBooked] = useState(false);
   const [bookingDate, setBookingDate] = useState("");
@@ -101,8 +100,8 @@ const ProductDescription: FC<
       <div className={styles.product_details__title}>
         <h2>{title}</h2>
         <p>{text}</p>
-        <p>Price: ${hourlyRate} per hour</p>
-        <p>Total Price: ${totalPrice.toFixed(2)}</p>
+        <p className="font-semibold">Price: ${hourlyRate} per hour</p>
+        <p className="font-semibold">Total Price: ${totalPrice.toFixed(2)}</p>
       </div>
 
       <div className={styles.product_details__condition}>
