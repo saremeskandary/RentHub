@@ -15,12 +15,14 @@ import {
 } from "~~/app/debug/_components/contract";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
 import { getParsedError, notification } from "~~/utils/scaffold-eth";
+import { formatParamName } from "~~/utils/scaffold-eth/formatParamName";
 
 type ReadOnlyFunctionFormProps = {
   contractAddress: Address;
   abiFunction: AbiFunction;
   inheritedFrom?: string;
   abi: Abi;
+  formatName?: boolean;
 };
 
 export const ReadOnlyFunctionForm = ({
@@ -28,6 +30,7 @@ export const ReadOnlyFunctionForm = ({
   abiFunction,
   inheritedFrom,
   abi,
+  formatName = true,
 }: ReadOnlyFunctionFormProps) => {
   const [form, setForm] = useState<Record<string, any>>(() => getInitialFormState(abiFunction));
   const [result, setResult] = useState<unknown>();
@@ -72,7 +75,7 @@ export const ReadOnlyFunctionForm = ({
   return (
     <div className="flex flex-col gap-3 py-5 first:pt-0 last:pb-1">
       <p className="font-medium my-0 break-words">
-        {abiFunction.name}
+        {formatName ? formatParamName(abiFunction.name) : abiFunction.name}
         <InheritanceTooltip inheritedFrom={inheritedFrom} />
       </p>
       {inputElements}

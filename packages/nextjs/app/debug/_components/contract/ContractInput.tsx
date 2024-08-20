@@ -13,18 +13,20 @@ import {
   IntegerVariant,
 } from "~~/components/scaffold-eth";
 import { AbiParameterTuple } from "~~/utils/scaffold-eth/contract";
+import { formatParamName } from "~~/utils/scaffold-eth/formatParamName";
 
 type ContractInputProps = {
   setForm: Dispatch<SetStateAction<Record<string, any>>>;
   form: Record<string, any> | undefined;
   stateObjectKey: string;
   paramType: AbiParameter;
+  formatName?: boolean;
 };
 
 /**
  * Generic Input component to handle input's based on their function param type
  */
-export const ContractInput = ({ setForm, form, stateObjectKey, paramType }: ContractInputProps) => {
+export const ContractInput = ({ setForm, form, stateObjectKey, paramType, formatName = true }: ContractInputProps) => {
   const inputProps = {
     name: stateObjectKey,
     value: form?.[stateObjectKey],
@@ -75,7 +77,11 @@ export const ContractInput = ({ setForm, form, stateObjectKey, paramType }: Cont
   return (
     <div className="flex flex-col gap-1.5 w-full">
       <div className="flex items-center ml-2">
-        {paramType.name && <span className="text-xs font-medium mr-2 leading-none">{paramType.name}</span>}
+        {paramType.name && (
+          <span className="text-xs font-medium mr-2 leading-none">
+            {formatName ? formatParamName(paramType.name) : paramType.name}
+          </span>
+        )}
         <span className="block text-xs font-extralight leading-none">{paramType.type}</span>
       </div>
       {renderInput()}
