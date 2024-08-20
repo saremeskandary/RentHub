@@ -21,6 +21,20 @@ type ContractInputProps = {
   stateObjectKey: string;
   paramType: AbiParameter;
   formatName?: boolean;
+<<<<<<< HEAD
+=======
+};
+
+/**
+ * Utility function to format parameter names
+ */
+const formatParamName = (name: string) => {
+  if (!name) return "";
+  // Remove underscores and split camel case
+  const formattedName = name.replace(/_/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
+  // Capitalize each word
+  return formattedName.replace(/\b\w/g, char => char.toUpperCase());
+>>>>>>> a78209715c794f0ce2af7dafe67460d34bf1d030
 };
 
 /**
