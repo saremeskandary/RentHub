@@ -49,6 +49,8 @@ interface IRentalDAO is ICommonErrors {
 	 */
 	function addDAOMember(address _member) external;
 
+	
+
 	/**
 	 * @dev Removes a DAO member
 	 * @param _member The address of the member to be removed
@@ -76,4 +78,5 @@ interface IRentalDAO is ICommonErrors {
 	function getContractAddress(
 		string memory _contractName
 	) external view returns (address);
+
 }

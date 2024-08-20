@@ -10,7 +10,7 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 	bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 	bytes32 public constant SCRIPT_ROLE = keccak256("SCRIPT_ROLE");
 	bytes32 public constant ARBITER_ROLE = keccak256("ARBITER_ROLE");
-	bytes32 public constant Distributor_ROLE = keccak256("Distributor_ROLE");
+	bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
 	bytes32 public constant DAO_ROLE = keccak256("DAO_ROLE");
 	bytes32 public constant VERFIED_USER_ROLE = keccak256("VERFIED_USER_ROLE");
 	bytes32 public constant APPROVED_CONTRACT_ROLE =
@@ -214,7 +214,7 @@ contract AccessRestriction is AccessControl, Pausable, IAccessRestriction {
 	function isDistributor(
 		address _address
 	) public view override returns (bool) {
-		return hasRole(Distributor_ROLE, _address);
+		return hasRole(DISTRIBUTOR_ROLE, _address);
 	}
 
 	function isArbiter(address _address) public view override returns (bool) {

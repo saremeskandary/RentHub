@@ -9,6 +9,8 @@ import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
+import "hardhat/console.sol";
+
 contract RentalAgreement is IRentalAgreement {
 	using SafeERC20 for IERC20;
 
@@ -36,7 +38,7 @@ contract RentalAgreement is IRentalAgreement {
 	}
 
 	constructor(
-		IERC20 _token,
+		address _token,
 		address _escrow,
 		address _inspection,
 		address _disputeResolution,
@@ -51,7 +53,7 @@ contract RentalAgreement is IRentalAgreement {
 		if (_socialFi == address(0)) revert InvalidAddress("socialFi");
 		if (_accessRestriction == address(0))
 			revert InvalidAddress("accessRestriction");
-		token = _token;
+		token = IERC20(_token);
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
 		disputeResolution = IDisputeResolution(_disputeResolution);
@@ -147,7 +149,9 @@ contract RentalAgreement is IRentalAgreement {
 		return agreementCounter;
 	}
 
-	function ArrivalAgreement(uint256 _agreementId) external {
+	function ArrivalAgreement(
+		uint256 _agreementId
+	) external onlyVerifiedUser(msg.sender) {
 		Agreement storage agreement = agreements[_agreementId];
 		if (
 			agreement.renter.userAddress != address(0) ||
@@ -166,8 +170,14 @@ contract RentalAgreement is IRentalAgreement {
 			);
 		if (!agreement.asset.isActive) revert AssetIsNotActive();
 
+		// console.log(asset.isActive);
 		// Lock funds in the Escrow
-		escrow.lockFunds(_agreementId, agreement.cost, agreement.deposit);
+		escrow.lockFunds(
+			msg.sender,
+			_agreementId,
+			agreement.cost,
+			agreement.deposit
+		);
 
 		agreement.asset.timesRented++;
 		agreement.renter = users[msg.sender];

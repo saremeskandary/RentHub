@@ -14,7 +14,7 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 	IAccessRestriction public accessRestriction;
 
 	mapping(string => address) private contractAddresses;
-
+ 
 	modifier onlyDAO() {
 		if (!accessRestriction.isDAO(msg.sender)) revert NotDAO(msg.sender);
 		_;
@@ -52,6 +52,7 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 		return systemFee;
 	}
 
+	
 	function withdrawFees(
 		address payable _recipient,
 		uint256 _amount

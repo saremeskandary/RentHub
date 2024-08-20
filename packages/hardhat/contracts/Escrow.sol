@@ -7,6 +7,8 @@ import { IEscrow } from "./interfaces/IEscrow.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 
+import "hardhat/console.sol";
+
 contract Escrow is IEscrow, ReentrancyGuard {
 	using SafeERC20 for IERC20;
 
@@ -22,13 +24,18 @@ contract Escrow is IEscrow, ReentrancyGuard {
 		_;
 	}
 
-	constructor(IERC20 _token, address _rentalDAO, address _accessRestriction) {
+	constructor(
+		address _token,
+		address _rentalDAO,
+		address _accessRestriction
+	) {
 		rentalDAO = IRentalDAO(_rentalDAO);
 		accessRestriction = IAccessRestriction(_accessRestriction);
-		token = _token;
+		token = IERC20(_token);
 	}
 
 	function lockFunds(
+		address _renter,
 		uint256 _agreementId,
 		uint256 _deposit,
 		uint256 _cost
@@ -37,11 +44,17 @@ contract Escrow is IEscrow, ReentrancyGuard {
 
 		uint256 systemFee = rentalDAO.getSystemFee();
 		uint256 totalAmount = _cost + _deposit;
-		uint256 feeAmount = systemFee * totalAmount;
+		uint256 feeAmount = (systemFee * totalAmount) / 10000;
+
+		if (IERC20(token).allowance(_renter, address(this)) < totalAmount)
+			revert AllowanceError();
 
 		// Transfer tokens from sender to this contract
-		token.safeTransferFrom(msg.sender, address(this), totalAmount);
+		token.safeTransferFrom(_renter, address(this), totalAmount);
 
+		console.log(IERC20(token).balanceOf(_renter));
+		console.log(totalAmount);
+		console.log(feeAmount);
 		// Transfer fee to the DAO
 		token.safeTransfer(address(rentalDAO), feeAmount);
 
