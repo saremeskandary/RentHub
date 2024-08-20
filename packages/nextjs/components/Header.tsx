@@ -18,22 +18,22 @@ export const menuLinks: HeaderMenuLink[] = [
   {
     label: "Home",
     href: "/",
-    icon: <House size={20} />,
+    icon: <House size={20} color="#333333" />,
   },
   {
     label: "Listings",
     href: "/listings",
-    icon: <ArrowLeftRight size={20} />,
+    icon: <ArrowLeftRight size={20} color="#333333" />,
   },
   {
     label: "SocialFI",
     href: "/socialfi",
-    icon: <MessageCircle size={20} />,
+    icon: <MessageCircle size={20} color="#333333" />,
   },
   {
     label: "Profile",
     href: "/profile",
-    icon: <User size={20} />,
+    icon: <User size={20} color="#333333" />,
   },
 ];
 
@@ -74,8 +74,8 @@ export const Header: FC = () => {
                       href={href}
                       passHref
                       className={`${
-                        pathname === href ? "bg-secondary shadow-md" : ""
-                      } flex gap-2 rounded-full px-3 py-2 text-sm transition hover:bg-secondary hover:shadow-md`}
+                        pathname === href ? "shadow-md" : ""
+                      } flex gap-2 rounded-full px-3 py-2 text-sm transition hover:shadow-md`}
                     >
                       {icon}
                       <span>{label}</span>

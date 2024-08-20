@@ -61,7 +61,7 @@ const Filter: FC<{ onLocationSelect: (i: [number, number]) => void }> = ({ onLoc
   }, []);
 
   return (
-    <div className="absolute left-1/2 top-20 z-[499] flex w-full max-w-[1200px] -translate-x-1/2 justify-between gap-5 px-3 md3:flex-col md3:gap-2">
+    <div className="absolute top-24 z-[499] flex w-full justify-between gap-5 px-3 md3:flex-col md3:gap-2">
       <div className="w-full max-w-[500px] md3:max-w-none">
         <div className="flex items-center gap-3 rounded border bg-white px-5 py-3">
           <Search size={20} color="#9095a9" className="mb-[2px]" />
@@ -69,7 +69,7 @@ const Filter: FC<{ onLocationSelect: (i: [number, number]) => void }> = ({ onLoc
             value={query}
             onChange={handleSearchChange}
             type="text"
-            className="block w-full appearance-none text-sm outline-none"
+            className="block w-full appearance-none bg-white text-sm outline-none"
             placeholder="Search"
           />
         </div>
