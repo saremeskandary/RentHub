@@ -45,7 +45,7 @@
 
 // export default MyRental;
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // Define the type for rental objects
 interface Rental {
@@ -60,7 +60,10 @@ interface Rental {
 
 const MyRental: React.FC = () => {
   const [rentals, setRentals] = useState<Rental[]>([]); // Use the Rental type for the state
-  const [selectedFiles, setSelectedFiles] = useState<{ [key: number]: File[] }>({}); // State to track selected files for each rental
+  const [showCamera, setShowCamera] = useState<{ [key: number]: boolean }>({}); // State to show camera per rental
+  const [capturedImage, setCapturedImage] = useState<{ [key: number]: string }>({}); // State to store captured image per rental
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     // Fetch rentals from localStorage
@@ -68,27 +71,40 @@ const MyRental: React.FC = () => {
     setRentals(storedRentals);
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, rentalId: number) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    setSelectedFiles((prev) => ({
-      ...prev,
-      [rentalId]: files,
-    }));
+  const startCamera = async (rentalId: number) => {
+    setShowCamera((prev) => ({ ...prev, [rentalId]: true }));
+    if (navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.error("Error accessing camera:", err);
+      }
+    }
+  };
+
+  const captureImage = (rentalId: number) => {
+    if (canvasRef.current && videoRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      if (context) {
+        context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+        const imageData = canvasRef.current.toDataURL('image/png');
+        setCapturedImage((prev) => ({ ...prev, [rentalId]: imageData }));
+
+        // Stop the camera after capturing the image
+        const stream = videoRef.current.srcObject as MediaStream;
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        setShowCamera((prev) => ({ ...prev, [rentalId]: false }));
+      }
+    }
   };
 
   const handleReturnRental = (rentalId: number) => {
-    const files = selectedFiles[rentalId];
-
-    if (!files || files.length === 0) {
-      alert('Please upload either an image or a video for safe return.');
-      return;
-    }
-
-    // Check if at least one image or video file is uploaded
-    const hasValidFile = files.some(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
-
-    if (!hasValidFile) {
-      alert('Please make sure to upload a valid image or video file.');
+    if (!capturedImage[rentalId]) {
+      alert('Please capture an image for safe return.');
       return;
     }
 
@@ -108,31 +124,55 @@ const MyRental: React.FC = () => {
       {rentals.length > 0 ? (
         <ul className="space-y-4">
           {rentals.map((rental, index) => (
-            <li key={index} className="border p-4 rounded shadow">
+            <li key={index} className="border p-4 rounded shadow flex justify-between gap-x-4 items-center w-full">
+              <div>
               <p className="font-bold text-lg">{rental.productTitle}</p>
               <p>Start Date: {rental.bookingDate}</p>
               <p>Start Time: {rental.bookingTime}</p>
               <p>End Date: {rental.endDate}</p>
               <p>End Time: {rental.endTime}</p>
+              </div>
 
+              <div>
+
+             
               {/* Only show return option if the rental is not yet returned */}
               {!rental.isReturned && (
+                
                 <div className="mt-4">
-                  <label className="block mb-2 font-semibold">Upload Image/Video for Safe Return:</label>
-                  <input
-                    type="file"
-                    accept="image/*,video/*"
-                    multiple
-                    onChange={(e) => handleFileChange(e, rental.productId)}
-                    className="mb-4"
-                  />
-
-                  <button
-                    onClick={() => handleReturnRental(rental.productId)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Return Rental
-                  </button>
+                  {!showCamera[rental.productId] ? (
+                    <>
+                      <button
+                        onClick={() => startCamera(rental.productId)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      >
+                        Enable Camera
+                      </button>
+                      {capturedImage[rental.productId] && (
+                        <div className="mt-4">
+                          <p className="text-green-500 font-semibold">Image captured successfully!</p>
+                          <img src={capturedImage[rental.productId]} alt="Captured" className="mt-2 border rounded" />
+                          <button
+                            onClick={() => handleReturnRental(rental.productId)}
+                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mt-4"
+                          >
+                            Confirm Return
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div>
+                      <video ref={videoRef} autoPlay className="border rounded mb-4 !w-72 !h-auto"></video>
+                      <canvas ref={canvasRef} width="640" height="480" className="hidden"></canvas>
+                      <button
+                        onClick={() => captureImage(rental.productId)}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      >
+                        Capture Image
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -140,6 +180,7 @@ const MyRental: React.FC = () => {
               {rental.isReturned && (
                 <p className="mt-4 text-green-500 font-semibold">Rental returned successfully!</p>
               )}
+               </div>
             </li>
           ))}
         </ul>

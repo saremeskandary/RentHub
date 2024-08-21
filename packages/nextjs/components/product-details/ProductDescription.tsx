@@ -241,13 +241,13 @@ const ProductDescription: FC<
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowModal(false)}
-                className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+                className="rounded !bg-red-400 px-4 py-2 text-gray-700 hover:!bg-red-500"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmBooking}
-                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                className="rounded !bg-green-500 px-4 py-2 text-white hover:!bg-green-600"
               >
                 Confirm Booking
               </button>

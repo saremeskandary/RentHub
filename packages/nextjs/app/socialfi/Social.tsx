@@ -60,7 +60,9 @@ export default function SocialFi() {
 
           <div className={styles.social__column}>
             {items.map(obj => (
-              <div key={obj.id}>{tab === `${obj.id}` && obj.children}</div>
+              <div key={obj.id}>{tab === `${obj.id}` && obj.children}
+             
+              </div>
             ))}
           </div>
         </div>
