@@ -2,6 +2,7 @@
 
 import { FC, useState } from "react";
 import Filter from "./HomeFilter";
+
 // import Map from "./Map";
 
 const Home: FC = () => {

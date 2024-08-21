@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
-import ProductDetails from './ProductDetails'
+import ProductDetails from "./ProductDetails";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: `ProductDetails`
-}
+  title: `ProductDetails`,
+};
 
 export default function ProductDetailsPage() {
-  return <ProductDetails />
+  return <ProductDetails />;
 }

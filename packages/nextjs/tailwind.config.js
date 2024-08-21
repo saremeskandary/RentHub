@@ -52,7 +52,7 @@ module.exports = {
   ],
   //   darkTheme: "dark",
   //   darkMode: ["selector", "[data-theme='dark']"],
-
+  // DaisyUI theme colors
   //   daisyui: {
   //     themes: [
   //       {
@@ -73,7 +73,9 @@ module.exports = {
   //           success: "#34EEB6",
   //           warning: "#FFCF72",
   //           error: "#FF8863",
+
   //           "--rounded-btn": "9999rem",
+
   //           ".tooltip": {
   //             "--tooltip-tail": "6px",
   //           },
@@ -103,7 +105,9 @@ module.exports = {
   //           success: "#34EEB6",
   //           warning: "#FFCF72",
   //           error: "#FF8863",
+
   //           "--rounded-btn": "9999rem",
+
   //           ".tooltip": {
   //             "--tooltip-tail": "6px",
   //             "--tooltip-color": "oklch(var(--p))",

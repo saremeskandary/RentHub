@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
-import Listings from './Listings'
+import Listings from "./Listings";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: `Listings`
-}
+  title: `Listings`,
+};
 
 export default function ListingsPage() {
-  return <Listings />
+  return <Listings />;
 }

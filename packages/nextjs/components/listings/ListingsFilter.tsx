@@ -46,13 +46,9 @@ const ListingsFilter: FC<{
           </button>
         </div>
       ) : (
-        <div className="mb-3 flex items-center gap-3 rounded border bg-white px-5 py-3">
+        <div className="mb-3 flex items-center gap-3 rounded border px-5 py-3">
           <Search size={20} color="#9095a9" />
-          <input
-            type="text"
-            className="block w-full appearance-none bg-white text-sm outline-none"
-            placeholder="Search"
-          />
+          <input type="text" className="block w-full appearance-none text-sm outline-none" placeholder="Search" />
         </div>
       )}
 

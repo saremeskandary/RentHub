@@ -10,7 +10,7 @@ export default function CreateProduct() {
 
   return (
     <section className={styles.product_create}>
-      <div className="container">
+      <div className="mx-auto max-w-[1200px] p-3">
         <div className={`${styles.product_create__body} ${image ? `${styles.image}` : ""}`}>
           {image && (
             <div className={styles.product_create__img}>

@@ -12,26 +12,20 @@ const ProductForm: FC<{ setImage: (i: string) => void }> = ({ setImage }) => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               if (e.target.files && e.target.files[0]) setImage(e.target.files[0].name);
             }}
-            id="file"
             type="file"
-            className="block w-full appearance-none bg-white text-sm outline-none"
+            className="block w-full appearance-none text-sm outline-none"
           />
-          <label htmlFor="file">Add image</label>
         </div>
 
         <div className={styles.product_create__input}>
           <LetterText size={20} color="#9095a9" />
-          <input
-            type="text"
-            className="block w-full appearance-none bg-white text-sm outline-none"
-            placeholder="Title"
-          />
+          <input type="text" className="block w-full appearance-none text-sm outline-none" placeholder="Title" />
         </div>
 
         <div className={styles.product_create__input}>
           <Text size={20} color="#9095a9" />
           <textarea
-            className="block w-full appearance-none bg-white text-sm outline-none"
+            className="block w-full resize-none appearance-none bg-white text-sm outline-none"
             placeholder="Text"
             rows={7}
           />
@@ -39,11 +33,7 @@ const ProductForm: FC<{ setImage: (i: string) => void }> = ({ setImage }) => {
 
         <div className={styles.product_create__input}>
           <HandCoins size={20} color="#9095a9" />
-          <input
-            type="text"
-            className="block w-full appearance-none bg-white text-sm outline-none"
-            placeholder="Price"
-          />
+          <input type="text" className="block w-full appearance-none text-sm outline-none" placeholder="Price" />
         </div>
 
         <div className={styles.product_create__condition}>

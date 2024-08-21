@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeftRight, House, MessageCircle, User } from "lucide-react";
+import { ArrowLeftRight, House, Key, MessageCircle, User } from "lucide-react";
 import { useMediaQuery } from "react-responsive";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
@@ -16,24 +16,24 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "Home",
-    href: "/",
-    icon: <House size={20} color="#333333" />,
-  },
-  {
     label: "Listings",
     href: "/listings",
-    icon: <ArrowLeftRight size={20} color="#333333" />,
+    icon: <ArrowLeftRight size={20} />,
   },
   {
     label: "SocialFI",
     href: "/socialfi",
-    icon: <MessageCircle size={20} color="#333333" />,
+    icon: <MessageCircle size={20} />,
+  },
+  {
+    label: "MyRentals",
+    href: "/myrentals",
+    icon: <Key size={20} />,
   },
   {
     label: "Profile",
     href: "/profile",
-    icon: <User size={20} color="#333333" />,
+    icon: <User size={20} />,
   },
 ];
 
@@ -50,15 +50,13 @@ export const Header: FC = () => {
   return (
     <header className="fixed z-[999] w-full bg-white shadow-md">
       <div className="px-3">
-        <div className="flex h-[70px] items-center gap-10">
-          {!isTablet && (
-            <Link href="/" className="flex items-center gap-5">
-              <Image alt="SE2 logo" src="/logo.svg" width={40} height={40} />
-              <span className="font-bold leading-tight">RentHub</span>
-            </Link>
-          )}
+        <div className="flex h-[70px] items-center gap-10 md2:gap-2">
+          <Link href="/" className="relative z-[600] flex items-center gap-5 md2:flex-1">
+            <Image alt="SE2 logo" src="/image.png" width={40} height={40} />
+            <span className="font-bold leading-tight md4:hidden">RentHub</span>
+          </Link>
 
-          <div className="flex-1">
+          <div className="flex-1 md2:order-3 md2:flex-[0_1_30px]">
             <div onClick={() => setMenu(!menu)} className={`icon-menu ${menu ? "active" : ""}`}>
               <span></span>
               <span></span>
@@ -74,8 +72,8 @@ export const Header: FC = () => {
                       href={href}
                       passHref
                       className={`${
-                        pathname === href ? "shadow-md" : ""
-                      } flex gap-2 rounded-full px-3 py-2 text-sm transition hover:shadow-md`}
+                        pathname === href ? "bg-[#DAE8FF] shadow-md" : ""
+                      } flex gap-2 rounded-full px-3 py-2 text-sm transition hover:bg-[#DAE8FF] hover:shadow-md`}
                     >
                       {icon}
                       <span>{label}</span>
