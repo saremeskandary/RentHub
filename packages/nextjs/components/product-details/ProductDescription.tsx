@@ -33,6 +33,11 @@ const ProductDescription: FC<
   const hourlyXRate = 8; // Example rate: $8 per hour
 
   useEffect(() => {
+    if (showModal) document.body.classList.add("lock");
+    else document.body.classList.remove("lock");
+  }, [showModal]);
+
+  useEffect(() => {
     // Set current date and time in the proper format
     const today = new Date();
     const formattedDate = today.toISOString().split("T")[0]; // YYYY-MM-DD format
@@ -253,7 +258,7 @@ const ProductDescription: FC<
       </button>
 
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black bg-opacity-50 px-3 py-20">
           <div className="w-full max-w-[500px] rounded-lg bg-white p-8 shadow-lg">
             <h2 className="mb-4 text-xl font-bold">{title}</h2>
             <p className="mb-4 text-gray-700">{text}</p>
@@ -281,7 +286,7 @@ const ProductDescription: FC<
                 </span>
               </p>
             </div>
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end gap-2 md4:flex-col">
               <button
                 onClick={() => setShowModal(false)}
                 className="rounded !bg-red-400 px-4 py-2 text-gray-700 hover:!bg-red-500"

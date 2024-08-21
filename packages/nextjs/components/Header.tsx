@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeftRight, House, Key, MessageCircle, User } from "lucide-react";
-import { useMediaQuery } from "react-responsive";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 type HeaderMenuLink = {
@@ -39,7 +38,6 @@ export const menuLinks: HeaderMenuLink[] = [
 
 export const Header: FC = () => {
   const [menu, setMenu] = useState<boolean>(false);
-  const isTablet = useMediaQuery({ maxWidth: 992.98 });
   const pathname = usePathname();
 
   useEffect(() => {
