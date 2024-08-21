@@ -14,6 +14,9 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
   if (["hardhat", "localhost", "anvil", "truffleDashboard"].includes(network)) {
     const mockToken = await deploy("MockToken", {
       from: deployer,
+      args: {"MockToken",
+'MKT',
+""},
       log: true,
     });
     tokenAddress = mockToken.address;
