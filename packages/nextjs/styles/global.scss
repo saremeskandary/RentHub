@@ -5,6 +5,7 @@
 body {
   color: #333;
   background: #fff;
+  min-width: 390px;
 }
 
 input {
@@ -40,7 +41,7 @@ body.lock {
     width: 310px;
     height: 100%;
     top: 0;
-    left: -110%;
+    right: -110%;
     overflow: auto;
     padding: 150px 0 20px 0;
     transition: all 0.3s ease 0s;
@@ -48,8 +49,11 @@ body.lock {
 
     &.active {
       background-color: #fff;
-      left: 0;
+      right: 0;
     }
+  }
+  @media (max-width: 500px) {
+    width: 100%;
   }
 }
 

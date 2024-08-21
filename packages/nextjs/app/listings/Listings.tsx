@@ -18,7 +18,7 @@ export default function Listings() {
   });
 
   return (
-    <div className="flex pt-16">
+    <div className="flex pt-16 md3:pt-10">
       <ListingsFilter visible={visible} setVisible={setVisible} isMobile={isMobile} />
 
       <div>
