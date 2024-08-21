@@ -33,6 +33,8 @@ contract DisputeResolution is IDisputeResolution {
 		_;
 	}
 
+	constructor() {}
+
 	function init(
 		address _rentalAgreement,
 		address _reputation,

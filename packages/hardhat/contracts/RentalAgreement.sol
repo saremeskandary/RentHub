@@ -9,12 +9,18 @@ import { IDisputeResolution } from "./interfaces/IDisputeResolution.sol";
 import { IRentalAgreement } from "./interfaces/IRentalAgreement.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
 
+import "hardhat/console.sol";
+
 contract RentalAgreement is IRentalAgreement {
 	using SafeERC20 for IERC20;
 
+	bytes32 public constant VERFIED_USER_ROLE = keccak256("VERFIED_USER_ROLE");
+
 	mapping(address => User) public users;
 	mapping(uint256 => Agreement) public agreements;
-	mapping(uint256 => Asset) public assets;
+	mapping(address => mapping(uint256 => Asset))
+		public
+		override rentalAsset1155s;
 	uint256 public agreementCounter;
 
 	IERC20 public token;
@@ -26,12 +32,13 @@ contract RentalAgreement is IRentalAgreement {
 	IAccessRestriction public accessRestriction;
 
 	modifier onlyVerifiedUser(address _user) {
-		if (!accessRestriction.isVerifiedUser(_user)) revert NotVerifiedUser(_user);
+		if (!accessRestriction.isVerifiedUser(_user))
+			revert NotVerifiedUser(_user);
 		_;
 	}
 
 	constructor(
-		IERC20 _token,
+		address _token,
 		address _escrow,
 		address _inspection,
 		address _disputeResolution,
@@ -46,7 +53,7 @@ contract RentalAgreement is IRentalAgreement {
 		if (_socialFi == address(0)) revert InvalidAddress("socialFi");
 		if (_accessRestriction == address(0))
 			revert InvalidAddress("accessRestriction");
-		token = _token;
+		token = IERC20(_token);
 		escrow = IEscrow(_escrow);
 		inspection = IInspection(_inspection);
 		disputeResolution = IDisputeResolution(_disputeResolution);
@@ -62,8 +69,41 @@ contract RentalAgreement is IRentalAgreement {
 		_;
 	}
 
+	modifier onlyAdmin() {
+		if (!accessRestriction.isAdmin(msg.sender)) revert NotAdmin(msg.sender);
+		_;
+	}
+
+	function setRentalAsset1155(
+		address _collection,
+		uint256 _tokenId,
+		bool _isActive
+	) external override onlyAdmin {
+		if (_collection == address(0)) revert InvalidAddress("collection");
+		Asset storage asset = rentalAsset1155s[_collection][_tokenId];
+		asset.isActive = _isActive;
+		// Emit an event upon successful validation status update.
+		emit RentalAsset1155Added(_collection, _tokenId, _isActive);
+	}
+
+	function addUser(address _user) external override onlyAdmin {
+		if (_user == address(0)) revert InvalidAddress("user");
+
+		users[_user] = User({
+			userAddress: _user,
+			validationTime: 0,
+			isValidated: true,
+			reputationScore: 0,
+			joinTime: block.timestamp
+		});
+
+		// accessRestriction.grantRole(VERFIED_USER_ROLE, _user);
+		emit UserAdded(_user);
+	}
+
 	function createAgreement(
-		address _renter,
+		// address _renter,
+		address _collection,
 		uint256 _tokenId,
 		uint256 _rentalPeriod,
 		uint256 _cost,
@@ -71,14 +111,16 @@ contract RentalAgreement is IRentalAgreement {
 	)
 		external
 		onlyVerifiedUser(msg.sender)
-		onlyVerifiedUser(_renter)
-		returns (uint256)
+		returns (
+			// onlyVerifiedUser(_renter)
+			uint256
+		)
 	{
 		if (_cost <= 0) revert MustBeGraterThanZero("cost");
 		if (_deposit <= 0) revert MustBeGraterThanZero("deposit");
 		if (_rentalPeriod <= 0) revert MustBeGraterThanZero("rentalPeriod");
 
-		Asset storage asset = assets[_tokenId];
+		Asset storage asset = rentalAsset1155s[_collection][_tokenId];
 		if (!asset.isActive) revert AssetIsNotActive();
 
 		agreements[agreementCounter] = Agreement({
@@ -96,12 +138,20 @@ contract RentalAgreement is IRentalAgreement {
 
 		agreementCounter++;
 
-		emit AgreementCreated(agreementCounter, msg.sender, _renter);
+		emit AgreementCreated(
+			agreementCounter,
+			_collection,
+			_tokenId,
+			msg.sender,
+			address(0) //_renter
+		);
 
 		return agreementCounter;
 	}
 
-	function ArrivalAgreement(uint256 _agreementId) external {
+	function ArrivalAgreement(
+		uint256 _agreementId
+	) external onlyVerifiedUser(msg.sender) {
 		Agreement storage agreement = agreements[_agreementId];
 		if (
 			agreement.renter.userAddress != address(0) ||
@@ -120,8 +170,14 @@ contract RentalAgreement is IRentalAgreement {
 			);
 		if (!agreement.asset.isActive) revert AssetIsNotActive();
 
+		// console.log(asset.isActive);
 		// Lock funds in the Escrow
-		escrow.lockFunds(_agreementId, agreement.cost, agreement.deposit);
+		escrow.lockFunds(
+			msg.sender,
+			_agreementId,
+			agreement.cost,
+			agreement.deposit
+		);
 
 		agreement.asset.timesRented++;
 		agreement.renter = users[msg.sender];

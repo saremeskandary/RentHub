@@ -2,8 +2,9 @@
 pragma solidity 0.8.26;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 import { IAccessRestriction } from "./interfaces/IAccessRestriction.sol";
+import { ICommonErrors } from "./interfaces/ICommonErrors.sol";
+import { IRentalDAO } from "./interfaces/IRentalDAO.sol";
 
 contract RentalDAO is IRentalDAO, ReentrancyGuard {
 	bytes32 public constant DAO_ROLE = keccak256("DAO_ROLE");
@@ -13,7 +14,7 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 	IAccessRestriction public accessRestriction;
 
 	mapping(string => address) private contractAddresses;
-
+ 
 	modifier onlyDAO() {
 		if (!accessRestriction.isDAO(msg.sender)) revert NotDAO(msg.sender);
 		_;
@@ -51,6 +52,7 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 		return systemFee;
 	}
 
+	
 	function withdrawFees(
 		address payable _recipient,
 		uint256 _amount
@@ -61,6 +63,13 @@ contract RentalDAO is IRentalDAO, ReentrancyGuard {
 		if (_amount == 0) revert MustBeGraterThanZero("amount");
 		_recipient.transfer(_amount);
 		emit Withdrawn(_recipient, _amount);
+	}
+
+	function setContractAddress(
+		string memory _contractName,
+		address _contractAddress
+	) external onlyDAO {
+		contractAddresses[_contractName] = _contractAddress;
 	}
 
 	function getContractAddress(
