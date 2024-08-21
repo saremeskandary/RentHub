@@ -24,11 +24,13 @@ const ProductDescription: FC<
   const [endTime, setEndTime] = useState("");
   const [endDate, setEndDate] = useState("");
   const [totalKPrice, setTotalKPrice] = useState(0);
+  const [totalXPrice, setTotalXPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0); // State to track the calculated price
   const router = useRouter();
 
-  const hourlyRate = 8;
-  const hourlyKRate = 378000; // Example rate: $8 per hour
+  const hourlyRate = 5;
+  const hourlyKRate = 378000;
+  const hourlyXRate = 8; // Example rate: $8 per hour
 
   useEffect(() => {
     // Set current date and time in the proper format
@@ -40,6 +42,22 @@ const ProductDescription: FC<
     setCurrentTime(formattedTime);
   }, []);
 
+  const calculatedXPrice = () => {
+    if (!bookingDate || !bookingTime || !endDate || !endTime) {
+      return 0;
+    }
+
+    const start = new Date(`${bookingDate}T${bookingTime}`);
+    const end = new Date(`${endDate}T${endTime}`);
+    const durationInHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Duration in hours
+
+    // Ensure the duration is positive
+    if (durationInHours > 0) {
+      return durationInHours * hourlyXRate;
+    }
+
+    return 0;
+  };
   const calculatedKPrice = () => {
     if (!bookingDate || !bookingTime || !endDate || !endTime) {
       return 0;
@@ -89,6 +107,7 @@ const ProductDescription: FC<
     const calculatedPrice = calculatePrice();
     setTotalPrice(calculatedPrice);
     setTotalKPrice(calculatedKPrice);
+    setTotalXPrice(calculatedXPrice);
     setShowModal(true); // Show modal on button click
   };
 
@@ -123,19 +142,25 @@ const ProductDescription: FC<
         <h2>{title}</h2>
         <p>{text}</p>
         <div className="my-3">
-          <p className="flex items-center gap-[6px] font-semibold">
+          <p className="flex flex-wrap gap-[6px] font-semibold">
             Price: ${hourlyRate} -
             <span className="flex items-center">
-              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} />
-              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> K9 {hourlyKRate}
+              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} /> K9 {hourlyKRate}
+            </span>{" "}
+            -
+            <span className="flex items-center">
+              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {hourlyXRate}
             </span>
             (per hour)
           </p>
-          <p className="flex items-center gap-[6px] font-semibold">
+          <p className="flex flex-wrap gap-[6px] gap-y-0 font-semibold">
             Total Price: ${totalPrice.toFixed(2)} -
             <span className="flex items-center">
-              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} />
-              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
+              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
+            </span>{" "}
+            -
+            <span className="flex items-center">
+              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {totalXPrice.toFixed(2)}
             </span>
           </p>
         </div>
@@ -214,7 +239,7 @@ const ProductDescription: FC<
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+          <div className="w-full max-w-[500px] rounded-lg bg-white p-8 shadow-lg">
             <h2 className="mb-4 text-xl font-bold">{title}</h2>
             <p className="mb-4 text-gray-700">{text}</p>
             <div className="mb-4">
@@ -230,24 +255,27 @@ const ProductDescription: FC<
               <p>
                 <strong>End Time:</strong> {endTime}
               </p>
-              <p className="flex items-center gap-[5px]">
+              <p className="flex flex-wrap items-center gap-[5px] gap-y-0">
                 <strong>Total Price: </strong> ${totalPrice.toFixed(2)} -
                 <span className="flex items-center">
-                  <Image src="/k9-logo.png" alt="xfi" width={15} height={15} />
-                  <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
+                  <Image src="/k9-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
+                </span>{" "}
+                -
+                <span className="flex items-center">
+                  <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {totalXPrice.toFixed(2)}
                 </span>
               </p>
             </div>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={() => setShowModal(false)}
-                className="rounded bg-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-400"
+                className="rounded !bg-red-400 px-4 py-2 text-gray-700 hover:!bg-red-500"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmBooking}
-                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                className="rounded !bg-green-500 px-4 py-2 text-white hover:!bg-green-600"
               >
                 Confirm Booking
               </button>

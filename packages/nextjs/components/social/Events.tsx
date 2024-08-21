@@ -14,7 +14,7 @@ const events = [
   {
     user: 'Admin',
     img: '/social/05.jpg',
-    text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Soluta numquam animi repudiandae exercitationem officia! Nobis.'
+    text: ' We are Back in 2024! Join us for Canada Crypto Week from August 11-17, 2024, where thousands of individuals will gather for networking, education, and more. Experience tons of events conveniently located at the prestigious Futurist Conference Venue, accessible with your conference badge!'
   }
 ]
 
