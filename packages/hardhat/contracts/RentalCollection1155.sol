@@ -82,5 +82,5 @@ contract RentalCollection1155 is
 		bytes memory data
 	) internal override(ERC1155, ERC1155Supply) {
 		super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
-	}
+	}	
 }
