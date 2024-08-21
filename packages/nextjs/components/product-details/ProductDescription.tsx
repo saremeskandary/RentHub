@@ -4,7 +4,7 @@ import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./ProductDetails.module.scss";
-import { ShoppingCart } from "lucide-react";
+import { CircleUserRound, ShoppingCart } from "lucide-react";
 
 const ProductDescription: FC<
   | {
@@ -141,8 +141,8 @@ const ProductDescription: FC<
       <div className={styles.product_details__title}>
         <h2>{title}</h2>
         <p>{text}</p>
-        <div className="my-3">
-          <p className="flex flex-wrap gap-[6px] font-semibold">
+        <div className="my-4">
+          <p className="flex flex-wrap gap-[6px] gap-y-0 font-semibold">
             Price: ${hourlyRate} -
             <span className="flex items-center">
               <Image src="/k9-logo.png" alt="xfi" width={15} height={15} /> K9 {hourlyKRate}
@@ -163,6 +163,21 @@ const ProductDescription: FC<
               <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {totalXPrice.toFixed(2)}
             </span>
           </p>
+        </div>
+      </div>
+
+      <div className="mb-7 flex items-center gap-7 md4:flex-col md4:items-start md4:gap-0">
+        <div className="flex items-center gap-2">
+          <CircleUserRound color="#4f4f4f" />
+          <span className="text-base font-semibold">Alex Ford</span>
+        </div>
+        <div className="flex items-center">
+          {[...Array(5)].map((_, i) => (
+            <span key={i} className={`mr-[2px] text-xl text-[#ffc107] ${i > 2 ? "text-gray-300" : ""}`}>
+              ★
+            </span>
+          ))}
+          <p className="ml-1">(144)</p>
         </div>
       </div>
 
