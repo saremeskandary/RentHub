@@ -10,10 +10,18 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
   // Example of setting TOKEN_ADDRESS based on the network
   let tokenAddress: string;
 
+  // Now deploy the contracts
+  const accessRestriction = await deploy("AccessRestriction", {
+    from: deployer,
+    args: [deployer],
+    log: true,
+  });
+
   // If deploying on local networks, deploy a mock USDT
   if (["hardhat", "localhost", "anvil", "truffleDashboard"].includes(network)) {
     const mockToken = await deploy("MockToken", {
       from: deployer,
+      args: ["MockToken", "MKT", accessRestriction.address],
       log: true,
     });
     tokenAddress = mockToken.address;
@@ -31,13 +39,6 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
     throw new Error("You need to choose your network.");
   }
 
-  // Now deploy the contracts
-  const accessRestriction = await deploy("AccessRestriction", {
-    from: deployer,
-    args: [deployer],
-    log: true,
-  });
-
   const reputation = await deploy("Reputation", {
     from: deployer,
     args: [accessRestriction.address],
@@ -46,12 +47,13 @@ const deployContracts: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   const socialFi = await deploy("SocialFi", {
     from: deployer,
-    args: [tokenAddress],
+    args: [tokenAddress, accessRestriction.address],
     log: true,
   });
 
   const inspection = await deploy("Inspection", {
     from: deployer,
+    args: [accessRestriction.address],
     log: true,
   });
 

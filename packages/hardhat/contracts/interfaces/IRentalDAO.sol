@@ -28,7 +28,7 @@ interface IRentalDAO is ICommonErrors {
 	 * @param newAddress The new address of the contract
 	 */
 	event ContractAddressUpdated(string contractName, address newAddress);
-	
+
 	event Withdrawn(address recipient, uint256 amount);
 
 	// Custom errors
@@ -48,6 +48,8 @@ interface IRentalDAO is ICommonErrors {
 	 * @param _member The address of the new member to be added
 	 */
 	function addDAOMember(address _member) external;
+
+	
 
 	/**
 	 * @dev Removes a DAO member
@@ -76,4 +78,5 @@ interface IRentalDAO is ICommonErrors {
 	function getContractAddress(
 		string memory _contractName
 	) external view returns (address);
+
 }
