@@ -23,6 +23,7 @@ interface IAccessRestriction is IAccessControl, ICommonErrors {
 	error NotScript(address caller);
 	/// @dev Thrown when a function restricted to arbiters is called by an unauthorized address.
 	error NotArbiter(address caller);
+	error NotDistributor(address caller);
 	/// @dev Thrown when a function restricted to the DAO is called by an unauthorized address.
 	error NotDAO(address caller);
 	error NotVerifiedUser(address caller);
@@ -71,6 +72,8 @@ interface IAccessRestriction is IAccessControl, ICommonErrors {
 	 */
 	function ifAdminOrApprovedContract(address _address) external view;
 
+	function ifDistributor(address _address) external view;
+
 	/**
 	 * @dev Checks if the given address has the owner role.
 	 * @param _address The address to check.
@@ -112,6 +115,8 @@ interface IAccessRestriction is IAccessControl, ICommonErrors {
 	 * @return bool True if the address has the arbiter role, false otherwise.
 	 */
 	function isArbiter(address _address) external view returns (bool);
+
+	function isDistributor(address _address) external view returns (bool);
 
 	/**
 	 * @dev Checks if the given address has the DAO role.

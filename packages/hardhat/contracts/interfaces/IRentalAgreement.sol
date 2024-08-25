@@ -44,7 +44,7 @@ interface IRentalAgreement is ICommonErrors {
 	 * @param timesRented Number of times this asset has been rented
 	 */
 	struct Asset {
-		Collection assetAddress;
+		// address collection;
 		string name;
 		string assetType;
 		bool isActive;
@@ -105,7 +105,13 @@ interface IRentalAgreement is ICommonErrors {
 	 * @param rentee The address of the asset rentee
 	 * @param renter The address of the renter
 	 */
-	event AgreementCreated(uint256 agreementId, address rentee, address renter);
+	event AgreementCreated(
+		uint256 agreementId,
+		address collection,
+		uint256 tokenId,
+		address rentee,
+		address renter
+	);
 
 	/**
 	 * @dev Emitted when an agreement is completed
@@ -158,10 +164,19 @@ interface IRentalAgreement is ICommonErrors {
 		uint256 arrivalTime
 	);
 
+	event RentalAsset1155Added(
+		address collection,
+		uint256 tokenId,
+		bool isActive
+	);
+
+	event UserAdded(address user);
+
+	function addUser(address _user) external;
+
 	/**
 	 * @notice Creates a new rental agreement
 	 * @dev Validates inputs and creates a new agreement
-	 * @param _renter Address of the renter
 	 * @param _tokenId ID of the asset to be rented
 	 * @param _rentalPeriod Duration of the rental period
 	 * @param _cost Cost of the rental
@@ -169,7 +184,8 @@ interface IRentalAgreement is ICommonErrors {
 	 * @return The ID of the newly created agreement
 	 */
 	function createAgreement(
-		address _renter,
+		// address _renter,
+		address _collection,
 		uint256 _tokenId,
 		uint256 _rentalPeriod,
 		uint256 _cost,
@@ -200,6 +216,12 @@ interface IRentalAgreement is ICommonErrors {
 	 */
 	function raiseDispute(uint256 _agreementId) external;
 
+	function setRentalAsset1155(
+		address _collection,
+		uint256 _tokenId,
+		bool _isActive
+	) external;
+
 	/**
 	 * @notice Extends the rental period of an existing agreement (called by rentee)
 	 * @param _agreementId The ID of the agreement to extend
@@ -221,6 +243,50 @@ interface IRentalAgreement is ICommonErrors {
 		uint256 _agreementId,
 		uint256 _additionalPeriod
 	) external;
+
+	function rentalAsset1155s(
+		address _collection,
+		uint256 _sellId
+	)
+		external
+		view
+		returns (
+			string memory name,
+			string memory assetType,
+			bool isActive,
+			uint256 timesRented
+		);
+
+	function agreements(
+		uint256 _agreementId
+	)
+		external
+		view
+		returns (
+			User memory rentee,
+			User memory renter,
+			Asset memory asset,
+			uint256 rentalPeriod,
+			uint256 cost,
+			uint256 deposit,
+			uint256 startTime,
+			uint256 registrationTime,
+			AgreementStatus status,
+			bool isDisputed
+		);
+
+	function users(
+		address _user
+	)
+		external
+		view
+		returns (
+			address userAddress,
+			uint256 validationTime,
+			bool isValidated,
+			uint256 reputationScore,
+			uint256 joinTime
+		);
 
 	/**
 	 * @notice Retrieves the parties involved in an agreement

@@ -56,6 +56,7 @@ interface IEscrow is ICommonErrors {
 	error No_funds_to_release();
 	error Renter_already_confirmed();
 	error No_deposit_to_refund();
+	error AllowanceError();
 
 	/**
 	 * @notice Locks funds in escrow for a specific agreement
@@ -65,6 +66,7 @@ interface IEscrow is ICommonErrors {
 	 * @param _cost The cost of the rental
 	 */
 	function lockFunds(
+		address _renter,
 		uint256 _agreementId,
 		uint256 _deposit,
 		uint256 _cost

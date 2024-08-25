@@ -5,9 +5,9 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
-  31337: {
+  4157: {
     AccessRestriction: {
-      address: "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0",
+      address: "0xc510984C0084bC914aEE674afee6Cf43144CA08d",
       abi: [
         {
           inputs: [
@@ -812,6 +812,7 @@ const deployedContracts = {
         ifApprovedContract: "contracts/interfaces/IAccessRestriction.sol",
         ifArbiter: "contracts/interfaces/IAccessRestriction.sol",
         ifDAO: "contracts/interfaces/IAccessRestriction.sol",
+        ifDistributor: "contracts/interfaces/IAccessRestriction.sol",
         ifNotPaused: "contracts/interfaces/IAccessRestriction.sol",
         ifOwner: "contracts/interfaces/IAccessRestriction.sol",
         ifOwnerOrAdmin: "contracts/interfaces/IAccessRestriction.sol",
@@ -822,6 +823,1104 @@ const deployedContracts = {
         isApprovedContract: "contracts/interfaces/IAccessRestriction.sol",
         isArbiter: "contracts/interfaces/IAccessRestriction.sol",
         isDAO: "contracts/interfaces/IAccessRestriction.sol",
+        isDistributor: "contracts/interfaces/IAccessRestriction.sol",
+        isOwner: "contracts/interfaces/IAccessRestriction.sol",
+        isScript: "contracts/interfaces/IAccessRestriction.sol",
+        isVerifiedUser: "contracts/interfaces/IAccessRestriction.sol",
+        pause: "contracts/interfaces/IAccessRestriction.sol",
+        unpause: "contracts/interfaces/IAccessRestriction.sol",
+      },
+    },
+    Reputation: {
+      address: "0xd24F2a43dAFFF634Fe435e3239236C0c71a9C3F3",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_accessRestriction",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "available",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "required",
+              type: "uint256",
+            },
+          ],
+          name: "InsufficientBalance",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "field",
+              type: "string",
+            },
+          ],
+          name: "InvalidAddress",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "updater",
+              type: "address",
+            },
+          ],
+          name: "InvalidUpdaterAddress",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "param",
+              type: "string",
+            },
+          ],
+          name: "MustBeGraterThanZero",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotAdmin",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "NotAuthorized",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotOwner",
+          type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "agreementId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "int256",
+              name: "change",
+              type: "int256",
+            },
+            {
+              indexed: false,
+              internalType: "int256",
+              name: "newScore",
+              type: "int256",
+            },
+          ],
+          name: "ReputationUpdated",
+          type: "event",
+        },
+        {
+          inputs: [],
+          name: "UPDATER_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "accessRestriction",
+          outputs: [
+            {
+              internalType: "contract IAccessRestriction",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+          ],
+          name: "getReputation",
+          outputs: [
+            {
+              internalType: "int256",
+              name: "",
+              type: "int256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "reputationScores",
+          outputs: [
+            {
+              internalType: "int256",
+              name: "",
+              type: "int256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_agreementId",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+            {
+              internalType: "int256",
+              name: "_change",
+              type: "int256",
+            },
+          ],
+          name: "updateReputation",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {
+        getReputation: "contracts/interfaces/IReputation.sol",
+        updateReputation: "contracts/interfaces/IReputation.sol",
+      },
+    },
+  },
+  31337: {
+    AccessRestriction: {
+      address: "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_deployer",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "ContractNotPaused",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "ContractPaused",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "available",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "required",
+              type: "uint256",
+            },
+          ],
+          name: "InsufficientBalance",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "field",
+              type: "string",
+            },
+          ],
+          name: "InvalidAddress",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "param",
+              type: "string",
+            },
+          ],
+          name: "MustBeGraterThanZero",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotAdmin",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotAdminOrApprovedContract",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotAdminOrOwner",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotAdminOrScript",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotApprovedContract",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotArbiter",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "NotAuthorized",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotDAO",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotDistributor",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotOwner",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotScript",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "caller",
+              type: "address",
+            },
+          ],
+          name: "NotVerifiedUser",
+          type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "Paused",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "previousAdminRole",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "newAdminRole",
+              type: "bytes32",
+            },
+          ],
+          name: "RoleAdminChanged",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "sender",
+              type: "address",
+            },
+          ],
+          name: "RoleGranted",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "sender",
+              type: "address",
+            },
+          ],
+          name: "RoleRevoked",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "Unpaused",
+          type: "event",
+        },
+        {
+          inputs: [],
+          name: "ADMIN_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "APPROVED_CONTRACT_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "ARBITER_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "DAO_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "DEFAULT_ADMIN_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "DISTRIBUTOR_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "SCRIPT_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "VERFIED_USER_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+          ],
+          name: "getRoleAdmin",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "grantRole",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "hasRole",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifAdmin",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifAdminOrApprovedContract",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifAdminOrScript",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifApprovedContract",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifArbiter",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifDAO",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifDistributor",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "ifNotPaused",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifOwner",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifOwnerOrAdmin",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "ifPaused",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifScript",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "ifVerifiedUser",
+          outputs: [],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isAdmin",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isApprovedContract",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isArbiter",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isDAO",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isDistributor",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isOwner",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isScript",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_address",
+              type: "address",
+            },
+          ],
+          name: "isVerifiedUser",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "pause",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "paused",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "renounceRole",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "role",
+              type: "bytes32",
+            },
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "revokeRole",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes4",
+              name: "interfaceId",
+              type: "bytes4",
+            },
+          ],
+          name: "supportsInterface",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "unpause",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {
+        DEFAULT_ADMIN_ROLE: "@openzeppelin/contracts/access/AccessControl.sol",
+        getRoleAdmin: "contracts/interfaces/IAccessRestriction.sol",
+        grantRole: "contracts/interfaces/IAccessRestriction.sol",
+        hasRole: "contracts/interfaces/IAccessRestriction.sol",
+        renounceRole: "contracts/interfaces/IAccessRestriction.sol",
+        revokeRole: "contracts/interfaces/IAccessRestriction.sol",
+        supportsInterface: "@openzeppelin/contracts/access/AccessControl.sol",
+        paused: "contracts/interfaces/IAccessRestriction.sol",
+        ifAdmin: "contracts/interfaces/IAccessRestriction.sol",
+        ifAdminOrApprovedContract:
+          "contracts/interfaces/IAccessRestriction.sol",
+        ifAdminOrScript: "contracts/interfaces/IAccessRestriction.sol",
+        ifApprovedContract: "contracts/interfaces/IAccessRestriction.sol",
+        ifArbiter: "contracts/interfaces/IAccessRestriction.sol",
+        ifDAO: "contracts/interfaces/IAccessRestriction.sol",
+        ifDistributor: "contracts/interfaces/IAccessRestriction.sol",
+        ifNotPaused: "contracts/interfaces/IAccessRestriction.sol",
+        ifOwner: "contracts/interfaces/IAccessRestriction.sol",
+        ifOwnerOrAdmin: "contracts/interfaces/IAccessRestriction.sol",
+        ifPaused: "contracts/interfaces/IAccessRestriction.sol",
+        ifScript: "contracts/interfaces/IAccessRestriction.sol",
+        ifVerifiedUser: "contracts/interfaces/IAccessRestriction.sol",
+        isAdmin: "contracts/interfaces/IAccessRestriction.sol",
+        isApprovedContract: "contracts/interfaces/IAccessRestriction.sol",
+        isArbiter: "contracts/interfaces/IAccessRestriction.sol",
+        isDAO: "contracts/interfaces/IAccessRestriction.sol",
+        isDistributor: "contracts/interfaces/IAccessRestriction.sol",
         isOwner: "contracts/interfaces/IAccessRestriction.sol",
         isScript: "contracts/interfaces/IAccessRestriction.sol",
         isVerifiedUser: "contracts/interfaces/IAccessRestriction.sol",
@@ -830,8 +1929,13 @@ const deployedContracts = {
       },
     },
     DisputeResolution: {
-      address: "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
+      address: "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
       abi: [
+        {
+          inputs: [],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
         {
           inputs: [
             {
@@ -1263,12 +2367,12 @@ const deployedContracts = {
       },
     },
     Escrow: {
-      address: "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      address: "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
       abi: [
         {
           inputs: [
             {
-              internalType: "contract IERC20",
+              internalType: "address",
               name: "_token",
               type: "address",
             },
@@ -1285,6 +2389,11 @@ const deployedContracts = {
           ],
           stateMutability: "nonpayable",
           type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "AllowanceError",
+          type: "error",
         },
         {
           inputs: [],
@@ -1552,6 +2661,11 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "address",
+              name: "_renter",
+              type: "address",
+            },
+            {
               internalType: "uint256",
               name: "_agreementId",
               type: "uint256",
@@ -1641,8 +2755,19 @@ const deployedContracts = {
       },
     },
     Inspection: {
-      address: "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
+      address: "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
       abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_accessRestriction",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
         {
           anonymous: false,
           inputs: [
@@ -1661,6 +2786,19 @@ const deployedContracts = {
           ],
           name: "ItemInspected",
           type: "event",
+        },
+        {
+          inputs: [],
+          name: "accessRestriction",
+          outputs: [
+            {
+              internalType: "contract IAccessRestriction",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
         },
         {
           inputs: [
@@ -1707,28 +2845,28 @@ const deployedContracts = {
       },
     },
     MockToken: {
-      address: "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+      address: "0x59b670e9fA9D0A427751Af201D676719a970857b",
       abi: [
-        {
-          inputs: [],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [],
-          name: "InvalidShortString",
-          type: "error",
-        },
         {
           inputs: [
             {
               internalType: "string",
-              name: "str",
+              name: "_name",
               type: "string",
             },
+            {
+              internalType: "string",
+              name: "_symbol",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "_accessRestriction",
+              type: "address",
+            },
           ],
-          name: "StringTooLong",
-          type: "error",
+          stateMutability: "nonpayable",
+          type: "constructor",
         },
         {
           anonymous: false,
@@ -1753,12 +2891,6 @@ const deployedContracts = {
             },
           ],
           name: "Approval",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [],
-          name: "EIP712DomainChanged",
           type: "event",
         },
         {
@@ -1788,12 +2920,12 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "DOMAIN_SEPARATOR",
+          name: "accessRestriction",
           outputs: [
             {
-              internalType: "bytes32",
+              internalType: "contract IAccessRestriction",
               name: "",
-              type: "bytes32",
+              type: "address",
             },
           ],
           stateMutability: "view",
@@ -1876,7 +3008,7 @@ const deployedContracts = {
               type: "uint8",
             },
           ],
-          stateMutability: "view",
+          stateMutability: "pure",
           type: "function",
         },
         {
@@ -1901,49 +3033,6 @@ const deployedContracts = {
             },
           ],
           stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "eip712Domain",
-          outputs: [
-            {
-              internalType: "bytes1",
-              name: "fields",
-              type: "bytes1",
-            },
-            {
-              internalType: "string",
-              name: "name",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "version",
-              type: "string",
-            },
-            {
-              internalType: "uint256",
-              name: "chainId",
-              type: "uint256",
-            },
-            {
-              internalType: "address",
-              name: "verifyingContract",
-              type: "address",
-            },
-            {
-              internalType: "bytes32",
-              name: "salt",
-              type: "bytes32",
-            },
-            {
-              internalType: "uint256[]",
-              name: "extensions",
-              type: "uint256[]",
-            },
-          ],
-          stateMutability: "view",
           type: "function",
         },
         {
@@ -1999,68 +3088,6 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-          ],
-          name: "nonces",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "deadline",
-              type: "uint256",
-            },
-            {
-              internalType: "uint8",
-              name: "v",
-              type: "uint8",
-            },
-            {
-              internalType: "bytes32",
-              name: "r",
-              type: "bytes32",
-            },
-            {
-              internalType: "bytes32",
-              name: "s",
-              type: "bytes32",
-            },
-          ],
-          name: "permit",
-          outputs: [],
-          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -2144,44 +3171,26 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {
-        allowance:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        approve:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        balanceOf:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        decimals:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        decreaseAllowance:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        increaseAllowance:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        name: "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        symbol:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        totalSupply:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        transfer:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        transferFrom:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        DOMAIN_SEPARATOR:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        eip712Domain:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        nonces:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
-        permit:
-          "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol",
+        allowance: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        approve: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        balanceOf: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        decimals: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        decreaseAllowance: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        increaseAllowance: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        name: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        symbol: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        totalSupply: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        transfer: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+        transferFrom: "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       },
     },
     RentalAgreement: {
-      address: "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
+      address: "0xc5a5C42992dECbae36851359345FE25997F5C42d",
       abi: [
         {
           inputs: [
             {
-              internalType: "contract IERC20",
+              internalType: "address",
               name: "_token",
               type: "address",
             },
@@ -2407,6 +3416,18 @@ const deployedContracts = {
             {
               indexed: false,
               internalType: "address",
+              name: "collection",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "address",
               name: "rentee",
               type: "address",
             },
@@ -2509,6 +3530,44 @@ const deployedContracts = {
           type: "event",
         },
         {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "address",
+              name: "collection",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "tokenId",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "bool",
+              name: "isActive",
+              type: "bool",
+            },
+          ],
+          name: "RentalAsset1155Added",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "address",
+              name: "user",
+              type: "address",
+            },
+          ],
+          name: "UserAdded",
+          type: "event",
+        },
+        {
           inputs: [
             {
               internalType: "uint256",
@@ -2523,6 +3582,19 @@ const deployedContracts = {
         },
         {
           inputs: [],
+          name: "VERFIED_USER_ROLE",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
           name: "accessRestriction",
           outputs: [
             {
@@ -2532,6 +3604,19 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+          ],
+          name: "addUser",
+          outputs: [],
+          stateMutability: "nonpayable",
           type: "function",
         },
         {
@@ -2624,23 +3709,6 @@ const deployedContracts = {
             {
               components: [
                 {
-                  components: [
-                    {
-                      internalType: "address",
-                      name: "collection",
-                      type: "address",
-                    },
-                    {
-                      internalType: "string",
-                      name: "name",
-                      type: "string",
-                    },
-                  ],
-                  internalType: "struct IRentalAgreement.Collection",
-                  name: "assetAddress",
-                  type: "tuple",
-                },
-                {
                   internalType: "string",
                   name: "name",
                   type: "string",
@@ -2708,57 +3776,6 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "assets",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "address",
-                  name: "collection",
-                  type: "address",
-                },
-                {
-                  internalType: "string",
-                  name: "name",
-                  type: "string",
-                },
-              ],
-              internalType: "struct IRentalAgreement.Collection",
-              name: "assetAddress",
-              type: "tuple",
-            },
-            {
-              internalType: "string",
-              name: "name",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "assetType",
-              type: "string",
-            },
-            {
-              internalType: "bool",
-              name: "isActive",
-              type: "bool",
-            },
-            {
-              internalType: "uint256",
-              name: "timesRented",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
               name: "_agreementId",
               type: "uint256",
             },
@@ -2785,7 +3802,7 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
-              name: "_renter",
+              name: "_collection",
               type: "address",
             },
             {
@@ -2938,6 +3955,68 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "rentalAsset1155s",
+          outputs: [
+            {
+              internalType: "string",
+              name: "name",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "assetType",
+              type: "string",
+            },
+            {
+              internalType: "bool",
+              name: "isActive",
+              type: "bool",
+            },
+            {
+              internalType: "uint256",
+              name: "timesRented",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_collection",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "_tokenId",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "_isActive",
+              type: "bool",
+            },
+          ],
+          name: "setRentalAsset1155",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
           inputs: [],
           name: "socialFi",
           outputs: [
@@ -3005,6 +4084,8 @@ const deployedContracts = {
       ],
       inheritedFunctions: {
         ArrivalAgreement: "contracts/interfaces/IRentalAgreement.sol",
+        addUser: "contracts/interfaces/IRentalAgreement.sol",
+        agreements: "contracts/interfaces/IRentalAgreement.sol",
         cancelAgreement: "contracts/interfaces/IRentalAgreement.sol",
         completeAgreement: "contracts/interfaces/IRentalAgreement.sol",
         createAgreement: "contracts/interfaces/IRentalAgreement.sol",
@@ -3012,10 +4093,13 @@ const deployedContracts = {
         extendRentalPeriodRenter: "contracts/interfaces/IRentalAgreement.sol",
         getAgreementParties: "contracts/interfaces/IRentalAgreement.sol",
         raiseDispute: "contracts/interfaces/IRentalAgreement.sol",
+        rentalAsset1155s: "contracts/interfaces/IRentalAgreement.sol",
+        setRentalAsset1155: "contracts/interfaces/IRentalAgreement.sol",
+        users: "contracts/interfaces/IRentalAgreement.sol",
       },
     },
     RentalDAO: {
-      address: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
+      address: "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
       abi: [
         {
           inputs: [
@@ -3317,6 +4401,24 @@ const deployedContracts = {
           type: "function",
         },
         {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_contractName",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "_contractAddress",
+              type: "address",
+            },
+          ],
+          name: "setContractAddress",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
           inputs: [],
           name: "systemFee",
           outputs: [
@@ -3358,7 +4460,7 @@ const deployedContracts = {
       },
     },
     Reputation: {
-      address: "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      address: "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
       abi: [
         {
           inputs: [
@@ -3572,13 +4674,18 @@ const deployedContracts = {
       },
     },
     SocialFi: {
-      address: "0x9A676e781A523b5d0C0e43731313A708CB607508",
+      address: "0x322813Fd9A801c5507c9de605d63CEA4f2CE6c44",
       abi: [
         {
           inputs: [
             {
               internalType: "contract IERC20",
               name: "_token",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_accessRestriction",
               type: "address",
             },
           ],
@@ -3692,6 +4799,19 @@ const deployedContracts = {
           ],
           name: "UserRewarded",
           type: "event",
+        },
+        {
+          inputs: [],
+          name: "accessRestriction",
+          outputs: [
+            {
+              internalType: "contract IAccessRestriction",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
         },
         {
           inputs: [],

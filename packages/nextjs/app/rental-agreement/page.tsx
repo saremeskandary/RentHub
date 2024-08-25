@@ -59,15 +59,60 @@ const RentalAgreement: NextPage = () => {
                     <div className="p-5 divide-y divide-base-300">
                       <BasicWriteOnlyFunctionForm
                         contract={deployedContractData}
+                        name={"setRentalAsset1155"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
+                        name={"addUser"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
                         name={"createAgreement"}
                         onChange={triggerRefreshDisplayVariables}
                         contractAddress={deployedContractData.address}
                         inheritedFrom={undefined} // Adjust as necessary
                       />
-                      {/* <ContractWriteMethods
-                      deployedContractData={deployedContractData}
-                      onChange={triggerRefreshDisplayVariables}
-                    /> */}
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
+                        name={"ArrivalAgreement"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
+                        name={"completeAgreement"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
+                        name={"cancelAgreement"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
+                        name={"raiseDispute"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
+                      <BasicWriteOnlyFunctionForm
+                        contract={deployedContractData}
+                        name={"extendRentalPeriodRenter"}
+                        onChange={triggerRefreshDisplayVariables}
+                        contractAddress={deployedContractData.address}
+                        inheritedFrom={undefined} // Adjust as necessary
+                      />
                     </div>
                   </div>
                 </div>
