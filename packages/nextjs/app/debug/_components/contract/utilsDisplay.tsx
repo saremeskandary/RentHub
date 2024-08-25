@@ -61,10 +61,10 @@ const NumberDisplay = ({ value }: { value: bigint }) => {
     <div className="flex items-baseline">
       {isEther ? "Ξ" + formatEther(value) : String(value)}
       <span
-        className="tooltip tooltip-secondary font-sans ml-2"
+        className="tooltip tooltip-secondary ml-2 font-sans"
         data-tip={isEther ? "Multiply by 1e18" : "Divide by 1e18"}
       >
-        <button className="btn btn-ghost btn-circle btn-xs" onClick={() => setIsEther(!isEther)}>
+        <button className="btn btn-circle btn-ghost btn-xs" onClick={() => setIsEther(!isEther)}>
           <ArrowsRightLeftIcon className="h-3 w-3 opacity-65" />
         </button>
       </span>
@@ -85,7 +85,7 @@ export const ObjectFieldDisplay = ({
 }) => {
   return (
     <div className={`flex flex-row items-baseline ${leftPad ? "ml-4" : ""}`}>
-      <span className="text-gray-500 dark:text-gray-400 mr-2">{name}:</span>
+      <span className="mr-2 text-gray-500 dark:text-gray-400">{name}:</span>
       <span className="text-base-content">{displayTxResult(value, size)}</span>
     </div>
   );

@@ -43,7 +43,7 @@
     "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
     "husky": "^9.1.4",
     "lint-staged": "^13.0.3",
-    "yarn-audit-fix": "^10.0.8"
+    "yarn-audit-fix": "^10.0.9"
   },
   "engines": {
     "node": ">=18.17.0"
