@@ -2675,6 +2675,43 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/react-compose-refs@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@radix-ui/react-compose-refs@npm:1.1.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 047a4ed5f87cb848be475507cd62836cf5af5761484681f521ea543ea7c9d59d61d42806d6208863d5e2380bf38cdf4cff73c2bbe5f52dbbe50fb04e1a13ac72
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-icons@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "@radix-ui/react-icons@npm:1.3.0"
+  peerDependencies:
+    react: ^16.x || ^17.x || ^18.x
+  checksum: 982f3ee2271eaaa12b944506ef7701d20fad847082592d99b393b66a2ebbd4cc89e3a0ba48146ed8801418a7bfd76cd55901dc5cb7c6ef404001e7e4c73d05f6
+  languageName: node
+  linkType: hard
+
+"@radix-ui/react-slot@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@radix-ui/react-slot@npm:1.1.0"
+  dependencies:
+    "@radix-ui/react-compose-refs": 1.1.0
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 3c9cd90aabf08f541e20dbecb581744be01c552a0cd16e90d7c218381bcc5307aa8a6013d045864e692ba89d3d8c17bfae08df18ed18be6d223d9330ab0302fa
+  languageName: node
+  linkType: hard
+
 "@rainbow-me/rainbowkit@npm:2.1.0":
   version: 2.1.0
   resolution: "@rainbow-me/rainbowkit@npm:2.1.0"
@@ -2714,6 +2751,17 @@ __metadata:
     viem: 2.x
     wagmi: ^2.9.0
   checksum: 8d127509b376715c3e22030a4df74ef061d3da86bfa481bae3ea035192fa324fb82179da284f4bdf98feb1b2672157ca9440ed0c51d9280d9da694b9e6ba6250
+  languageName: node
+  linkType: hard
+
+"@react-leaflet/core@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@react-leaflet/core@npm:2.1.0"
+  peerDependencies:
+    leaflet: ^1.9.0
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  checksum: c11a15fb71a9929b809f346d8f784d0f32afa373bc096aa1f0d0fa6a2ef0ce632a563c31876abf8b255a12a19d6e80ece31e2ef505f79a678bbf073e7a6c5c60
   languageName: node
   linkType: hard
 
@@ -2957,36 +3005,53 @@ __metadata:
   resolution: "@se-2/nextjs@workspace:packages/nextjs"
   dependencies:
     "@heroicons/react": ^2.0.11
+    "@radix-ui/react-icons": ^1.3.0
+    "@radix-ui/react-slot": ^1.1.0
     "@rainbow-me/rainbowkit": 2.1.2
     "@tanstack/react-query": ^5.28.6
     "@trivago/prettier-plugin-sort-imports": ^4.3.0
+    "@types/leaflet": ^1.9.12
+    "@types/lodash.debounce": ^4.0.9
     "@types/node": ^17.0.35
     "@types/nprogress": ^0
     "@types/react": ^18.0.9
     "@types/react-copy-to-clipboard": ^5.0.4
+    "@types/react-leaflet": ^3.0.0
     "@typescript-eslint/eslint-plugin": ^5.39.0
     "@uniswap/sdk-core": ^4.0.1
     "@uniswap/v2-sdk": ^3.0.1
     abitype: 1.0.5
     autoprefixer: ^10.4.12
+    axios: ^1.7.4
     blo: ^1.0.1
     burner-connector: ^0.0.8
+    class-variance-authority: ^0.7.0
+    clsx: ^2.1.1
     daisyui: 4.5.0
     eslint: ^8.15.0
     eslint-config-next: ^14.0.4
     eslint-config-prettier: ^9.1.0
     eslint-plugin-prettier: ^5.1.3
+    leaflet: ^1.9.4
+    lodash.debounce: ^4.0.8
+    lucide-react: ^0.428.0
     next: ^14.0.4
     next-themes: ^0.2.1
     nprogress: ^0.2.0
     postcss: ^8.4.16
     prettier: ^3.3.2
+    prettier-plugin-tailwindcss: ^0.6.6
     qrcode.react: ^3.1.0
     react: ^18.2.0
     react-copy-to-clipboard: ^5.1.0
     react-dom: ^18.2.0
     react-hot-toast: ^2.4.0
+    react-leaflet: ^4.2.1
+    react-responsive: ^10.0.0
+    sass: ^1.77.8
+    tailwind-merge: ^2.5.2
     tailwindcss: ^3.4.3
+    tailwindcss-animate: ^1.0.7
     type-fest: ^4.6.0
     typescript: 5.5.3
     use-debounce: ^8.0.4
@@ -3995,6 +4060,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/geojson@npm:*":
+  version: 7946.0.14
+  resolution: "@types/geojson@npm:7946.0.14"
+  checksum: ae511bee6488ae3bd5a3a3347aedb0371e997b14225b8983679284e22fa4ebd88627c6e3ff8b08bf4cc35068cb29310c89427311ffc9322c255615821a922e71
+  languageName: node
+  linkType: hard
+
 "@types/glob@npm:^7.1.1":
   version: 7.2.0
   resolution: "@types/glob@npm:7.2.0"
@@ -4051,12 +4123,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/leaflet@npm:^1.9.12":
+  version: 1.9.12
+  resolution: "@types/leaflet@npm:1.9.12"
+  dependencies:
+    "@types/geojson": "*"
+  checksum: 45e69572048d6da96840505ab13e1e672f75d1e058c8dd87894e7d4be51c62b650303406e45c9df720722a111d348c27626ed22eb7ac0ac102249964e958a635
+  languageName: node
+  linkType: hard
+
 "@types/lodash-es@npm:^4.17.12":
   version: 4.17.12
   resolution: "@types/lodash-es@npm:4.17.12"
   dependencies:
     "@types/lodash": "*"
   checksum: 990a99e2243bebe9505cb5ad19fbc172beb4a8e00f9075c99fc06c46c2801ffdb40bc2867271cf580d5f48994fc9fb076ec92cd60a20e621603bf22114e5b077
+  languageName: node
+  linkType: hard
+
+"@types/lodash.debounce@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "@types/lodash.debounce@npm:4.0.9"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: 8183a152e01928e3b97ca773f6ae6038b8695e76493ba8bf6b743ec143948a62294fbc9d49fa4a78b52265b3ba4892ef57534e0c13d04aa0f111671b5a944feb
   languageName: node
   linkType: hard
 
@@ -4219,6 +4309,15 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: adc2970c8756e648daa06e294c422df3dc076a784344ab2ecb78a17ebd7e8e3dfd7f31e68c24267de4815cdeec573a743d952a308b45b8380f6b7912a9a8b911
+  languageName: node
+  linkType: hard
+
+"@types/react-leaflet@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@types/react-leaflet@npm:3.0.0"
+  dependencies:
+    react-leaflet: "*"
+  checksum: 3997d77e7b61f84774ad8170707975a03340f1f977afc822c3cc2aacb3fa8964f328d1c51d2c0e322b1390f6eb01c9f8fcf501f372eb61deb18aadcea45f8195
   languageName: node
   linkType: hard
 
@@ -4646,9 +4745,9 @@ __metadata:
   linkType: hard
 
 "@vanilla-extract/private@npm:^1.0.3":
-  version: 1.0.5
-  resolution: "@vanilla-extract/private@npm:1.0.5"
-  checksum: 147acf9b1795f0681372db92e483bc27eeddad050b7d517e9ab87c5e9bcbdce69c0be300c4948f42e3bdeb81b8dd16b8243f3404ce74e6bc9acbb31112429ff4
+  version: 1.0.6
+  resolution: "@vanilla-extract/private@npm:1.0.6"
+  checksum: 2265b02af29d8cd40f6ddeeed197fb2df1a7695f5a9821d5e3597677179be8b83bcd8fe4df4a6178544f89123d745a3c6a13599d4fe4e5873b065a8ad329f690
   languageName: node
   linkType: hard
 
@@ -7060,7 +7159,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:^3.4.0, chokidar@npm:^3.5.2, chokidar@npm:^3.5.3, chokidar@npm:^3.6.0":
+"chokidar@npm:>=3.0.0 <4.0.0, chokidar@npm:^3.4.0, chokidar@npm:^3.5.2, chokidar@npm:^3.5.3, chokidar@npm:^3.6.0":
   version: 3.6.0
   resolution: "chokidar@npm:3.6.0"
   dependencies:
@@ -7143,6 +7242,15 @@ __metadata:
   version: 1.1.0
   resolution: "class-is@npm:1.1.0"
   checksum: 49024de3b264fc501a38dd59d8668f1a2b4973fa6fcef6b83d80fe6fe99a2000a8fbea5b50d4607169c65014843c9f6b41a4f8473df806c1b4787b4d47521880
+  languageName: node
+  linkType: hard
+
+"class-variance-authority@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "class-variance-authority@npm:0.7.0"
+  dependencies:
+    clsx: 2.0.0
+  checksum: e7fd1fab433ef06f52a1b7b241b70b4a185864deef199d3b0a2c3412f1cc179517288264c383f3b971a00d76811625fc8f7ffe709e6170219e88cd7368f08a20
   languageName: node
   linkType: hard
 
@@ -7289,6 +7397,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"clsx@npm:2.0.0":
+  version: 2.0.0
+  resolution: "clsx@npm:2.0.0"
+  checksum: a2cfb2351b254611acf92faa0daf15220f4cd648bdf96ce369d729813b85336993871a4bf6978ddea2b81b5a130478339c20d9d0b5c6fc287e5147f0c059276e
+  languageName: node
+  linkType: hard
+
 "clsx@npm:2.1.0":
   version: 2.1.0
   resolution: "clsx@npm:2.1.0"
@@ -7300,6 +7415,13 @@ __metadata:
   version: 1.2.1
   resolution: "clsx@npm:1.2.1"
   checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12
+  languageName: node
+  linkType: hard
+
+"clsx@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "clsx@npm:2.1.1"
+  checksum: acd3e1ab9d8a433ecb3cc2f6a05ab95fe50b4a3cfc5ba47abb6cbf3754585fcb87b84e90c822a1f256c4198e3b41c7f6c391577ffc8678ad587fc0976b24fd57
   languageName: node
   linkType: hard
 
@@ -7766,6 +7888,13 @@ __metadata:
     safe-buffer: ^5.2.0
     sha3: ^2.1.1
   checksum: c9d16a81eeb7cf6ac9392349dcf7d4bd5b9f3dd73c60e472fe6cba256dc2f9ba45b756f23b65a2e1abfe0612cfb4e85dd8e480783288bba239eade8abb4c4f43
+  languageName: node
+  linkType: hard
+
+"css-mediaquery@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "css-mediaquery@npm:0.1.2"
+  checksum: 8e26ae52d8aaaa71893f82fc485363ff0fab494b7d3b3464572aaed50714b8b538d33dbdaa69f0c02cf7f80d1f4d9a77519306c0492223ce91b3987475031a69
   languageName: node
   linkType: hard
 
@@ -8429,9 +8558,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.4":
-  version: 1.5.10
-  resolution: "electron-to-chromium@npm:1.5.10"
-  checksum: 44dcdf428286abf63790deb9fcf67608e5ab2594d4aa5c7e5c66422be7074d3cc453d0a2f0508080cf0f2363b9bcb6376dd4690eff8a5feae01f49b3c394d4ec
+  version: 1.5.11
+  resolution: "electron-to-chromium@npm:1.5.11"
+  checksum: 9dbf480ff39005b3c9657e6b8df534a4597d0747472f2982315cc169024ebfb45f99b16dd57d8be4a51a063f14590f9f585f179e55f68591f870f38b9a5e491a
   languageName: node
   linkType: hard
 
@@ -11668,6 +11797,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hyphenate-style-name@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "hyphenate-style-name@npm:1.1.0"
+  checksum: b9ed74e29181d96bd58a2d0e62fc4a19879db591dba268275829ff0ae595fcdf11faafaeaa63330a45c3004664d7db1f0fc7cdb372af8ee4615ed8260302c207
+  languageName: node
+  linkType: hard
+
 "i18next-browser-languagedetector@npm:7.1.0":
   version: 7.1.0
   resolution: "i18next-browser-languagedetector@npm:7.1.0"
@@ -11755,7 +11891,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immutable@npm:^4.0.0-rc.12":
+"immutable@npm:^4.0.0, immutable@npm:^4.0.0-rc.12":
   version: 4.3.7
   resolution: "immutable@npm:4.3.7"
   checksum: 1c50eb053bb300796551604afff554066f041aa8e15926cf98f6d11d9736b62ad12531c06515dd96375258653878b4736f8051cd20b640f5f976d09fa640e3ec
@@ -12846,6 +12982,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"leaflet@npm:^1.9.4":
+  version: 1.9.4
+  resolution: "leaflet@npm:1.9.4"
+  checksum: bfc79f17a247b37b92d84b3c78702501603392d6589fde606de4a825d11f1609d90225388834f2e0709dac327e52dcd4b4b9cc9fd3d590060c5b1e53b84fa6c6
+  languageName: node
+  linkType: hard
+
 "level-codec@npm:9.0.2, level-codec@npm:^9.0.0":
   version: 9.0.2
   resolution: "level-codec@npm:9.0.2"
@@ -13410,6 +13553,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^0.428.0":
+  version: 0.428.0
+  resolution: "lucide-react@npm:0.428.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0-rc
+  checksum: da9b9460cd957353d995a61e1a40f69c2ed991698a7c5f0a482ce38bb3bac8066671bd016a4000f69b4b4789269db6439641c62053f9360e5bd89e319738b515
+  languageName: node
+  linkType: hard
+
 "make-dir@npm:^3.1.0":
   version: 3.1.0
   resolution: "make-dir@npm:3.1.0"
@@ -13457,6 +13609,15 @@ __metadata:
   version: 1.2.6
   resolution: "match-all@npm:1.2.6"
   checksum: 3d4f16b8fd082f2fd10e362f4a8b71c62f8a767591b3db831ca2bdcf726337e9a64e4abc30e2ef053dc2bcfb875a9ed80bd78e006ad5ef11380a7158d0cb00e1
+  languageName: node
+  linkType: hard
+
+"matchmediaquery@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "matchmediaquery@npm:0.4.2"
+  dependencies:
+    css-mediaquery: ^0.1.2
+  checksum: 0d495dd20a4bdd4c6485c43fe9363d41de6c8cbe3bb4c259f39b885f1d2627f102ac21a759b6108a313d0dbd3445edb9847b734cff2f06b5b19fed62dbb7856f
   languageName: node
   linkType: hard
 
@@ -15868,6 +16029,64 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier-plugin-tailwindcss@npm:^0.6.6":
+  version: 0.6.6
+  resolution: "prettier-plugin-tailwindcss@npm:0.6.6"
+  peerDependencies:
+    "@ianvs/prettier-plugin-sort-imports": "*"
+    "@prettier/plugin-pug": "*"
+    "@shopify/prettier-plugin-liquid": "*"
+    "@trivago/prettier-plugin-sort-imports": "*"
+    "@zackad/prettier-plugin-twig-melody": "*"
+    prettier: ^3.0
+    prettier-plugin-astro: "*"
+    prettier-plugin-css-order: "*"
+    prettier-plugin-import-sort: "*"
+    prettier-plugin-jsdoc: "*"
+    prettier-plugin-marko: "*"
+    prettier-plugin-multiline-arrays: "*"
+    prettier-plugin-organize-attributes: "*"
+    prettier-plugin-organize-imports: "*"
+    prettier-plugin-sort-imports: "*"
+    prettier-plugin-style-order: "*"
+    prettier-plugin-svelte: "*"
+  peerDependenciesMeta:
+    "@ianvs/prettier-plugin-sort-imports":
+      optional: true
+    "@prettier/plugin-pug":
+      optional: true
+    "@shopify/prettier-plugin-liquid":
+      optional: true
+    "@trivago/prettier-plugin-sort-imports":
+      optional: true
+    "@zackad/prettier-plugin-twig-melody":
+      optional: true
+    prettier-plugin-astro:
+      optional: true
+    prettier-plugin-css-order:
+      optional: true
+    prettier-plugin-import-sort:
+      optional: true
+    prettier-plugin-jsdoc:
+      optional: true
+    prettier-plugin-marko:
+      optional: true
+    prettier-plugin-multiline-arrays:
+      optional: true
+    prettier-plugin-organize-attributes:
+      optional: true
+    prettier-plugin-organize-imports:
+      optional: true
+    prettier-plugin-sort-imports:
+      optional: true
+    prettier-plugin-style-order:
+      optional: true
+    prettier-plugin-svelte:
+      optional: true
+  checksum: b78a1a9c47e23f8ff1fb61456f8b0710eabce573f0d644cde6480e103a5d4c2b266ad09e890604a3bb8703669b304efdd2ac3cd1db47beae95792c212b513585
+  languageName: node
+  linkType: hard
+
 "prettier@npm:^2.3.1":
   version: 2.8.8
   resolution: "prettier@npm:2.8.8"
@@ -15966,7 +16185,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.8.1":
+"prop-types@npm:^15.6.1, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -16298,6 +16517,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-leaflet@npm:*, react-leaflet@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "react-leaflet@npm:4.2.1"
+  dependencies:
+    "@react-leaflet/core": ^2.1.0
+  peerDependencies:
+    leaflet: ^1.9.0
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  checksum: 79222c2ba0c62facaa3dfee18f7a692f917a4fb744ba8d22269a77f9779fc9634962230eb51265ff2563a1a5e3287d2ec16640ee7f5de459458027e05cd756ba
+  languageName: node
+  linkType: hard
+
 "react-native-webview@npm:^11.26.0":
   version: 11.26.1
   resolution: "react-native-webview@npm:11.26.1"
@@ -16343,6 +16575,20 @@ __metadata:
     "@types/react":
       optional: true
   checksum: e0dbb6856beaed2cff4996d9ca62d775686ff72e3e9de34043034d932223b588993b2fc7a18644750dd3d73eb19bd3f2cedb8d91f0e424c1ef8403010da24b1d
+  languageName: node
+  linkType: hard
+
+"react-responsive@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "react-responsive@npm:10.0.0"
+  dependencies:
+    hyphenate-style-name: ^1.0.0
+    matchmediaquery: ^0.4.2
+    prop-types: ^15.6.1
+    shallow-equal: ^3.1.0
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 49580f3fd333316704f774a241dc733506a27b23d1f397fc63e100df08a80ee4ae14cb2b2b1e2bf79e0ee2989d73761f10ec5f9e0caa208a907aee548d85818e
   languageName: node
   linkType: hard
 
@@ -16997,6 +17243,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sass@npm:^1.77.8":
+  version: 1.77.8
+  resolution: "sass@npm:1.77.8"
+  dependencies:
+    chokidar: ">=3.0.0 <4.0.0"
+    immutable: ^4.0.0
+    source-map-js: ">=0.6.2 <2.0.0"
+  bin:
+    sass: sass.js
+  checksum: 6b5dce17faa1bd1e349b4825bf7f76559a32f3f95d789cd2847623c88ee9635e1485d3458532a05fa5b9134cfbce79a4bad3f13dc63c2433632347674db0abae
+  languageName: node
+  linkType: hard
+
 "sc-istanbul@npm:^0.4.5":
   version: 0.4.6
   resolution: "sc-istanbul@npm:0.4.6"
@@ -17307,6 +17566,13 @@ __metadata:
   dependencies:
     buffer: 6.0.3
   checksum: fb49c8e18143cc46babc0e5d83d5f5d0149e645f26633a0e6a9aa2514df2ef91f10b6ece20da229e7ead8b8002d8e9514dcc747ef96a25b749294d6385c6f29f
+  languageName: node
+  linkType: hard
+
+"shallow-equal@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "shallow-equal@npm:3.1.0"
+  checksum: 7eab4ae9fbd79c8913a88d6af873548b6ce619baab2e9e0a2f11696881cdaae289d51423837f6aca38de874581609c8e5e2fa052d8b79c10b55ac9fe7bd2f2f2
   languageName: node
   linkType: hard
 
@@ -17661,7 +17927,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"source-map-js@npm:^1.0.2, source-map-js@npm:^1.2.0":
+"source-map-js@npm:>=0.6.2 <2.0.0, source-map-js@npm:^1.0.2, source-map-js@npm:^1.2.0":
   version: 1.2.0
   resolution: "source-map-js@npm:1.2.0"
   checksum: 791a43306d9223792e84293b00458bf102a8946e7188f3db0e4e22d8d530b5f80a4ce468eb5ec0bf585443ad55ebbd630bf379c98db0b1f317fd902500217f97
@@ -18400,6 +18666,22 @@ __metadata:
     string-width: ^4.2.3
     strip-ansi: ^6.0.1
   checksum: 61188652f53a980d1759ca460ca8dea5c5322aece3210457e7084882f053c2b6a870041295e08a82cb1d676e31b056406845d94b0abf3c79a4b104777bec413b
+  languageName: node
+  linkType: hard
+
+"tailwind-merge@npm:^2.5.2":
+  version: 2.5.2
+  resolution: "tailwind-merge@npm:2.5.2"
+  checksum: af745fc16245ac14eb5d3f0b9d076c024321877ad45f43b324465f6aa7f8b5de3816640594fbf6ac8b3500f70ff2687345787888744196ff6f82dfe9a1f99b97
+  languageName: node
+  linkType: hard
+
+"tailwindcss-animate@npm:^1.0.7":
+  version: 1.0.7
+  resolution: "tailwindcss-animate@npm:1.0.7"
+  peerDependencies:
+    tailwindcss: "*"
+  checksum: c1760983eb3fec0c8421e95082bf308e6845df43e2f90862386366e82545c801b26b4d189c4cd23d6915252b76d18005c8e5f591f8b119944c7fb8650d0f8bce
   languageName: node
   linkType: hard
 
@@ -19891,8 +20173,8 @@ __metadata:
   linkType: hard
 
 "viem@npm:^2.1.1":
-  version: 2.19.6
-  resolution: "viem@npm:2.19.6"
+  version: 2.19.7
+  resolution: "viem@npm:2.19.7"
   dependencies:
     "@adraffy/ens-normalize": 1.10.0
     "@noble/curves": 1.4.0
@@ -19908,7 +20190,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 8eabc081c18f307dfeb71c297c1fd2fc1bf58bea6eb63cec941783047e432af88998a3d6e30d4b182d296d0d9a996a92aabee2caa1a49bfc2bcc6f13c1e6e375
+  checksum: 61e9bca6f38d510a8ce0308d6b093970e0d58ae45481fcea78bbfdefb0b2d8b651071dd940da07049b949a2cb4b5c005eca2fdee748139ea816edb4b7bc53a8e
   languageName: node
   linkType: hard
 
