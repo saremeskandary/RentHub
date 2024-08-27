@@ -19,24 +19,30 @@ const ProductDescription: FC<
 > = ({ title, text, id }) => {
   const [showModal, setShowModal] = useState(false); // Modal state
   const [isBooked, setIsBooked] = useState(false);
+
   const [bookingDate, setBookingDate] = useState("");
   const [bookingTime, setBookingTime] = useState("");
   const [currentDate, setCurrentDate] = useState<string>("");
   const [currentTime, setCurrentTime] = useState<string>("");
   const [endTime, setEndTime] = useState("");
   const [endDate, setEndDate] = useState("");
+
   const [totalKPrice, setTotalKPrice] = useState(0);
   const [totalXPrice, setTotalXPrice] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0); // State to track the calculated price
+  const [totalBPrice, setTotalBPrice] = useState(0);
+  const [totalLPrice, setTotalLPrice] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+
   const router = useRouter();
 
   const hourlyRate = 5;
   const hourlyKRate = 378000;
-  const hourlyXRate = 8; // Example rate: $8 per hour
+  const hourlyXRate = 8;
+  const hourlyBRate = 0.000081;
+  const hourlyLRate = 0.079;
 
   const { isConnected, address } = useAccount();
   const { sendTransaction } = useSendTransaction();
-  const { data: balance } = useWatchBalance({ address });
 
   const handleSend = () => {
     if (isConnected && address) {
@@ -71,7 +77,7 @@ const ProductDescription: FC<
     setCurrentTime(formattedTime);
   }, []);
 
-  const calculatedXPrice = () => {
+  const calculatePrice = (rate: number) => {
     if (!bookingDate || !bookingTime || !endDate || !endTime) {
       return 0;
     }
@@ -82,40 +88,7 @@ const ProductDescription: FC<
 
     // Ensure the duration is positive
     if (durationInHours > 0) {
-      return durationInHours * hourlyXRate;
-    }
-
-    return 0;
-  };
-  const calculatedKPrice = () => {
-    if (!bookingDate || !bookingTime || !endDate || !endTime) {
-      return 0;
-    }
-
-    const start = new Date(`${bookingDate}T${bookingTime}`);
-    const end = new Date(`${endDate}T${endTime}`);
-    const durationInHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Duration in hours
-
-    // Ensure the duration is positive
-    if (durationInHours > 0) {
-      return durationInHours * hourlyKRate;
-    }
-
-    return 0;
-  };
-
-  const calculatePrice = () => {
-    if (!bookingDate || !bookingTime || !endDate || !endTime) {
-      return 0;
-    }
-
-    const start = new Date(`${bookingDate}T${bookingTime}`);
-    const end = new Date(`${endDate}T${endTime}`);
-    const durationInHours = (end.getTime() - start.getTime()) / (1000 * 60 * 60); // Duration in hours
-
-    // Ensure the duration is positive
-    if (durationInHours > 0) {
-      return durationInHours * hourlyRate;
+      return durationInHours * rate;
     }
 
     return 0;
@@ -133,11 +106,13 @@ const ProductDescription: FC<
       return;
     }
 
-    const calculatedPrice = calculatePrice();
-    setTotalPrice(calculatedPrice);
-    setTotalKPrice(calculatedKPrice);
-    setTotalXPrice(calculatedXPrice);
-    setShowModal(true); // Show modal on button click
+    setTotalPrice(calculatePrice(hourlyRate));
+    setTotalKPrice(calculatePrice(hourlyKRate));
+    setTotalXPrice(calculatePrice(hourlyXRate));
+    setTotalBPrice(calculatePrice(hourlyBRate));
+    setTotalLPrice(calculatePrice(hourlyLRate));
+
+    setShowModal(true);
   };
 
   const handleConfirmBooking = () => {
@@ -184,6 +159,14 @@ const ProductDescription: FC<
             <span className="flex items-center">
               <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {hourlyXRate}
             </span>
+            -
+            <span className="flex items-center">
+              <Image src="/btc-logo.png" alt="xfi" width={15} height={15} /> BTC {hourlyBRate}
+            </span>
+            -
+            <span className="flex items-center">
+              <Image src="/ltc-logo.png" alt="xfi" width={15} height={15} /> LTC {hourlyLRate}
+            </span>
             (per hour)
           </p>
           <p className="flex flex-wrap gap-[6px] gap-y-0 font-semibold">
@@ -194,6 +177,14 @@ const ProductDescription: FC<
             -
             <span className="flex items-center">
               <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {totalXPrice.toFixed(2)}
+            </span>
+            -
+            <span className="flex items-center">
+              <Image src="/btc-logo.png" alt="xfi" width={15} height={15} /> BTC {totalBPrice.toFixed(4)}
+            </span>
+            -
+            <span className="flex items-center">
+              <Image src="/ltc-logo.png" alt="xfi" width={15} height={15} /> LTC {totalLPrice.toFixed(2)}
             </span>
           </p>
         </div>
@@ -314,6 +305,14 @@ const ProductDescription: FC<
                 -
                 <span className="flex items-center">
                   <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {totalXPrice.toFixed(2)}
+                </span>
+                -
+                <span className="flex items-center">
+                  <Image src="/btc-logo.png" alt="xfi" width={15} height={15} /> BTC {totalBPrice.toFixed(4)}
+                </span>
+                -
+                <span className="flex items-center">
+                  <Image src="/ltc-logo.png" alt="xfi" width={15} height={15} /> LTC {totalLPrice.toFixed(2)}
                 </span>
               </p>
             </div>
