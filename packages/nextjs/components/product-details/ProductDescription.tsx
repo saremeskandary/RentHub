@@ -141,35 +141,31 @@ const ProductDescription: FC<
   };
 
   const handleConfirmBooking = () => {
-    if (balance?.formatted !== "0") {
-      try {
-        handleSend();
+    try {
+      handleSend();
 
-        const rental = {
-          productTitle: title,
-          productId: id,
-          bookingDate,
-          bookingTime,
-          endDate,
-          endTime,
-          totalPrice,
-        };
+      const rental = {
+        productTitle: title,
+        productId: id,
+        bookingDate,
+        bookingTime,
+        endDate,
+        endTime,
+        totalPrice,
+      };
 
-        const storedRentals = JSON.parse(localStorage.getItem("rentals") || "[]");
-        storedRentals.push(rental);
-        localStorage.setItem("rentals", JSON.stringify(storedRentals));
+      const storedRentals = JSON.parse(localStorage.getItem("rentals") || "[]");
+      storedRentals.push(rental);
+      localStorage.setItem("rentals", JSON.stringify(storedRentals));
 
-        setIsBooked(true);
-        setShowModal(false);
+      setIsBooked(true);
+      setShowModal(false);
 
-        setTimeout(() => {
-          router.push("/myrentals");
-        }, 1000);
-      } catch (error) {
-        alert("Failed to send transaction. Please try again.");
-      }
-    } else {
-      alert("Insufficient funds!");
+      setTimeout(() => {
+        router.push("/myrentals");
+      }, 1000);
+    } catch (error) {
+      alert("Failed to send transaction. Please try again.");
     }
   };
 
