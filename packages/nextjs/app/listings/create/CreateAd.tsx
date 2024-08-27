@@ -14,7 +14,7 @@ export default function CreateProduct() {
         <div className={`${styles.product_create__body} ${image ? `${styles.image}` : ""}`}>
           {image && (
             <div className={styles.product_create__img}>
-              <Image src={image ? `/${image}` : ""} alt="product-create" width={1000} height={1000} />
+              <Image src={image ? `/${image}` : ""} alt="product-create" width={500} height={500} />
             </div>
           )}
 

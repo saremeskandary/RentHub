@@ -1,40 +1,15 @@
-// "use client"
-// import Link from "next/link";
-// import { Settings, Wallet } from "lucide-react";
-// import styles from "~~/components/profile/Profile.module.scss";
-// import { ConnectButton } from "@rainbow-me/rainbowkit";
-// import { useAccount } from "wagmi";
-
-// export default function Profile() {
-//   const { address, isConnected } = useAccount();
-
-//   return (
-//     <section className={styles.profile}>
-//       <Link href="/settings">
-//         <Settings size={24} color="#9095a9" />
-//         <span>Settings</span>
-//       </Link>
-
-//       <Link href="/wallet">
-//         <Wallet size={24} color="#9095a9" />
-//         <span>Wallet</span>
-//       </Link>
-     
-//       <ConnectButton />
-//     </section>
-//   );
-// }
 "use client";
-import Link from "next/link";
-import { Settings, Wallet } from "lucide-react";
+
 import { useState } from "react";
-import styles from "~~/components/profile/Profile.module.scss";
+import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { Settings, Wallet } from "lucide-react";
 import { useAccount } from "wagmi";
+import styles from "~~/components/profile/Profile.module.scss";
 
 export default function Profile() {
   const { address, isConnected } = useAccount();
-  const [userType, setUserType] = useState<string>('Renter'); // Default to 'Renter'
+  const [userType, setUserType] = useState<string>("Renter"); // Default to 'Renter'
   const [showPopup, setShowPopup] = useState<boolean>(false); // State for popup visibility
 
   const handleUserTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -82,9 +57,7 @@ export default function Profile() {
         <div className={styles.popupOverlay}>
           <div className={styles.popupContent}>
             <h2 className={styles.popupTitle}>Welcome, {userType}!</h2>
-            <p className={styles.popupMessage}>
-              You have successfully selected the {userType} role.
-            </p>
+            <p className={styles.popupMessage}>You have successfully selected the {userType} role.</p>
             <button onClick={closePopup} className={styles.popupCloseButton}>
               Close
             </button>

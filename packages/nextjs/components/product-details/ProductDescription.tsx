@@ -4,14 +4,16 @@ import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import styles from "./ProductDetails.module.scss";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircleUserRound, ShoppingCart } from "lucide-react";
+import { useAccount, useSendTransaction } from "wagmi";
+import { useWatchBalance } from "~~/hooks/scaffold-eth";
 
 const ProductDescription: FC<
   | {
       title: string;
       text: string;
       id: number;
-      img: string;
     }
   | any
 > = ({ title, text, id }) => {
@@ -31,6 +33,28 @@ const ProductDescription: FC<
   const hourlyRate = 5;
   const hourlyKRate = 378000;
   const hourlyXRate = 8; // Example rate: $8 per hour
+
+  const { isConnected, address } = useAccount();
+  const { sendTransaction } = useSendTransaction();
+  const { data: balance } = useWatchBalance({ address });
+
+  const handleSend = () => {
+    if (isConnected && address) {
+      try {
+        const tx = {
+          to: "0x97C13a6517b4a9cA752638EeeCC2ea257c174792",
+          value: BigInt("10"),
+        };
+
+        const txHash = sendTransaction(tx);
+        alert(`Success!`);
+
+        return txHash;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (showModal) document.body.classList.add("lock");
@@ -117,28 +141,36 @@ const ProductDescription: FC<
   };
 
   const handleConfirmBooking = () => {
-    const rental = {
-      productTitle: title,
-      productId: id,
-      bookingDate,
-      bookingTime,
-      endDate,
-      endTime,
-      totalPrice,
-    };
+    if (balance?.formatted !== "0") {
+      try {
+        handleSend();
 
-    // Store the rental in localStorage
-    const storedRentals = JSON.parse(localStorage.getItem("rentals") || "[]");
-    storedRentals.push(rental);
-    localStorage.setItem("rentals", JSON.stringify(storedRentals));
+        const rental = {
+          productTitle: title,
+          productId: id,
+          bookingDate,
+          bookingTime,
+          endDate,
+          endTime,
+          totalPrice,
+        };
 
-    setIsBooked(true);
-    setShowModal(false); // Hide modal after confirmation
+        const storedRentals = JSON.parse(localStorage.getItem("rentals") || "[]");
+        storedRentals.push(rental);
+        localStorage.setItem("rentals", JSON.stringify(storedRentals));
 
-    // Redirect to My Rentals after booking
-    setTimeout(() => {
-      router.push("/myrentals");
-    }, 1000); // Delay to allow user to see the confirmation
+        setIsBooked(true);
+        setShowModal(false);
+
+        setTimeout(() => {
+          router.push("/myrentals");
+        }, 1000);
+      } catch (error) {
+        alert("Failed to send transaction. Please try again.");
+      }
+    } else {
+      alert("Insufficient funds!");
+    }
   };
 
   return (
@@ -264,6 +296,9 @@ const ProductDescription: FC<
             <p className="mb-4 text-gray-700">{text}</p>
             <div className="mb-4">
               <p>
+                <strong>Deposit:</strong> $75.00
+              </p>
+              <p>
                 <strong>Start Date:</strong> {bookingDate}
               </p>
               <p>
@@ -286,19 +321,39 @@ const ProductDescription: FC<
                 </span>
               </p>
             </div>
-            <div className="flex justify-end gap-2 md4:flex-col">
+            <div className="flex gap-2 md4:flex-col">
               <button
                 onClick={() => setShowModal(false)}
                 className="rounded !bg-red-400 px-4 py-2 text-gray-700 hover:!bg-red-500"
               >
                 Cancel
               </button>
-              <button
-                onClick={handleConfirmBooking}
-                className="rounded !bg-green-500 px-4 py-2 text-white hover:!bg-green-600"
-              >
-                Confirm Booking
-              </button>
+              {isConnected ? (
+                <button
+                  onClick={handleConfirmBooking}
+                  className="rounded !bg-green-500 px-4 py-2 text-white hover:!bg-green-600"
+                >
+                  Confirm Booking
+                </button>
+              ) : (
+                <div className="w-full max-w-[320px] md4:max-w-full">
+                  <ConnectButton.Custom>
+                    {({ openConnectModal }) => {
+                      return (
+                        <>
+                          {(() => {
+                            return (
+                              <button onClick={openConnectModal} type="button">
+                                Connect Wallet
+                              </button>
+                            );
+                          })()}
+                        </>
+                      );
+                    }}
+                  </ConnectButton.Custom>
+                </div>
+              )}
             </div>
           </div>
         </div>

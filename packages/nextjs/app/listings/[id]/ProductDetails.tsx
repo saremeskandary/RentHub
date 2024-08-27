@@ -19,14 +19,8 @@ export default function ProductDetails() {
     <section className={styles.product_details}>
       <div className="mx-auto max-w-[1200px] p-3">
         <div className={styles.product_details__body}>
-          <div className="h-[100vh]">
-            <Image
-              src={data ? data.img : ""}
-              alt="product-details"
-              width={1000}
-              height={1000}
-              className="aspect-video !h-full !object-cover"
-            />
+          <div className="flex-[0_1_55%]">
+            <Image src={data ? data.img : ""} alt="product-details" width={1000} height={1000} layout="responsive" />
           </div>
 
           <ProductDescription {...data} />
