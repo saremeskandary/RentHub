@@ -27,8 +27,6 @@ const ProductDescription: FC<
   const [endTime, setEndTime] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const [totalKPrice, setTotalKPrice] = useState(0);
-  const [totalXPrice, setTotalXPrice] = useState(0);
   const [totalBPrice, setTotalBPrice] = useState(0);
   const [totalLPrice, setTotalLPrice] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -36,8 +34,6 @@ const ProductDescription: FC<
   const router = useRouter();
 
   const hourlyRate = 5;
-  const hourlyKRate = 378000;
-  const hourlyXRate = 8;
   const hourlyBRate = 0.000081;
   const hourlyLRate = 0.079;
 
@@ -107,8 +103,6 @@ const ProductDescription: FC<
     }
 
     setTotalPrice(calculatePrice(hourlyRate));
-    setTotalKPrice(calculatePrice(hourlyKRate));
-    setTotalXPrice(calculatePrice(hourlyXRate));
     setTotalBPrice(calculatePrice(hourlyBRate));
     setTotalLPrice(calculatePrice(hourlyLRate));
 
@@ -153,14 +147,6 @@ const ProductDescription: FC<
           <p className="flex flex-wrap gap-[6px] gap-y-0 font-semibold">
             Price: ${hourlyRate} -
             <span className="flex items-center">
-              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} /> K9 {hourlyKRate}
-            </span>{" "}
-            -
-            <span className="flex items-center">
-              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {hourlyXRate}
-            </span>
-            -
-            <span className="flex items-center">
               <Image src="/btc-logo.png" alt="xfi" width={15} height={15} /> BTC {hourlyBRate}
             </span>
             -
@@ -171,14 +157,6 @@ const ProductDescription: FC<
           </p>
           <p className="flex flex-wrap gap-[6px] gap-y-0 font-semibold">
             Total Price: ${totalPrice.toFixed(2)} -
-            <span className="flex items-center">
-              <Image src="/k9-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
-            </span>{" "}
-            -
-            <span className="flex items-center">
-              <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {totalXPrice.toFixed(2)}
-            </span>
-            -
             <span className="flex items-center">
               <Image src="/btc-logo.png" alt="xfi" width={15} height={15} /> BTC {totalBPrice.toFixed(4)}
             </span>
@@ -299,14 +277,6 @@ const ProductDescription: FC<
               </p>
               <p className="flex flex-wrap items-center gap-[5px] gap-y-0">
                 <strong>Total Price: </strong> ${totalPrice.toFixed(2)} -
-                <span className="flex items-center">
-                  <Image src="/k9-logo.png" alt="xfi" width={15} height={15} /> K9 {totalKPrice.toFixed(2)}
-                </span>{" "}
-                -
-                <span className="flex items-center">
-                  <Image src="/xfi-logo.png" alt="xfi" width={15} height={15} /> XFI {totalXPrice.toFixed(2)}
-                </span>
-                -
                 <span className="flex items-center">
                   <Image src="/btc-logo.png" alt="xfi" width={15} height={15} /> BTC {totalBPrice.toFixed(4)}
                 </span>

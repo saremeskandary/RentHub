@@ -114,12 +114,18 @@ const MyRental: React.FC = () => {
                   <div className="mt-4">
                     {!showCamera[rental.productId] ? (
                       <>
-                        <button
-                          onClick={() => startCamera(rental.productId)}
-                          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-                        >
-                          AR Inspect
-                        </button>
+                        <div className="flex gap-5">
+                          <button
+                            onClick={() => startCamera(rental.productId)}
+                            className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                          >
+                            AR Inspect
+                          </button>
+
+                          <button className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600">
+                            Initiate dispute
+                          </button>
+                        </div>
                         {capturedImage[rental.productId] && (
                           <div className="mt-4">
                             <p className="font-semibold text-green-500">Image captured successfully!</p>
