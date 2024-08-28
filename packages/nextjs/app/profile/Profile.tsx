@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Settings, Wallet } from "lucide-react";
-import { useAccount } from "wagmi";
-import styles from "~~/components/profile/Profile.module.scss";
+import { Settings, Upload, Wallet } from "lucide-react";
 
 export default function Profile() {
-  const { address, isConnected } = useAccount();
-  const [userType, setUserType] = useState<string>("Renter"); // Default to 'Renter'
-  const [showPopup, setShowPopup] = useState<boolean>(false); // State for popup visibility
+  const [userType, setUserType] = useState<string>("Renter");
+  const [showPopup, setShowPopup] = useState<boolean>(false);
 
   const handleUserTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedType = event.target.value;
@@ -23,16 +19,14 @@ export default function Profile() {
   };
 
   return (
-    <section className={styles.profile}>
-      <div className={styles.profile__dropdown}>
-        <label htmlFor="userType" className={styles.profile__label}>
-          Select User Type
-        </label>
+    <section className="flex flex-[1_1_100%] flex-col items-center justify-center gap-5">
+      <div className="flex flex-col">
+        <label htmlFor="userType">Select User Type</label>
         <select
           id="userType"
           value={userType}
           onChange={handleUserTypeChange}
-          className={styles.profile__select} // Same styling for dropdown
+          className="w-[200px] rounded border bg-white px-5 py-2 text-sm outline-none"
         >
           <option value="Renter">Renter</option>
           <option value="Owner">Owner</option>
@@ -40,27 +34,40 @@ export default function Profile() {
         </select>
       </div>
 
-      <Link href="/settings" className={styles.profile__link}>
-        <Settings size={24} color="#9095a9" />
-        <span>Settings</span>
-      </Link>
+      <div className="flex gap-5">
+        <Link
+          href="/settings"
+          className="flex w-[150px] items-center justify-center gap-2 rounded bg-white px-5 py-3 font-semibold text-[#9095a9] shadow-md"
+        >
+          <Settings size={20} color="#9095a9" />
+          <span>Settings</span>
+        </Link>
 
-      <Link href="/wallet" className={styles.profile__link}>
-        <Wallet size={24} color="#9095a9" />
-        <span>Wallet</span>
-      </Link>
+        <Link
+          href="/wallet"
+          className="flex w-[150px] items-center justify-center gap-2 rounded bg-white px-5 py-3 font-semibold text-[#9095a9] shadow-md"
+        >
+          <Wallet size={20} color="#9095a9" />
+          <span>Wallet</span>
+        </Link>
+      </div>
 
-      <ConnectButton />
+      <button className="flex items-center justify-center gap-3 rounded bg-gray-400 px-5 py-2 text-white transition hover:bg-gray-500">
+        <Upload color="#fff" size={18} />
+        <span>ZK Upload ID</span>
+      </button>
 
-      {/* Popup Modal */}
       {showPopup && (
-        <div className={styles.popupOverlay}>
-          <div className={styles.popupContent}>
-            <h2 className={styles.popupTitle}>Welcome, {userType}!</h2>
-            <p className={styles.popupMessage}>You have successfully selected the {userType} role.</p>
-            <button onClick={closePopup} className={styles.popupCloseButton}>
-              Close
+        <div className="fixed inset-0 z-[999] flex h-full w-full items-center justify-center bg-black bg-opacity-50">
+          <div className="relative w-full max-w-[400px] rounded bg-white p-5 text-center">
+            <button
+              className="absolute right-2 top-0 text-2xl text-gray-500 hover:text-gray-700"
+              onClick={() => setShowPopup(false)}
+            >
+              ×
             </button>
+            <h2 className="text-lg font-bold">Welcome, {userType}!</h2>
+            <p className="text-sm text-gray-400">You have successfully selected the {userType} role.</p>
           </div>
         </div>
       )}
