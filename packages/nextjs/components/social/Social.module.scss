@@ -237,7 +237,8 @@
   }
 
   &__image {
-    text-align: center;
+    display: flex;
+    justify-content: center;
     background-color: rgba($gray, 0.2);
     margin: 0 0 10px 0;
   }

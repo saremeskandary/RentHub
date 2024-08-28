@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarClock, HandHeart, MessageSquareText, Newspaper } from "lucide-react";
+import { CalendarClock, HandHeart, MessageSquareText, Newspaper, Plus } from "lucide-react";
 import ContentFeed from "~~/components/social/ContentFeed";
 import Contribution from "~~/components/social/Contribution";
+import CreatePost from "~~/components/social/CreatePost";
 import Events from "~~/components/social/Events";
 import Forum from "~~/components/social/Forum";
 import styles from "~~/components/social/Social.module.scss";
 
 export default function SocialFi() {
   const [tab, setTab] = useState("1");
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const items = [
     {
@@ -56,13 +58,25 @@ export default function SocialFi() {
                 </button>
               ))}
             </div>
+
+            {(tab === "2" || tab === "3") && (
+              <div className="max-w-[190px] border-t pt-5 md3:border-none md4:max-w-full">
+                <CreatePost isOpen={isPopupOpen} setIsPopupOpen={setIsPopupOpen} />
+
+                <button
+                  onClick={() => setIsPopupOpen(true)}
+                  className="flex w-full items-center justify-center gap-3 rounded bg-gray-400 p-2 text-white transition hover:bg-gray-500"
+                >
+                  <Plus size={20} color="#fff" />
+                  <span>{tab === "2" ? "Add contribution" : tab === "3" ? "Create an event" : ""}</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <div className={styles.social__column}>
             {items.map(obj => (
-              <div key={obj.id}>{tab === `${obj.id}` && obj.children}
-             
-              </div>
+              <div key={obj.id}>{tab === `${obj.id}` && obj.children}</div>
             ))}
           </div>
         </div>

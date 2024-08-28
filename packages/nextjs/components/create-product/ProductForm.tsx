@@ -3,15 +3,24 @@ import styles from "./CreateProduct.module.scss";
 import { HandCoins, ImagePlus, LetterText, Plus, Text } from "lucide-react";
 
 const ProductForm: FC<{ setImage: (i: string) => void }> = ({ setImage }) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className={styles.product_create__form}>
       <form>
         <div className={styles.product_create__input}>
           <ImagePlus size={20} color="#9095a9" />
           <input
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              if (e.target.files && e.target.files[0]) setImage(e.target.files[0].name);
-            }}
+            onChange={handleFileChange}
             type="file"
             className="block w-full appearance-none text-sm outline-none"
           />
