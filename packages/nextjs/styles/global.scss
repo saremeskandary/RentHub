@@ -64,7 +64,6 @@ body.lock {
   border: 2px solid #333;
   border-radius: 50%;
   position: relative;
-  cursor: pointer;
 
   &:checked::before {
     content: "";

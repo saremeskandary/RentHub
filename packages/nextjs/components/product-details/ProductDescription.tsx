@@ -3,11 +3,10 @@
 import { FC, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import styles from "./ProductDetails.module.scss";
+import UserProfile from "./UserProfile";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CircleUserRound, ShoppingCart } from "lucide-react";
 import { useAccount, useSendTransaction } from "wagmi";
-import { useWatchBalance } from "~~/hooks/scaffold-eth";
 
 const ProductDescription: FC<
   | {
@@ -17,7 +16,8 @@ const ProductDescription: FC<
     }
   | any
 > = ({ title, text, id }) => {
-  const [showModal, setShowModal] = useState(false); // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isBooked, setIsBooked] = useState(false);
 
   const [bookingDate, setBookingDate] = useState("");
@@ -58,10 +58,17 @@ const ProductDescription: FC<
     }
   };
 
+  const [rating, setRating] = useState(3);
+  const comments = [
+    { user: "Michale", message: "Great post!" },
+    { user: "Alex", message: "Thanks for sharing!" },
+    { user: "Alice", message: "Interesting read!" },
+  ];
+
   useEffect(() => {
-    if (showModal) document.body.classList.add("lock");
+    if (showModal || isPopupOpen) document.body.classList.add("lock");
     else document.body.classList.remove("lock");
-  }, [showModal]);
+  }, [showModal, isPopupOpen]);
 
   useEffect(() => {
     // Set current date and time in the proper format
@@ -139,10 +146,11 @@ const ProductDescription: FC<
   };
 
   return (
-    <div className={styles.product_details__description}>
-      <div className={styles.product_details__title}>
-        <h2>{title}</h2>
-        <p>{text}</p>
+    <div className="flex flex-[0_1_45%] flex-col p-5">
+      <div className="mb-3">
+        <h2 className="mb-4 text-lg font-semibold leading-5">{title}</h2>
+        <p className="text-sm">{text}</p>
+
         <div className="my-4">
           <p className="flex flex-wrap gap-[6px] gap-y-0 font-semibold">
             Price: ${hourlyRate} -
@@ -168,30 +176,40 @@ const ProductDescription: FC<
         </div>
       </div>
 
-      <div className="mb-7 flex items-center gap-7 md4:flex-col md4:items-start md4:gap-0">
-        <div className="flex items-center gap-2">
-          <CircleUserRound color="#4f4f4f" />
-          <span className="text-base font-semibold">Alex Ford</span>
-        </div>
-        <div className="flex items-center">
-          {[...Array(5)].map((_, i) => (
-            <span key={i} className={`mr-[2px] text-xl text-[#ffc107] ${i > 2 ? "text-gray-300" : ""}`}>
-              ★
-            </span>
-          ))}
-          <p className="ml-1">(144)</p>
-        </div>
+      <div className="relative mb-7">
+        <UserProfile
+          comments={comments}
+          isPopupOpen={isPopupOpen}
+          setIsPopupOpen={setIsPopupOpen}
+          rating={rating}
+          setRating={setRating}
+        />
+
+        <button onClick={() => setIsPopupOpen(true)} className="flex items-center gap-7">
+          <div className="flex items-center gap-2">
+            <CircleUserRound color="#4f4f4f" />
+            <span className="text-base font-semibold">Alex Ford</span>
+          </div>
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+              <span key={i} className={`mr-[2px] text-xl text-[#ffc107] ${i > rating ? "text-gray-300" : ""}`}>
+                ★
+              </span>
+            ))}
+            <p className="ml-1">({comments.length})</p>
+          </div>
+        </button>
       </div>
 
-      <div className={styles.product_details__condition}>
-        <span>
+      <div className="mb-7 flex gap-5">
+        <span className="flex items-center gap-1 font-semibold">
           <label htmlFor="radio1">New</label>
-          <input type="radio" id="radio1" name="option" disabled />
+          <input className="cheked-input" type="radio" id="radio1" name="option" disabled />
         </span>
 
-        <span>
+        <span className="flex items-center gap-1 font-semibold">
           <label htmlFor="radio2">Used</label>
-          <input type="radio" id="radio2" name="option" disabled checked />
+          <input className="cheked-input" type="radio" id="radio2" name="option" disabled checked />
         </span>
       </div>
 
@@ -249,7 +267,11 @@ const ProductDescription: FC<
         />
       </div>
 
-      <button onClick={handleBooking} disabled={isBooked} className="!bg-green-500 hover:!bg-green-500/85">
+      <button
+        onClick={handleBooking}
+        disabled={isBooked}
+        className="mt-auto flex w-full items-center justify-center gap-3 rounded bg-green-500 px-5 py-3 text-white transition-colors hover:bg-green-600"
+      >
         <ShoppingCart size={18} color="#fff" />
         <span>{isBooked ? "Already Booked" : "Initiate rental"}</span>
       </button>
