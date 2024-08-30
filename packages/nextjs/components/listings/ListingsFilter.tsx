@@ -54,7 +54,7 @@ const ListingsFilter: FC<{
 
       <Link
         href="/listings/create"
-        className="mb-5 flex items-center justify-center gap-3 rounded bg-gray-400 py-2 text-white transition hover:bg-gray-300"
+        className="mb-5 flex items-center justify-center gap-3 rounded bg-green-500 py-2 text-white transition hover:bg-green-600"
       >
         <Plus size={20} color="#fff" />
         <span>Create a new ad</span>

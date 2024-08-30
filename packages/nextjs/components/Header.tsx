@@ -48,10 +48,10 @@ export const Header: FC = () => {
   return (
     <header className="fixed z-[999] w-full bg-white shadow-md">
       <div className="px-3">
-        <div className="flex h-[70px] items-center gap-10 md2:gap-2">
+        <div className="flex h-[70px] items-center gap-10 md2:gap-4">
           <Link href="/" className="relative z-[600] flex items-center gap-5 md2:flex-1">
-            <Image alt="SE2 logo" src="/image.png" width={40} height={40} />
-            <span className="font-bold leading-tight md4:hidden">RentHub</span>
+            <Image alt="SE2 logo" src="/logo.jpg" width={80} height={80} />
+            <span className="font-bold leading-tight md4:hidden">RNT-X</span>
           </Link>
 
           <div className="flex-1 md2:order-3 md2:flex-[0_1_30px]">

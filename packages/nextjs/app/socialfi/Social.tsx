@@ -65,7 +65,7 @@ export default function SocialFi() {
 
                 <button
                   onClick={() => setIsPopupOpen(true)}
-                  className="flex w-full items-center justify-center gap-3 rounded bg-gray-400 p-2 text-white transition hover:bg-gray-500"
+                  className="flex w-full items-center justify-center gap-3 rounded bg-green-500 p-2 text-white transition hover:bg-green-600"
                 >
                   <Plus size={20} color="#fff" />
                   <span>{tab === "2" ? "Add contribution" : tab === "3" ? "Create an event" : ""}</span>

@@ -59,11 +59,11 @@ const ProductDescription: FC<
   };
 
   const [rating, setRating] = useState(3);
-  const comments = [
+  const [comments, setComments] = useState([
     { user: "Michale", message: "Great post!" },
     { user: "Alex", message: "Thanks for sharing!" },
     { user: "Alice", message: "Interesting read!" },
-  ];
+  ]);
 
   useEffect(() => {
     if (showModal || isPopupOpen) document.body.classList.add("lock");
@@ -179,6 +179,7 @@ const ProductDescription: FC<
       <div className="relative mb-7">
         <UserProfile
           comments={comments}
+          setComments={setComments}
           isPopupOpen={isPopupOpen}
           setIsPopupOpen={setIsPopupOpen}
           rating={rating}

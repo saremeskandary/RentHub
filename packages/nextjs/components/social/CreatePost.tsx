@@ -63,7 +63,7 @@ const CreatePost: FC<{
             </button>
             <button
               type="submit"
-              className="w-full rounded-md bg-gray-400 px-4 py-2 text-white transition-colors hover:bg-gray-500"
+              className="w-full rounded-md bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
             >
               Submit
             </button>

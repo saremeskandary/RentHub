@@ -63,7 +63,7 @@ const Popup: FC<{
           />
           <button
             type="submit"
-            className="flex items-center gap-1 rounded-md bg-gray-400 px-4 py-2 text-white transition-colors hover:bg-gray-300"
+            className="flex items-center gap-1 rounded-md bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
           >
             <span className="md4:hidden">Send</span>
             <SendHorizontal color="#fff" size={18} />

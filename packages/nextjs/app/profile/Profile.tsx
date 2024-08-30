@@ -2,20 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Settings, Upload, Wallet } from "lucide-react";
+import { File, Settings, Upload, Wallet } from "lucide-react";
 
 export default function Profile() {
   const [userType, setUserType] = useState<string>("Renter");
   const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files ? event.target.files[0] : null;
+    setFile(selectedFile);
+  };
 
   const handleUserTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedType = event.target.value;
     setUserType(selectedType);
-    setShowPopup(true); // Show the popup after selection
-  };
-
-  const closePopup = () => {
-    setShowPopup(false);
+    setShowPopup(true);
   };
 
   return (
@@ -52,10 +54,22 @@ export default function Profile() {
         </Link>
       </div>
 
-      <button className="flex items-center justify-center gap-3 rounded bg-gray-400 px-5 py-2 text-white transition hover:bg-gray-500">
-        <Upload color="#fff" size={18} />
-        <span>ZK Upload ID</span>
-      </button>
+      <div>
+        <input type="file" onChange={handleFileChange} className="hidden" id="file-upload" />
+        <label
+          htmlFor="file-upload"
+          className="flex cursor-pointer items-center gap-3 rounded bg-blue-500 px-5 py-2 text-white transition hover:bg-blue-600"
+        >
+          <Upload color="#fff" size={18} />
+          <span>ZK Upload ID</span>
+        </label>
+        {file?.name && (
+          <div className="mt-1 flex items-center justify-center gap-2">
+            <File size={16} />
+            <span className="text-center text-sm font-semibold">{file.name}</span>
+          </div>
+        )}
+      </div>
 
       {showPopup && (
         <div className="fixed inset-0 z-[999] flex h-full w-full items-center justify-center bg-black bg-opacity-50">
