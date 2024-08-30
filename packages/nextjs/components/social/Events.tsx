@@ -13,7 +13,7 @@ const events = [
   {
     user: "Admin",
     img: "/social/05.png",
-    text: " We are Back in 2024! Join us for Canada Crypto Week from August 11-17, 2024, where thousands of individuals will gather for networking, education, and more. Experience tons of events conveniently located at the prestigious Futurist Conference Venue, accessible with your conference badge!",
+    text: "Join the Bitcoin Olympics Hackathon Hosted by Bitcoin Startup Lab: Unleash Innovation and Shape the Future of Bitcoin. Build, Learn, and Win !",
   },
 ];
 
